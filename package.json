@@ -16,6 +16,7 @@
     "rollup-plugin-dts": "^6.1.0"
   },
   "devDependencies": {
+    "@rollup/plugin-image": "^3.0.3",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "rollup-plugin-postcss": "^4.0.2"
   }
