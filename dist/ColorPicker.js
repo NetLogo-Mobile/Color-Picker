@@ -17,7 +17,7 @@ export default class ColorPicker {
             <div class="cp-body">
                 <div class="cp-header">
                     <div class="cp-title"> 
-                        <img src="./assets/cp-icon.svg"/>
+                        <img src="./dist/assets/cp-icon.svg"/>
                     </div> 
                 </div>
             </div>
