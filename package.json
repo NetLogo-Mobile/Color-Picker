@@ -1,9 +1,10 @@
 {
-  "name": "cp2",
+  "name": "netlogo-cp2",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/ColorPicker.js",
   "module": "./dist/ColorPicker.bundle.js",
+  "types": "./dist/ColorPicker.bundle.d.ts",
   "scripts": {
     "build": "tsc && cp -R src/assets/ dist/assets/ && rollup -c"
   },
