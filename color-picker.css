@@ -56,13 +56,15 @@
   box-sizing: border-box;
   height: calc(100% - 2.7876rem); /* 100% - height of the header */
   padding: 1.2rem 2rem 2rem 2rem; /* we can change this to lower the padding later according to David*/
+  display: flex;
+  flex-direction: row;
 }
 
 .cp-mode-btn-cont {
   display: flex;
   flex-direction: row;
   gap: 0.384rem;
-  padding-right: 10.06rem;
+  padding-bottom: 0.686rem;
 }
 
 .cp-mode-btn {
@@ -89,6 +91,7 @@
   font-size: 0.6504rem;
 }
 
+/** cp-body-btn-cont: container for the button modes of the color picker */
 .cp-body-btn-cont {
   display: flex;
   flex-direction: row;
@@ -97,6 +100,8 @@
 
 .cp-model-indicator {
   width: 10.62rem;
+  margin: auto;
+  margin-bottom: 0.686rem;
 }
 
 /* cp-body-mode: styling for inner body that changes with the mode  */
@@ -116,4 +121,104 @@
 /** cp-body-mode-result: the result portion of the color picker (right section) */
 .cp-body-mode-result {
   background-color: white;
+}
+
+/** cp-body-mode-left: styling for the left side of the body */
+.cp-body-left {
+  display: flex;
+  flex-direction: column;
+  padding-right: 1.52rem;
+}
+
+/** cp-body-mode-right: styling for the right side of the body */
+.cp-body-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.cp-color-preview {
+  width: 10.948rem;
+  height: 10.948rem;
+  background-color: white;
+  border: solid 1px #cecece;
+  border-radius: 0.2rem;
+}
+
+.cp-alpha-text {
+  font-size: 0.7rem;
+}
+
+.cp-alpha-cont {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 1.83rem;
+  background-color: white;
+  margin-top: 0.53rem;
+  border: solid 1px #C0C0C0;
+  border-radius: 0.2rem;
+}
+
+
+/* Base style for all sliders */
+input[type='range'].cp-styled-slider {
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+/* Progress support for sliders */
+input[type='range'].cp-styled-slider.slider-progress {
+  --range: calc(var(--max) - var(--min));
+  --ratio: calc((var(--value) - var(--min)) / var(--range));
+  --sx: calc(0.5 * 2em + var(--ratio) * (100% - 2em));
+}
+
+/* Thumb styles for color and alpha sliders */
+input[type='range'].cp-styled-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 0.125rem black;
+  cursor: pointer;
+}
+
+input[type='range'].cp-styled-slider.alphaSlider::-webkit-slider-thumb {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: -0.2rem;
+}
+
+/* Unified track style */
+input[type='range'].cp-styled-slider::-webkit-slider-runnable-track {
+  height: 1em;
+  border: 1px solid #b2b2b2;
+  border-radius: 0.3em;
+  background: #efefef;
+}
+
+/* Hover effect for all thumbs */
+input[type='range'].cp-styled-slider::-webkit-slider-thumb:hover {
+  background: white;
+}
+
+/* Specific style for alpha slider */
+input[type='range'].cp-styled-slider.color-alpha {
+  height: 1rem;
+  width: 8rem;
+}
+
+/* Alpha slider track color with simplified repeating background */
+input[type='range'].cp-styled-slider.color-alpha::-webkit-slider-runnable-track{
+  background: linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%),
+    linear-gradient(to right, rgba(0, 0, 0, 0) 0, #ccc 100%);
+  background-size: 0.625rem 0.625rem, 0.625rem 0.625rem, 0.625rem 0.625rem, 0.625rem 0.625rem, 100% 100%;
+  background-position: 0 0, 0 0.313rem, 0.313rem -0.313rem, -0.313rem 0rem, 0 0;
+  background-repeat: repeat, repeat, repeat, repeat, no-repeat;
 }

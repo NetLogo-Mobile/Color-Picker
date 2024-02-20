@@ -30,7 +30,7 @@ export default class ColorPicker {
             </div>
 
             <div class="cp-body">
-                <div class="cp-body-btn-cont">
+                <div class="cp-body-left">
                     <div class="cp-mode-btn-cont">
                         <button class="cp-mode-btn">
                             <img class="cp-mode-btn-img" src="${cpGrid}"/>
@@ -45,14 +45,22 @@ export default class ColorPicker {
                             <span class="cp-mode-btn-text"> Slider </span> 
                         </button>
                     </div>
+                    <div class="cp-body-mode-main"></div>
+                </div>
+                <div class="cp-body-mode-right">
                     <button class="cp-mode-btn cp-model-indicator"> 
                         <img class="cp-mode-btn-img" src="${modelIndicator}"/>
                         <span class="cp-mode-btn-text"> Model Color Selected </span>
                     </button>
-                </div>
-                <div class="cp-body-mode">
-                    <div class="cp-body-mode-main"></div>
-                    <div class="cp-body-mode-result"></div> 
+                    <div class="cp-color-preview">
+                        <svg viewBox="0 0 100 100">
+                        <path xmlns="http://www.w3.org/2000/svg" class="cp-turtlePreview" fill="orange" d="M 50.069 9.889 L 14.945 89.069 L 50.71 65.458 L 86.458 89.73 L 50.069 9.889 Z"/>
+                        </svg>
+                    </div>
+                    <div class="cp-alpha-cont">
+                        <span class="cp-alpha-text"> Alpha </span>
+                        <input type="range" min="0" max="255" class="cp-styled-slider alphaSlider color-alpha slider-progress cp-alphaSlider"">
+                    </div>
                 </div>
             </div>
         </div>
