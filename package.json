@@ -1,7 +1,7 @@
 {
-  "name": "netlogo-cp2",
-  "version": "1.2.2",
-  "description": "",
+  "name": "@netlogo/netlogo-color-picker",
+  "version": "1.8.4",
+  "description": "Color Picker for NetLogo Web",
   "main": "./dist/ColorPicker.bundle.js",
   "module": "./dist/ColorPicker.bundle.js",
   "types": "./dist/ColorPicker.bundle.d.ts",
