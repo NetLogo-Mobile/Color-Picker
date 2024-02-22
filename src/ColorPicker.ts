@@ -5,29 +5,50 @@ import cpGrid from './assets/cp-grid.svg';
 import cpWheel from './assets/cp-wheel.svg';
 import cpSlider from './assets/cp-slider.svg';
 import modelIndicator from './assets/cp-model-indicator.svg';
+import { rgbToNetlogo } from './helpers/colors';
 
 export default class ColorPicker {
-    // currentColor: The current color of the color picker
-    private currentColor: number[];
-    //currentMode: The current mode of the color picker. One of 'grid', 'wheel', 'slider'
-    private currentMode: string; 
+    private state : {
+        currentColor: number[],
+        currentMode: string,
+        changeModelColor: boolean // a flag to indicate if we are changing the model color or the background color
+    }
     //parent: the parent element of the ColorPicker
     private parent: HTMLElement;
+    // onColorSelect: a callback function that is called when a color is selected
+    private onColorSelect: (color: number[]) => void;
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
-    constructor(parent: HTMLElement, initColor: number[]) {
-        this.currentColor = initColor;
-        this.currentMode = 'grid'
+    constructor(parent: HTMLElement, initColor: number[], onColorSelect: (color: any) => void) {
+        this.state = {
+            currentColor: initColor,
+            currentMode: 'grid',
+            changeModelColor: true
+        }
         this.parent = parent;
+        this.onColorSelect = onColorSelect;
         this.init();
+    }
+
+    /** setState: used to change the state of the color picker and call all update functions */
+    private setState(newState: Partial<typeof this.state>) {
+        this.state = { ...this.state, ...newState };
+        this.updateColorParameters();
     }
 
     /** init: initializes the ColorPicker */
     private init() {
         this.toDOM();
+        this.updateColorParameters();
     }
 
+    /** updateColorParameters: updates the displayed color parameters to reflect the current Color */
+    private updateColorParameters() {
+        let colorParamDisplay = document.querySelectorAll('.cp-values-display');
+        colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
+        colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
+    }
     /** toDOM: creates and attaches the ColorPicker body to parent */
-    public toDOM() {
+    private toDOM() {
         const cpBody = `
         <div class="cp">
             <div class="cp-header">
@@ -69,6 +90,11 @@ export default class ColorPicker {
                     <div class="cp-alpha-cont">
                         <span class="cp-alpha-text"> Alpha </span>
                         <input type="range" min="0" max="255" class="cp-styled-slider alphaSlider color-alpha slider-progress cp-alphaSlider"">
+                    </div>
+                    <div class="cp-values-display-cont">
+                        <span class="cp-color-param-txt"> Color Parameters </span>
+                        <div class="cp-values-display"></div>
+                        <div class="cp-values-display"></div>
                     </div>
                 </div>
             </div>

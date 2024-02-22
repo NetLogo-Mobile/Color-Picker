@@ -160,6 +160,7 @@
   border: solid 1px #C0C0C0;
   border-radius: 0.2rem;
   gap: 0.5rem;
+
 }
 
 
@@ -222,4 +223,25 @@ input[type='range'].cp-styled-slider.color-alpha::-webkit-slider-runnable-track{
   background-size: 0.625rem 0.625rem, 0.625rem 0.625rem, 0.625rem 0.625rem, 0.625rem 0.625rem, 100% 100%;
   background-position: 0 0, 0 0.313rem, 0.313rem -0.313rem, -0.313rem 0rem, 0 0;
   background-repeat: repeat, repeat, repeat, repeat, no-repeat;
+}
+.cp-color-param-txt {
+  font-weight: bold;
+  font-size: 0.7504rem;
+}
+
+.cp-values-display {
+  display: flex;
+  flex-direction: row;
+  background-color: white;
+  height: 1.7rem;
+  width: 100%;
+  border: 1px solid #c0c0c0;
+  border-radius: 0.1.5rem;
+}
+
+.cp-values-display-cont {
+  margin-top: 0.53rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.53rem;
 }

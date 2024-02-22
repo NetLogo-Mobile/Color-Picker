@@ -5,17 +5,34 @@ import cpGrid from './assets/cp-grid.svg';
 import cpWheel from './assets/cp-wheel.svg';
 import cpSlider from './assets/cp-slider.svg';
 import modelIndicator from './assets/cp-model-indicator.svg';
+import { rgbToNetlogo } from './helpers/colors';
 export default class ColorPicker {
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
-    constructor(parent, initColor) {
-        this.currentColor = initColor;
-        this.currentMode = 'grid';
+    constructor(parent, initColor, onColorSelect) {
+        this.state = {
+            currentColor: initColor,
+            currentMode: 'grid',
+            changeModelColor: true
+        };
         this.parent = parent;
+        this.onColorSelect = onColorSelect;
         this.init();
+    }
+    /** setState: used to change the state of the color picker and call all update functions */
+    setState(newState) {
+        this.state = Object.assign(Object.assign({}, this.state), newState);
+        this.updateColorParameters();
     }
     /** init: initializes the ColorPicker */
     init() {
         this.toDOM();
+        this.updateColorParameters();
+    }
+    /** updateColorParameters: updates the displayed color parameters to reflect the current Color */
+    updateColorParameters() {
+        let colorParamDisplay = document.querySelectorAll('.cp-values-display');
+        colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
+        colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
     }
     /** toDOM: creates and attaches the ColorPicker body to parent */
     toDOM() {
@@ -60,6 +77,11 @@ export default class ColorPicker {
                     <div class="cp-alpha-cont">
                         <span class="cp-alpha-text"> Alpha </span>
                         <input type="range" min="0" max="255" class="cp-styled-slider alphaSlider color-alpha slider-progress cp-alphaSlider"">
+                    </div>
+                    <div class="cp-values-display-cont">
+                        <span class="cp-color-param-txt"> Color Parameters </span>
+                        <div class="cp-values-display"></div>
+                        <div class="cp-values-display"></div>
                     </div>
                 </div>
             </div>
