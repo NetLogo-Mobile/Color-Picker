@@ -116,6 +116,8 @@
   height: 19.59rem;
   border: solid 1.5px #cecece;
   border-radius: 0.4rem;
+  display: flex;
+  flex-direction: column;
 }
 
 /** cp-body-mode-result: the result portion of the color picker (right section) */
@@ -244,4 +246,18 @@ input[type='range'].cp-styled-slider.color-alpha::-webkit-slider-runnable-track{
   display: flex;
   flex-direction: column;
   gap: 0.53rem;
+}
+
+/** grid stylings */
+.cp-grid-cont {
+  width: 20rem;
+  height: 14.01rem;
+  border: 1px solid #c0c0c0;
+  overflow: hidden;
+  margin: auto;
+  border-radius: 0.5rem;
+}
+
+.cp-grid-cell {
+  cursor: pointer;
 }
