@@ -1,10 +1,10 @@
 {
-  "name": "netlogo-cp2",
-  "version": "1.1.1",
-  "description": "",
-  "main": "./dist/ColorPicker.js",
-  "module": "./dist/ColorPicker.bundle.js",
-  "types": "./dist/ColorPicker.bundle.d.ts",
+  "name": "@netlogo/netlogo-color-picker",
+  "version": "1.8.2",
+  "description": "Color Picker for NetLogo Web",
+  "main": "dist/ColorPicker.bundle.js",
+  "module": "dist/ColorPicker.bundle.js",
+  "types": "./dist/ColorPicker.d.ts",
   "scripts": {
     "build": "tsc && cp -R src/assets/ dist/assets/ && rollup -c"
   },
