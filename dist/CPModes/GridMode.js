@@ -22,7 +22,6 @@ export class GridMode extends ColorMode {
             // generate the row
             for (let i = 0; i < colorsPerRow; i++) {
                 let number = j * 10 + i * this.increment;
-                console.log(number);
                 if (i == colorsPerRow - 1) {
                     number -= 0.1;
                 }
