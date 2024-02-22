@@ -7,6 +7,7 @@ export class WheelMode extends ColorMode {
 
     constructor(currentColor: number[], parent: HTMLElement, setState: (newState: Partial<ColorPickerState>) => void){
         super(currentColor, parent, setState);
+        this.parent.replaceChildren();
         this.toDOM();
     }
 

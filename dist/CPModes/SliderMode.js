@@ -4,6 +4,7 @@ export class SliderMode extends ColorMode {
     /** increment: the increment in which cells in the grid are made */
     constructor(currentColor, parent, setState) {
         super(currentColor, parent, setState);
+        this.parent.replaceChildren();
         this.toDOM();
     }
     /** toDOM: creates the body of the Grid */
