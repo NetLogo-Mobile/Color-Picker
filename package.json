@@ -1,6 +1,6 @@
 {
   "name": "netlogo-cp2",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "",
   "main": "./dist/ColorPicker.js",
   "module": "./dist/ColorPicker.bundle.js",
