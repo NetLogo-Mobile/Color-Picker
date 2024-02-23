@@ -15,6 +15,8 @@ declare class ColorPicker {
     private init;
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color */
     private updateColorParameters;
+    /** updateModelDisplay: updates the color of the model/background  */
+    private updateModelDisplay;
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
     private attachEventListeners;
     /** toDOM: creates and attaches the ColorPicker body to parent */

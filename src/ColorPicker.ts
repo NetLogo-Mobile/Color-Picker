@@ -36,6 +36,7 @@ export default class ColorPicker {
     private setState(newState: Partial<typeof this.state>) {
         this.state = { ...this.state, ...newState };
         this.updateColorParameters();
+        this.updateModelDisplay();
     }
 
     /** init: initializes the ColorPicker */
@@ -52,24 +53,22 @@ export default class ColorPicker {
         colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
     }
 
+    /** updateModelDisplay: updates the color of the model/background  */
+    private updateModelDisplay() {
+        if(this.state.changeModelColor) document.querySelector('.cp-model-preview')?.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3] / 255})`);
+        else document.querySelector('.cp-model-background')?.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, 1)`);
+    }
+
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
     private attachEventListeners() {
         /** changeButtonColor: Helper function to toggle button color */
         function changeButtonColor(button: HTMLElement, isPressed: boolean): void {
-            if (isPressed) {
-                button.style.backgroundColor = '#5A648D';
-                button.style.color = 'white';
-                let image = button.querySelector('.cp-mode-btn-img') as HTMLElement;
-                if (image != null) {
-                    image.style.filter = 'invert(100%)';
-                }
-            } else {
-                button.style.backgroundColor = '#E5E5E5';
-                button.style.color = 'black';
-                let image = button.querySelector('.cp-mode-btn-img') as HTMLElement;
-                if (image != null) {
-                    image.style.filter = 'invert(0%)';
-                }
+            // Set styles based on isPressed
+            button.style.backgroundColor = isPressed ? '#5A648D' : '#E5E5E5';
+            button.style.color = isPressed ? 'white' : 'black';
+            let image = button.querySelector('.cp-mode-btn-img') as HTMLElement;
+            if (image) {
+                image.style.filter = `invert(${isPressed ? '100%' : '0%'})`;
             }
         }
 
@@ -99,7 +98,17 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[1] as HTMLElement, false);
             new SliderMode(this.state.currentColor, document.querySelector('.cp-body-mode-main') as HTMLElement, this.setState.bind(this));
         });
+
+        // attach event listener to model indicator button
+        let modelIndicatorButton = document.querySelector('.cp-model-indicator');
+        modelIndicatorButton?.addEventListener('click', () => {
+            this.setState({ changeModelColor: !this.state.changeModelColor });
+            modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? ' Model Color Selected ' : ' Background Color Selected ';
+            changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);
+        });
     }
+
+
     /** toDOM: creates and attaches the ColorPicker body to parent */
     private toDOM() {
         const cpBody = `
@@ -137,7 +146,8 @@ export default class ColorPicker {
                     </button>
                     <div class="cp-color-preview">
                         <svg viewBox="0 0 100 100">
-                        <path xmlns="http://www.w3.org/2000/svg" class="cp-turtlePreview" fill="orange" d="M 50.069 9.889 L 14.945 89.069 L 50.71 65.458 L 86.458 89.73 L 50.069 9.889 Z"/>
+                            <rect x="0" y="0" width="100" height="100" fill="white" class="cp-model-background"/>
+                            <path xmlns="http://www.w3.org/2000/svg" class="cp-model-preview" fill="white" d="M 50.069 9.889 L 14.945 89.069 L 50.71 65.458 L 86.458 89.73 L 50.069 9.889 Z"/>
                         </svg>
                     </div>
                     <div class="cp-alpha-cont">
