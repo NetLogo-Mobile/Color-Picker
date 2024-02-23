@@ -118,6 +118,8 @@
   border-radius: 0.4rem;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  gap: 0.97rem;
 }
 
 /** cp-body-mode-result: the result portion of the color picker (right section) */
@@ -164,7 +166,6 @@
   gap: 0.5rem;
 
 }
-
 
 /* Base style for all sliders */
 input[type='range'].cp-styled-slider {
@@ -254,10 +255,49 @@ input[type='range'].cp-styled-slider.color-alpha::-webkit-slider-runnable-track{
   height: 14.01rem;
   border: 1px solid #c0c0c0;
   overflow: hidden;
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
   border-radius: 0.5rem;
 }
 
 .cp-grid-cell {
   cursor: pointer;
+}
+
+.cp-increment-cont {
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: row;
+  border: 2px solid #C0C0C0;
+  border-radius: 0.3rem;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.cp-grid-btn-cont {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.483rem;
+}
+
+.cp-numbers-btn {
+  all: unset;
+  height: 0.8rem;
+  width: 0.8rem;
+  border-radius: 0.1rem;
+  border: 1px solid #CECECE;
+}
+
+.cp-increment-label {
+  font-size: 0.6504rem;
+}
+
+.cp-btn-label-cont {
+  display: flex;
+  flex-direction: row;
+  gap: 0.2rem;
+  justify-content: center;
+  align-items: center;
 }

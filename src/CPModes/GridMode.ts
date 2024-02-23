@@ -91,9 +91,52 @@ export class GridMode extends ColorMode {
     }
     /** toDOM: creates the body of the Grid */
     public toDOM() : void {
-        let gridContainer = document.createElement('div');
-        gridContainer.classList.add('cp-grid-cont');
-        gridContainer.appendChild(this.createGrid());
-        this.parent.appendChild(gridContainer);
-    }
+      let gridContainer = document.createElement('div');
+      gridContainer.classList.add('cp-grid-cont');
+      gridContainer.appendChild(this.createGrid());
+      this.parent.appendChild(gridContainer);
+  
+      // create the container for grid buttons
+      let gridBtnCont = document.createElement('div');
+      gridBtnCont.classList.add('cp-grid-btn-cont');
+  
+      // Container for increment buttons
+      let incrementBtnCont = document.createElement('div');
+      incrementBtnCont.classList.add('cp-increment-cont');
+  
+      // Container for numbers button
+      let numbersBtnCont = document.createElement('div');
+      numbersBtnCont.classList.add('cp-increment-cont');
+  
+      // create numbers button
+      let numbersBtn = document.createElement('button');
+      numbersBtn.classList.add('cp-numbers-btn');
+      let numbersLabel = document.createElement('span');
+      numbersLabel.textContent = "Numbers";
+      numbersLabel.classList.add('cp-increment-label');
+      numbersBtnCont.appendChild(numbersBtn);
+      numbersBtnCont.appendChild(numbersLabel);
+      const increments = ["1", "0.5", "0.1"]; // Array of increment values
+      increments.forEach((inc) => {
+          let btnLabelCont = document.createElement('div');
+          btnLabelCont.classList.add('cp-btn-label-cont');
+          let btn = document.createElement('button');
+          btn.classList.add('cp-numbers-btn');
+          let label = document.createElement('span');
+          label.textContent = inc; 
+          label.classList.add('cp-increment-label');
+          btnLabelCont.appendChild(btn);
+          btnLabelCont.appendChild(label);
+          incrementBtnCont.appendChild(btnLabelCont);
+      });
+      let incrementLabel = document.createElement('span');
+      incrementLabel.textContent = "Increment";
+      incrementLabel.classList.add('cp-increment-label');
+      incrementBtnCont.appendChild(incrementLabel);
+
+      gridBtnCont.appendChild(numbersBtnCont);
+      gridBtnCont.appendChild(incrementBtnCont);
+      this.parent.appendChild(gridBtnCont);
+  }
+  
 }
