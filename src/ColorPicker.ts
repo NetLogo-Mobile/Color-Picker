@@ -44,6 +44,7 @@ export default class ColorPicker {
         this.toDOM();
         this.updateColorParameters();
         this.attachEventListeners();
+        this.initAlphaSlider();
         // click the grid button to start
         document.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
@@ -90,7 +91,6 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[1] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
-            console.log(this.state);
             new WheelMode(document.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
         modeButtons[2].addEventListener('click', () => {
@@ -118,6 +118,14 @@ export default class ColorPicker {
         });
     }
 
+    /** initAlphaSlider: initializes the alpha slider */
+    private initAlphaSlider() {
+        let alphaSlider = document.querySelector('.cp-alpha-slider') as HTMLInputElement;
+        console.log(alphaSlider);
+        alphaSlider.addEventListener('input', () => {
+            this.setState({ currentColor: [this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], parseInt(alphaSlider.value)] });
+        });
+    }
 
     /** toDOM: creates and attaches the ColorPicker body to parent */
     private toDOM() {
@@ -162,7 +170,7 @@ export default class ColorPicker {
                     </div>
                     <div class="cp-alpha-cont">
                         <span class="cp-alpha-text"> Alpha </span>
-                        <input type="range" min="0" max="255" class="cp-styled-slider alphaSlider color-alpha slider-progress cp-alphaSlider"">
+                        <input type="range" min="0" max="255" value="${this.state.currentColor[3]}" class="cp-styled-slider cp-alpha-slider color-alpha slider-progress">
                     </div>
                     <div class="cp-values-display-cont">
                         <span class="cp-color-param-txt"> Color Parameters </span>

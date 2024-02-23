@@ -34,6 +34,7 @@ export default class ColorPicker {
         this.toDOM();
         this.updateColorParameters();
         this.attachEventListeners();
+        this.initAlphaSlider();
         // click the grid button to start
         document.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
@@ -79,7 +80,6 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[1], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[2], false);
-            console.log(this.state);
             new WheelMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
         modeButtons[2].addEventListener('click', () => {
@@ -102,6 +102,14 @@ export default class ColorPicker {
         closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => {
             this.parent.replaceChildren();
             this.onColorSelect(this.state.currentColor);
+        });
+    }
+    /** initAlphaSlider: initializes the alpha slider */
+    initAlphaSlider() {
+        let alphaSlider = document.querySelector('.cp-alpha-slider');
+        console.log(alphaSlider);
+        alphaSlider.addEventListener('input', () => {
+            this.setState({ currentColor: [this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], parseInt(alphaSlider.value)] });
         });
     }
     /** toDOM: creates and attaches the ColorPicker body to parent */
@@ -147,7 +155,7 @@ export default class ColorPicker {
                     </div>
                     <div class="cp-alpha-cont">
                         <span class="cp-alpha-text"> Alpha </span>
-                        <input type="range" min="0" max="255" class="cp-styled-slider alphaSlider color-alpha slider-progress cp-alphaSlider"">
+                        <input type="range" min="0" max="255" value="${this.state.currentColor[3]}" class="cp-styled-slider cp-alpha-slider color-alpha slider-progress">
                     </div>
                     <div class="cp-values-display-cont">
                         <span class="cp-color-param-txt"> Color Parameters </span>

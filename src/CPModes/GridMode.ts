@@ -8,12 +8,11 @@ export class GridMode extends ColorMode {
     private colorArray: number[] = [];
     /** textElements: Array of SVGTextElements that are the "numbers" of each cell in the grid. */
     private textElements: SVGTextElement[] = [];
-
     constructor(parent: HTMLElement, state: ColorPickerState, setState: (newState: Partial<ColorPickerState>) => void){
         super(parent, state, setState);
         this.init();
     }
-
+    /** createGrid: creates the grid of colors */
     public createGrid() : SVGSVGElement {
         function hover(e: Event) {
           if (e.target instanceof SVGRectElement) {
@@ -170,7 +169,6 @@ export class GridMode extends ColorMode {
       btn.classList.toggle('cp-numbers-clicked', isSelected);
     };
   }
-
 
   /** attachEventListeners: Attaches the event listeners to the GridMode body */
   private attachEventListeners() {

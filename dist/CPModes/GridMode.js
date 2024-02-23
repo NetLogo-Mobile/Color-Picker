@@ -10,6 +10,7 @@ export class GridMode extends ColorMode {
         this.textElements = [];
         this.init();
     }
+    /** createGrid: creates the grid of colors */
     createGrid() {
         function hover(e) {
             if (e.target instanceof SVGRectElement) {
