@@ -2,13 +2,13 @@ import { netlogoColorToHex, netlogoColorToRGBA } from "../helpers/colors";
 import { ColorMode } from "./ColorMode";
 /** GridMode: A mode for the ColorPicker that shows a grid of colors */
 export class GridMode extends ColorMode {
-    constructor(currentColor, parent, setState) {
-        super(currentColor, parent, setState);
+    constructor(parent, state, setState) {
+        super(parent, state, setState);
         /** colorArray: an array of netlogo colors in the grid */
         this.colorArray = [];
-        this.increment = 1;
-        this.parent.replaceChildren();
-        this.toDOM();
+        /** textElements: Array of SVGTextElements that are the "numbers" of each cell in the grid. */
+        this.textElements = [];
+        this.init();
     }
     createGrid() {
         function hover(e) {
@@ -50,13 +50,14 @@ export class GridMode extends ColorMode {
         svg.setAttribute('viewBox', '0 0 20 14.01');
         // create the cells 
         let numRows = 14;
-        let colorsPerRow = 10 / this.increment + 1;
+        let colorsPerRow = 10 / this.state.increment + 1;
         let cellWidth = 20 / colorsPerRow;
         let cellHeight = 14.01 / numRows;
+        let textFontSize = this.state.increment == 1 ? 0.6 : 0.4;
         for (let j = 0; j < numRows; j++) {
             // generate the row
             for (let i = 0; i < colorsPerRow; i++) {
-                let number = j * 10 + i * this.increment;
+                let number = j * 10 + i * this.state.increment;
                 if (i == colorsPerRow - 1) {
                     number -= 0.1;
                 }
@@ -73,12 +74,30 @@ export class GridMode extends ColorMode {
                 rect.addEventListener('mouseout', hoverOut);
                 rect.addEventListener('click', handleChangeColor.bind(this));
                 svg.appendChild(rect);
+                // Create and append text element for each rect
+                if (this.state.increment > 0.1) {
+                    let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', `${cellWidth * i + cellWidth / 2}`);
+                    text.setAttribute('y', `${cellHeight * j + cellHeight / 2}`);
+                    if (i < (colorsPerRow + 1) / 3) {
+                        text.setAttribute('fill', 'white');
+                    }
+                    text.setAttribute('dominant-baseline', 'middle');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.classList.add('cp-grid-text');
+                    text.textContent = `${number}`;
+                    text.setAttribute('visibility', this.state.showNumbers ? 'visible' : 'hidden');
+                    text.setAttribute('font-size', textFontSize.toString());
+                    this.textElements.push(text); // pushed to the list to allow toggling visibility 
+                    svg.appendChild(text);
+                }
             }
         }
         return svg;
     }
     /** toDOM: creates the body of the Grid */
     toDOM() {
+        this.parent.replaceChildren();
         let gridContainer = document.createElement('div');
         gridContainer.classList.add('cp-grid-cont');
         gridContainer.appendChild(this.createGrid());
@@ -105,6 +124,7 @@ export class GridMode extends ColorMode {
             let btnLabelCont = document.createElement('div');
             btnLabelCont.classList.add('cp-btn-label-cont');
             let btn = document.createElement('button');
+            btn.setAttribute('data-increment', inc);
             btn.classList.add('cp-numbers-btn');
             let label = document.createElement('span');
             label.textContent = inc;
@@ -120,5 +140,50 @@ export class GridMode extends ColorMode {
         gridBtnCont.appendChild(numbersBtnCont);
         gridBtnCont.appendChild(incrementBtnCont);
         this.parent.appendChild(gridBtnCont);
+    }
+    /** updateIncrementApperance: updates the increment button apperance based on which increment is on */
+    updateIncrementAppearance() {
+        var _a;
+        const incrementBtns = document.querySelectorAll('.cp-numbers-btn');
+        incrementBtns[0].classList.toggle('cp-numbers-clicked', this.state.showNumbers);
+        for (let i = 1; i < incrementBtns.length; i++) {
+            const btn = incrementBtns[i];
+            // Retrieve the data-increment value
+            const incrementValue = parseFloat((_a = btn.getAttribute('data-increment')) !== null && _a !== void 0 ? _a : "0");
+            const isSelected = incrementValue === this.state.increment;
+            btn.classList.toggle('cp-numbers-clicked', isSelected);
+        }
+        ;
+    }
+    /** attachEventListeners: Attaches the event listeners to the GridMode body */
+    attachEventListeners() {
+        const gridBtns = document.querySelectorAll('.cp-numbers-btn');
+        // event listener of the numbers button 
+        gridBtns[0].addEventListener('click', () => {
+            this.setState({ showNumbers: !this.state.showNumbers });
+            this.state.showNumbers = !this.state.showNumbers;
+            this.toggleTextVisibility();
+            this.updateIncrementAppearance();
+        });
+        // the increment buttons 
+        for (let i = 1; i < gridBtns.length; i++) {
+            gridBtns[i].addEventListener('click', () => {
+                var _a;
+                let increment = parseFloat((_a = gridBtns[i].getAttribute('data-increment')) !== null && _a !== void 0 ? _a : "0");
+                this.setState({ increment: increment });
+                this.state.increment = increment; // weird bug, did we create a copy of the state?
+                this.init();
+            });
+        }
+    }
+    /** toggleTextVisibility: toggles the text visibility based on state of numbers */
+    toggleTextVisibility() {
+        this.state.showNumbers ? this.textElements.forEach((text) => text.setAttribute('visibility', 'visible')) : this.textElements.forEach((text) => text.setAttribute('visibility', 'hidden'));
+    }
+    /** init: initializes a grid mode  */
+    init() {
+        this.toDOM();
+        this.updateIncrementAppearance();
+        this.attachEventListeners();
     }
 }

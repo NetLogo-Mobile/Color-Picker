@@ -15,7 +15,9 @@ export default class ColorPicker {
         this.state = {
             currentColor: initColor,
             currentMode: 'grid',
-            changeModelColor: true
+            changeModelColor: true,
+            increment: 1,
+            showNumbers: false
         };
         this.parent = parent;
         this.onColorSelect = onColorSelect;
@@ -32,6 +34,8 @@ export default class ColorPicker {
         this.toDOM();
         this.updateColorParameters();
         this.attachEventListeners();
+        // click the grid button to start
+        document.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color */
     updateColorParameters() {
@@ -67,7 +71,7 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[0], true);
             changeButtonColor(modeButtons[1], false);
             changeButtonColor(modeButtons[2], false);
-            new GridMode(this.state.currentColor, document.querySelector('.cp-body-mode-main'), this.setState.bind(this));
+            new GridMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
         modeButtons[1].addEventListener('click', () => {
             // wheel button
@@ -75,7 +79,8 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[1], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[2], false);
-            new WheelMode(this.state.currentColor, document.querySelector('.cp-body-mode-main'), this.setState.bind(this));
+            console.log(this.state);
+            new WheelMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
         modeButtons[2].addEventListener('click', () => {
             // slider button
@@ -83,7 +88,7 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[2], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[1], false);
-            new SliderMode(this.state.currentColor, document.querySelector('.cp-body-mode-main'), this.setState.bind(this));
+            new SliderMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
         // attach event listener to model indicator button
         let modelIndicatorButton = document.querySelector('.cp-model-indicator');
@@ -91,6 +96,12 @@ export default class ColorPicker {
             this.setState({ changeModelColor: !this.state.changeModelColor });
             modelIndicatorButton.querySelector('.cp-mode-btn-text').innerHTML = this.state.changeModelColor ? ' Model Color Selected ' : ' Background Color Selected ';
             changeButtonColor(modelIndicatorButton, !this.state.changeModelColor);
+        });
+        //attach event listener to close button
+        const closeButton = document.querySelector('.cp-close');
+        closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => {
+            this.parent.replaceChildren();
+            this.onColorSelect(this.state.currentColor);
         });
     }
     /** toDOM: creates and attaches the ColorPicker body to parent */

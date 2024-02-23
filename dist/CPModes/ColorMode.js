@@ -1,8 +1,8 @@
 /** ColorMode: Base class for each of the ColorPicker Modes */
 class ColorMode {
-    constructor(currentColor, parent, setState) {
-        this.currentColor = currentColor;
+    constructor(parent, state, setState) {
         this.parent = parent;
+        this.state = state;
         this.setState = setState;
     }
     /** toDOM: A mode of the colorPicker will change the body of the color picker*/

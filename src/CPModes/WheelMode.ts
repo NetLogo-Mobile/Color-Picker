@@ -5,8 +5,8 @@ import { ColorPickerState } from "./ColorMode";
 export class WheelMode extends ColorMode {
     /** increment: the increment in which cells in the grid are made */
 
-    constructor(currentColor: number[], parent: HTMLElement, setState: (newState: Partial<ColorPickerState>) => void){
-        super(currentColor, parent, setState);
+    constructor(parent: HTMLElement, state: ColorPickerState, setState: (newState: Partial<ColorPickerState>) => void){
+        super(parent, state, setState);
         this.parent.replaceChildren();
         this.toDOM();
     }

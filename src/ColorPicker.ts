@@ -9,13 +9,11 @@ import { rgbToNetlogo } from './helpers/colors';
 import { GridMode } from './CPModes/GridMode';
 import { WheelMode } from './CPModes/WheelMode';
 import { SliderMode } from './CPModes/SliderMode';
+import { ColorPickerState } from './CPModes/ColorMode';
 
 export default class ColorPicker {
-    private state : {
-        currentColor: number[],
-        currentMode: string,
-        changeModelColor: boolean // a flag to indicate if we are changing the model color or the background color
-    }
+    // state: the state of the ColorPicker
+    private state: ColorPickerState;
     //parent: the parent element of the ColorPicker
     private parent: HTMLElement;
     // onColorSelect: a callback function that is called when a color is selected
@@ -25,7 +23,9 @@ export default class ColorPicker {
         this.state = {
             currentColor: initColor,
             currentMode: 'grid',
-            changeModelColor: true
+            changeModelColor: true,
+            increment : 1,
+            showNumbers: false
         }
         this.parent = parent;
         this.onColorSelect = onColorSelect;
@@ -44,6 +44,8 @@ export default class ColorPicker {
         this.toDOM();
         this.updateColorParameters();
         this.attachEventListeners();
+        // click the grid button to start
+        document.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
 
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color */
@@ -80,7 +82,7 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[0] as HTMLElement, true);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
-            new GridMode(this.state.currentColor, document.querySelector('.cp-body-mode-main') as HTMLElement, this.setState.bind(this));
+            new GridMode(document.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
         modeButtons[1].addEventListener('click', () => {
             // wheel button
@@ -88,7 +90,8 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[1] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
-            new WheelMode(this.state.currentColor, document.querySelector('.cp-body-mode-main') as HTMLElement, this.setState.bind(this));
+            console.log(this.state);
+            new WheelMode(document.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
         modeButtons[2].addEventListener('click', () => {
             // slider button
@@ -96,7 +99,7 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[2] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
-            new SliderMode(this.state.currentColor, document.querySelector('.cp-body-mode-main') as HTMLElement, this.setState.bind(this));
+            new SliderMode(document.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
 
         // attach event listener to model indicator button
@@ -105,6 +108,13 @@ export default class ColorPicker {
             this.setState({ changeModelColor: !this.state.changeModelColor });
             modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? ' Model Color Selected ' : ' Background Color Selected ';
             changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);
+        });
+
+        //attach event listener to close button
+        const closeButton = document.querySelector('.cp-close');
+        closeButton?.addEventListener('click', () => {
+            this.parent.replaceChildren();
+            this.onColorSelect(this.state.currentColor);
         });
     }
 
