@@ -111,11 +111,15 @@ export class GridMode extends ColorMode {
       let gridContainer = document.createElement('div');
       gridContainer.classList.add('cp-grid-cont');
       gridContainer.appendChild(this.createGrid());
-      this.parent.appendChild(gridContainer);
+      let spaceContainer = document.createElement('div');
+      spaceContainer.classList.add("cp-space-container");
   
       // create the container for grid buttons
       let gridBtnCont = document.createElement('div');
       gridBtnCont.classList.add('cp-grid-btn-cont');
+
+      spaceContainer.appendChild(gridContainer);
+      this.parent.appendChild(spaceContainer);
   
       // Container for increment buttons
       let incrementBtnCont = document.createElement('div');
@@ -154,7 +158,7 @@ export class GridMode extends ColorMode {
 
       gridBtnCont.appendChild(numbersBtnCont);
       gridBtnCont.appendChild(incrementBtnCont);
-      this.parent.appendChild(gridBtnCont);
+      spaceContainer.appendChild(gridBtnCont);
   }
 
   /** updateIncrementApperance: updates the increment button apperance based on which increment is on */
