@@ -317,3 +317,16 @@ input[type='range'].cp-styled-slider.color-alpha::-webkit-slider-runnable-track{
   pointer-events: none;
 }
 
+.cp-hello {
+  background-color: red;
+}
+
+.cp-wheel-cont {
+  width: 20rem;
+  height: 14.01rem;
+  overflow: hidden;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 0.5rem;
+  user-select: none;
+}
