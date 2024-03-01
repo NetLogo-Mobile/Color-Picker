@@ -131,6 +131,16 @@ export class WheelMode extends ColorMode {
     /** setThumbs: creates the thumbs and sets them in the right spot  */
     setThumbs() {
         let innerThumb = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        let innerThumbCor = [30, 30];
+        innerThumb.setAttribute('cx', `${innerThumbCor[0]}`);
+        innerThumb.setAttribute('cy', `${innerThumbCor[1]}`);
+        innerThumb.setAttribute('r', '2');
+        innerThumb.setAttribute('fill', 'black');
+        innerThumb.setAttribute('stroke', 'white');
+        innerThumb.setAttribute('stroke-width', '1.2');
+        innerThumb.setAttribute('class', 'cp-thumb');
+        const svg = document.querySelector('.cp-wheel-svg');
+        svg.appendChild(innerThumb);
     }
     /** outerWheelSetup(): sets up the color of the outer wheel */
     outerWheelSetup() {
@@ -200,5 +210,6 @@ export class WheelMode extends ColorMode {
         this.toDOM();
         this.updateIncrementAppearance();
         this.attachEventListeners();
+        this.setThumbs();
     }
 }
