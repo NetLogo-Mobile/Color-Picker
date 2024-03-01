@@ -47,6 +47,7 @@ export class GridMode extends ColorMode {
             let newColor = netlogoColorToRGBA(this.colorArray[colorIndex]);
             // Use setState to update the currentColor in the component's state
             this.setState({ currentColor: newColor });
+            console.log("clicked");
           }
         }
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -117,7 +118,7 @@ export class GridMode extends ColorMode {
       let incrementBtns = `
       <div class="cp-grid-btn-cont"><div class="cp-increment-cont"><button class="cp-numbers-btn"></button><span class="cp-increment-label">Numbers</span></div><div class="cp-increment-cont"><div class="cp-btn-label-cont"><button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button><span class="cp-increment-label">1</span></div><div class="cp-btn-label-cont"><button data-increment="0.5" class="cp-numbers-btn"></button><span class="cp-increment-label">0.5</span></div><div class="cp-btn-label-cont"><button data-increment="0.1" class="cp-numbers-btn"></button><span class="cp-increment-label">0.1</span></div><span class="cp-increment-label">Increment</span></div></div>
       `;
-      spaceContainer.innerHTML  += incrementBtns;
+      spaceContainer.insertAdjacentHTML('beforeend', incrementBtns);
       this.parent.appendChild(spaceContainer);
   }
 
