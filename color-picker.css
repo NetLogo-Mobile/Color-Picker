@@ -322,9 +322,6 @@ input[type='range'].cp-styled-slider.color-alpha::-webkit-slider-runnable-track{
   pointer-events: none;
 }
 
-.cp-hello {
-  background-color: red;
-}
 
 .cp-wheel-cont {
   width: 20rem;
@@ -334,4 +331,21 @@ input[type='range'].cp-styled-slider.color-alpha::-webkit-slider-runnable-track{
   margin-right: auto;
   border-radius: 0.5rem;
   user-select: none;
+}
+
+.cp-wheel-spacing-cont {
+  display: flex;
+  flex-direction: column;
+  gap: 0.97rem;
+  padding-top: 0.97rem;
+}
+
+.cp-inner-wheel {
+  width: 100%;
+  height: 100%;
+}
+
+.cp-outer-wheel {
+  width: 100%;
+  height: 100%;
 }

@@ -1,68 +1,97 @@
 import { ColorMode } from "./ColorMode";
+import * as color from '../helpers/colors';
 /** GridMode: A mode for the ColorPicker that shows a wheel of colors */
 export class WheelMode extends ColorMode {
     constructor(parent, state, setState) {
         super(parent, state, setState);
         this.textElements = [];
-        this.innerWheel = null;
+        this.outerWheelColors = []; // hex colors of the outer wheel
         this.parent.replaceChildren();
         this.init();
-    }
-    /** createWheel: creates the wheel with inner and outer arcs */
-    createWheel() {
-        let wheel = `<svg viewBox="0 0 110 110" width="100%" height="100%">
-        <clipPath id="clip">
-            <path d="M 55 5 a 50 50 0 0 1 0 100 50 50 0 0 1 0 -100 v 26 a 24 24 0 0 0 0 48 24 24 0 0 0 0 -48" />
-        </clipPath>
-        <rect x="0" y="0" width="110" height="110" clip-path="url(#clip)" />
-    </svg>`;
-        return wheel;
     }
     /** toDOM: creates the body of the Wheel */
     toDOM() {
         this.parent.replaceChildren();
-        let wheelContainer = document.createElement('div');
-        wheelContainer.classList.add('cp-wheel-cont');
-        wheelContainer.innerHTML = this.createWheel();
-        this.parent.appendChild(wheelContainer);
-        // create the container for grid buttons
-        let wheelBtnCont = document.createElement('div');
-        wheelBtnCont.classList.add('cp-grid-btn-cont');
-        // Container for increment buttons
-        let incrementBtnCont = document.createElement('div');
-        incrementBtnCont.classList.add('cp-increment-cont');
-        // Container for numbers button
-        let numbersBtnCont = document.createElement('div');
-        numbersBtnCont.classList.add('cp-increment-cont');
-        // create numbers button
-        let numbersBtn = document.createElement('button');
-        numbersBtn.classList.add('cp-numbers-btn');
-        let numbersLabel = document.createElement('span');
-        numbersLabel.textContent = "Numbers";
-        numbersLabel.classList.add('cp-increment-label');
-        numbersBtnCont.appendChild(numbersBtn);
-        numbersBtnCont.appendChild(numbersLabel);
-        const increments = ["1", "0.5", "0.1"]; // Array of increment values
-        increments.forEach((inc) => {
-            let btnLabelCont = document.createElement('div');
-            btnLabelCont.classList.add('cp-btn-label-cont');
-            let btn = document.createElement('button');
-            btn.setAttribute('data-increment', inc);
-            btn.classList.add('cp-numbers-btn');
-            let label = document.createElement('span');
-            label.textContent = inc;
-            label.classList.add('cp-increment-label');
-            btnLabelCont.appendChild(btn);
-            btnLabelCont.appendChild(label);
-            incrementBtnCont.appendChild(btnLabelCont);
-        });
-        let incrementLabel = document.createElement('span');
-        incrementLabel.textContent = "Increment";
-        incrementLabel.classList.add('cp-increment-label');
-        incrementBtnCont.appendChild(incrementLabel);
-        wheelBtnCont.appendChild(numbersBtnCont);
-        wheelBtnCont.appendChild(incrementBtnCont);
-        this.parent.appendChild(wheelBtnCont);
+        this.parent.innerHTML = `
+        <div class="cp-wheel-spacing-cont"><div class="cp-wheel-cont"><svg viewBox="0 0 110 110" width="100%" height="100%">
+        <clipPath id="cp-inner-wheel-clip">
+        <path d="M 55 35 
+                 a 20 20 0 0 1 0 40 
+                 a 20 20 0 0 1 0 -40 
+                 M 55 10 
+                 a 45 45 0 0 0 0 90 
+                 a 45 45 0 0 0 0 -90"></path>
+    </clipPath>
+
+        <clipPath id="cp-outer-wheel-clip">
+            <path d="M 55 0 
+                        a 55 55 0 0 1 0 110 
+                        a 55 55 0 0 1 0 -110 
+                        M 55 5 
+                        a 50 50 0 0 0 0 100 
+                        a 50 50 0 0 0 0 -100"></path>
+        </clipPath>
+    
+
+        <foreignObject width="110" height="110" clip-path="url(#cp-inner-wheel-clip)" >
+            <div xmlns="http://www.w3.org/1999/xhtml" class="cp-inner-wheel"></div>
+        </foreignObject>
+
+        <foreignObject width="110" height="110" clip-path="url(#cp-outer-wheel-clip)">
+            <div xmlns="http://www.w3.org/1999/xhtml" class="cp-outer-wheel"></div>
+        </foreignObject>
+
+    </svg></div><div class="cp-grid-btn-cont"><div class="cp-increment-cont"><button class="cp-numbers-btn"></button><span class="cp-increment-label">Numbers</span></div><div class="cp-increment-cont"><div class="cp-btn-label-cont"><button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button><span class="cp-increment-label">1</span></div><div class="cp-btn-label-cont"><button data-increment="0.5" class="cp-numbers-btn"></button><span class="cp-increment-label">0.5</span></div><div class="cp-btn-label-cont"><button data-increment="0.1" class="cp-numbers-btn"></button><span class="cp-increment-label">0.1</span></div><span class="cp-increment-label">Increment</span></div></div></div>
+        `;
+        this.innerWheelSetup();
+        this.outerWheelSetup();
+    }
+    /** innerWheelSetup() : sets up the color of the inner wheel  */
+    innerWheelSetup() {
+        // get the inner wheel 
+        console.log('inner wheel setup');
+        const innerWheel = document.querySelector('.cp-inner-wheel');
+        let netlogoColors = Object.keys(color.mappedColors);
+        let hexColors = [];
+        for (let i = 0; i < netlogoColors.length; i++) {
+            hexColors.push(color.netlogoColorToHex(Number(color.mappedColors[netlogoColors[i]])));
+        }
+        let degreesPerSV = 360 / netlogoColors.length;
+        let cssFormat = `background-image: conic-gradient(`;
+        let degreeTracker = 0;
+        for (let i = 0; i < netlogoColors.length - 1; i++) {
+            cssFormat +=
+                hexColors[i] +
+                    ` ${degreeTracker}deg ${degreeTracker + degreesPerSV}deg, `;
+            degreeTracker += degreesPerSV;
+        }
+        cssFormat +=
+            hexColors[netlogoColors.length - 1] + ` ${degreeTracker}deg 0deg`;
+        innerWheel.setAttribute('style', cssFormat + `);`);
+    }
+    /** outerWheelSetup(): sets up the color of the outer wheel */
+    outerWheelSetup() {
+        // solve base color based on current color
+        const baseColor = Math.floor(color.rgbToNetlogo(this.state.currentColor) / 10) * 10;
+        const numColors = 10 / this.state.increment + 1;
+        this.outerWheelColors = [];
+        for (let i = 0; i < numColors - 1; i++) {
+            this.outerWheelColors.push(color.netlogoColorToHex(baseColor + i * this.state.increment));
+        }
+        this.outerWheelColors.push(color.netlogoColorToHex(baseColor + 9.9));
+        const degreesPerSV = 360 / numColors;
+        let cssFormat = `background-image: conic-gradient(`;
+        let degreeTracker = 0;
+        for (let i = 0; i < numColors - 1; i++) {
+            cssFormat +=
+                this.outerWheelColors[i] +
+                    ` ${degreeTracker}deg ${degreeTracker + degreesPerSV}deg, `;
+            degreeTracker += degreesPerSV;
+        }
+        cssFormat +=
+            this.outerWheelColors[numColors - 1] + ` ${degreeTracker}deg 0deg`;
+        const outerWheel = document.querySelector('.cp-outer-wheel');
+        outerWheel.setAttribute('style', cssFormat + `);`);
     }
     /** updateIncrementApperance: updates the increment button apperance based on which increment is on */
     updateIncrementAppearance() {
