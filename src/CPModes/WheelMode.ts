@@ -4,6 +4,7 @@ import * as color from '../helpers/colors'
 
 /** GridMode: A mode for the ColorPicker that shows a wheel of colors */
 export class WheelMode extends ColorMode {
+    /** textElements: Array of SVGTextElements that are the "numbers" of each cell in the grid. */
     private textElements: SVGTextElement[] = [];
     private outerWheelColors: string[] = []; // hex colors of the outer wheel
 
@@ -17,7 +18,7 @@ export class WheelMode extends ColorMode {
     public toDOM() : void {
         this.parent.replaceChildren();
         this.parent.innerHTML = `
-        <div class="cp-wheel-spacing-cont"><div class="cp-wheel-cont"><svg viewBox="0 0 110 110" width="100%" height="100%">
+        <div class="cp-wheel-spacing-cont"><div class="cp-wheel-cont"><svg class="cp-wheel-svg" viewBox="0 0 110 110" width="100%" height="100%">
         <clipPath id="cp-inner-wheel-clip">
         <path d="M 55 35 
                  a 20 20 0 0 1 0 40 
@@ -49,6 +50,7 @@ export class WheelMode extends ColorMode {
         `
         this.innerWheelSetup();
         this.outerWheelSetup();
+        this.numbersSetup();
     }
 
     /** innerWheelSetup() : sets up the color of the inner wheel  */
@@ -73,6 +75,74 @@ export class WheelMode extends ColorMode {
         cssFormat +=
             hexColors[netlogoColors.length - 1] + ` ${degreeTracker}deg 0deg`;
         innerWheel!.setAttribute('style', cssFormat + `);`);
+    }
+
+    /** toRadians: Coverts degress to radians  */
+    private toRadians(degrees: number) {
+        return degrees * Math.PI / 180;
+    }
+
+    /** numbersSetup: sets up & updates the appropriate numbers for the wheel */
+    private numbersSetup() {
+        const radius = 38;
+        const degreesPerIncrement = 360 / 14; // divide by 14 because the wheel has 14 inner colors 
+        const center = [55, 55];
+        const svg = document.querySelector(".cp-wheel-svg");
+        if (svg === null) {
+            console.log("null")
+            return;
+        }
+        /** calculate the correct x and y coords in the svg viewbox for each text element  */
+        for(let i = 0; i < 14; i++) {
+            let angle = this.toRadians(i * degreesPerIncrement + degreesPerIncrement / 2) - 0.01;  // give it a small offset for appearance
+            const x = center[0] + radius * Math.sin(angle); // Use sin for x
+            const y = center[1] - radius * Math.cos(angle); // Use -cos for y
+            let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', `${x}`);
+            text.setAttribute('y', `${y}`);
+            text.setAttribute('fill', 'white');
+            text.setAttribute('font-size', '0.4rem');
+            text.setAttribute("dominant-baseline", "middle");
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute('visibility', this.state.showNumbers ? 'visible' : 'hidden');
+            text.textContent = `${i * 10 + 5}`;
+            this.textElements.push(text);
+            svg.appendChild(text);
+        }
+        
+        // create text elements for the outer wheel 
+        // if(this.state.increment == 0.01) return;
+        // const outerRadius = 51;
+        // const numIncrements = 10 / this.state.increment;
+        // const outerDegreesPerIncrement = 360 / numIncrements;
+        
+        // for(let i = 0; i <= numIncrements; i++) {
+        //     let angle = outerDegreesPerIncrement * i - 90; // Adjusting starting angle to -90 degrees for correct orientation
+        //     let angleInRadians = this.toRadians(angle);
+        //     const x = center[0] + outerRadius * Math.sin(angleInRadians);
+        //     const y = center[1] + outerRadius * Math.cos(angleInRadians);
+        //     let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        //     text.setAttribute('x', `${x}`);
+        //     text.setAttribute('y', `${y}`);
+        //     text.setAttribute('fill', 'white');
+        //     text.setAttribute('font-size', '0.2rem');
+        //     text.setAttribute('text-anchor', 'middle');
+        //     text.setAttribute('dominant-baseline', 'central'); // Ensuring vertical alignment is centered
+        //     // Apply rotation directly at the text's position without offset
+        //     text.setAttribute('transform', `rotate(${angle + 90}, ${x}, ${y})`); // Correcting rotation to make text upright
+        //     text.classList.add('cp-wheel-text');
+        //     text.setAttribute('visibility', this.state.showNumbers ? 'visible' : 'hidden');
+        //     text.textContent = `${(i * this.state.increment).toFixed(2)}`; // Adjust text content as needed
+        //     this.textElements.push(text);
+        //     svg.appendChild(text);
+        // }
+        
+    }
+
+    /** setThumbs: creates the thumbs and sets them in the right spot  */
+    private setThumbs() {
+        let innerThumb = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        
     }
 
     /** outerWheelSetup(): sets up the color of the outer wheel */
