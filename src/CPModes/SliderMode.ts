@@ -60,13 +60,12 @@ export class SliderMode extends ColorMode {
     private updateSavedColors() {
         const savedColors = this.state.savedColors;
         const savedSquares = document.querySelectorAll(".cp-saved-colors");
+        console.log(savedColors);
     
-        // Clear all squares first to the default color
         savedSquares.forEach(square => {
-            (square as HTMLElement).style.backgroundColor = '#f1f1f1'; // Default color
+            (square as HTMLElement).style.backgroundColor = '#f1f1f1'; 
         });
     
-        // Then, fill the squares from the end, in reverse order of savedColors
         for (let i = 0; i < savedColors.length; i++) {
             const squareIndex = savedSquares.length - 1 - i;
             if (savedSquares[squareIndex]) { 
