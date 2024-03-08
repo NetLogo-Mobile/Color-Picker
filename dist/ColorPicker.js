@@ -17,7 +17,8 @@ export default class ColorPicker {
             currentMode: 'grid',
             changeModelColor: true,
             increment: 1,
-            showNumbers: false
+            showNumbers: false,
+            savedColors: [], // queue of saved colors 
         };
         this.parent = parent;
         this.onColorSelect = onColorSelect;

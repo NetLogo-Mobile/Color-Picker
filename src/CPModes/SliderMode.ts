@@ -1,6 +1,7 @@
 import { ColorMode } from "./ColorMode";
 import { ColorPickerState } from "./ColorMode";
 import { Slider } from "../helpers/Slider";
+import { arrToString } from "../helpers/colors";
 
 /** GridMode: A mode for the ColorPicker that shows a grid of colors */
 export class SliderMode extends ColorMode {
@@ -20,6 +21,13 @@ export class SliderMode extends ColorMode {
                     <!-- part that switches from rgb to hsl -->
                     <div class="cp-slider-changer"></div>
                 </div>
+                <div class="cp-saved-colors-cont">
+                    <div class="cp-saved-colors"></div>
+                    <div class="cp-saved-colors"></div>
+                    <div class="cp-saved-colors"></div>
+                    <div class="cp-saved-colors"></div>
+                    <div class="cp-saved-color-add"></div>
+                </div>
             </div>
         `
     }
@@ -30,6 +38,43 @@ export class SliderMode extends ColorMode {
         colorDisplay.style.backgroundColor = `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]})`;
     }
 
+    /** setupSavedColors: sets up saved colors by adding event handlers */
+    private setupSavedColors() {
+        // add event handler to the add button
+        const addButton = document.querySelector(".cp-saved-color-add");
+        addButton?.addEventListener("click", () => {
+            const savedColors = this.state.savedColors;
+            // Create a shallow copy of the current color
+            const colorCopy = [...this.state.currentColor];
+            savedColors.push(colorCopy);
+            if(savedColors.length > 4) savedColors.shift();
+            this.state.savedColors = savedColors;
+            console.log(this.state.savedColors);
+            this.updateSavedColors();
+        });
+        // update the appearance of each color grid based on the queue 
+        this.updateSavedColors();
+    }
+
+    /** updatedSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
+    private updateSavedColors() {
+        const savedColors = this.state.savedColors;
+        const savedSquares = document.querySelectorAll(".cp-saved-colors");
+    
+        // Clear all squares first to the default color
+        savedSquares.forEach(square => {
+            (square as HTMLElement).style.backgroundColor = '#f1f1f1'; // Default color
+        });
+    
+        // Then, fill the squares from the end, in reverse order of savedColors
+        for (let i = 0; i < savedColors.length; i++) {
+            const squareIndex = savedSquares.length - 1 - i;
+            if (savedSquares[squareIndex]) { 
+                const square = savedSquares[squareIndex] as HTMLElement;
+                square.style.backgroundColor = arrToString(savedColors[i]);
+            }
+        }
+    }
     /** createRGB: creates the RGB sliders */
     private createRGB() : void {
         const parent = document.querySelector('.cp-slider-changer') as HTMLElement;
@@ -61,5 +106,6 @@ export class SliderMode extends ColorMode {
         this.toDOM();
         this.updateColorDisplay();
         this.createRGB();
+        this.setupSavedColors();
     }
 }

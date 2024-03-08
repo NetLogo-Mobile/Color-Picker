@@ -109,6 +109,22 @@ function netlogoColorToHex(netlogoColor) {
     let temp = cached[Math.floor(netlogoColor * 10)];
     return rgbToHex(temp[0], temp[1], temp[2]);
 }
+/**
+ * arrToString: takes an rgb(a) array and returns a string rgb(a)**/
+function arrToString(colorArray) {
+    // Check if the array represents an RGBA color
+    if (!Array.isArray(colorArray) || !colorArray.every(item => typeof item === 'number')) {
+        console.error('Invalid colorArray input:', colorArray);
+        return 'invalid'; // or any fallback string you prefer
+    }
+    if (colorArray.length === 4) {
+        const [r, g, b, a] = colorArray;
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }
+    // If not RGBA, assume it's RGB
+    const [r, g, b] = colorArray;
+    return `rgb(${r}, ${g}, ${b})`;
+}
 /** RGBAToHSLA: Converts rgba color to hsla color array. */
 function RGBAToHSLA(r, g, b, a) {
     // turn into fractionss
@@ -147,4 +163,4 @@ function netlogoColorToRGBA(netlogoColor, alpha = 255) {
     let temp = cached[Math.floor(netlogoColor * 10)];
     return [temp[0], temp[1], temp[2], alpha];
 }
-export { netlogoColorToHex, netlogoColorToRGBA, mappedColors, cachedNetlogoColors, netlogoBaseColors, cached, RGBAToHSLA, rgbToHex, rgbaToHex, componentToHex, r, g, b, step, baseIndex, colorTimesTen, rgbToNetlogo, };
+export { netlogoColorToHex, netlogoColorToRGBA, mappedColors, cachedNetlogoColors, netlogoBaseColors, cached, RGBAToHSLA, rgbToHex, rgbaToHex, componentToHex, r, g, b, step, baseIndex, colorTimesTen, rgbToNetlogo, arrToString };

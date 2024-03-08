@@ -451,3 +451,33 @@ input[type='number'].cp-slider-value-display-cont {
   padding-left: 0.3rem;
   padding-bottom: 0.2rem;
 }
+
+/** Wheel mode */
+.cp-saved-colors-cont {
+  display: flex;
+  flex-direction: row;
+  gap: 0.8rem;
+}
+
+.cp-saved-colors {
+  background-color: #f1f1f1;
+  box-shadow: 0 0.313rem 0.313rem rgba(0, 0, 0, 0.3);
+  border-radius: 0.2rem;
+  width: 2.8rem;
+  height: 2.8rem;
+  cursor: pointer;
+}
+
+.cp-saved-color-add {
+  background-color: white;
+  border: 2px solid #808080;
+  border-radius: 0.2rem;
+  width: 2.8rem;
+  height: 2.8rem;
+  cursor: pointer;
+  background: linear-gradient(#808080 0 0), linear-gradient(#808080 0 0);
+  background-position: center;
+  background-size: 50% 0.125rem, 0.125rem 50%; 
+  background-repeat: no-repeat;
+}
+

@@ -123,6 +123,23 @@ function netlogoColorToHex(netlogoColor: number): string {
   return rgbToHex(temp[0], temp[1], temp[2]);
 }
 
+/**
+ * arrToString: takes an rgb(a) array and returns a string rgb(a)**/
+function arrToString(colorArray: number[]) {
+  // Check if the array represents an RGBA color
+  if (!Array.isArray(colorArray) || !colorArray.every(item => typeof item === 'number')) {
+    console.error('Invalid colorArray input:', colorArray);
+    return 'invalid'; // or any fallback string you prefer
+  }
+  if (colorArray.length === 4) {
+      const [r, g, b, a] = colorArray;
+      return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+  // If not RGBA, assume it's RGB
+  const [r, g, b] = colorArray;
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 /** RGBAToHSLA: Converts rgba color to hsla color array. */
 function RGBAToHSLA(r: number, g: number, b: number, a: number): number[] {
   // turn into fractionss
@@ -187,4 +204,5 @@ export {
   baseIndex,
   colorTimesTen,
   rgbToNetlogo,
+  arrToString
 };
