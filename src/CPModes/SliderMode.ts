@@ -35,6 +35,7 @@ export class SliderMode extends ColorMode {
     /** updateColorDisplay: updates the color display to be the current color  */
     private updateColorDisplay() : void {
         const colorDisplay = document.querySelector('.cp-slider-color-display') as HTMLElement;
+        console.log("update Color display called");
         colorDisplay.style.backgroundColor = `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]})`;
     }
 
@@ -44,16 +45,33 @@ export class SliderMode extends ColorMode {
         const addButton = document.querySelector(".cp-saved-color-add");
         addButton?.addEventListener("click", () => {
             const savedColors = this.state.savedColors;
-            // Create a shallow copy of the current color
             const colorCopy = [...this.state.currentColor];
-            savedColors.push(colorCopy);
-            if(savedColors.length > 4) savedColors.shift();
+            savedColors.unshift(colorCopy);
+            // if saved colors is length 5, remove the last element
+            if( savedColors.length == 5 ) savedColors.pop();
             this.state.savedColors = savedColors;
-            console.log(this.state.savedColors);
             this.updateSavedColors();
         });
         // update the appearance of each color grid based on the queue 
         this.updateSavedColors();
+        // add event handler to each color button
+        const savedButtons = document.querySelectorAll(".cp-saved-colors");
+        for(let i = 0; i < savedButtons.length; i++) {
+            const button = savedButtons[i] as HTMLElement;
+            button.addEventListener("click", () => {
+                if(button.dataset.value) {
+                    // has a color so return it 
+                    const colorsAsArr = button.dataset.value.split(",");
+                    const colorIntArr: number[] = [];
+                    colorsAsArr.forEach((color) => {
+                        colorIntArr.push(Number(color));
+                    })
+                    this.setState({ currentColor: colorIntArr });
+                    this.state.currentColor = colorIntArr;
+                    this.updateColorDisplay();
+                } else return
+            })
+        }
     }
 
     /** updatedSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
@@ -61,7 +79,6 @@ export class SliderMode extends ColorMode {
         const savedColors = this.state.savedColors;
         const savedSquares = document.querySelectorAll(".cp-saved-colors");
         console.log(savedColors);
-    
         savedSquares.forEach(square => {
             (square as HTMLElement).style.backgroundColor = '#f1f1f1'; 
         });
@@ -71,6 +88,7 @@ export class SliderMode extends ColorMode {
             if (savedSquares[squareIndex]) { 
                 const square = savedSquares[squareIndex] as HTMLElement;
                 square.style.backgroundColor = arrToString(savedColors[i]);
+                square.setAttribute('data-value', savedColors[i] + "" );
             }
         }
     }

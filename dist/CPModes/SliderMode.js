@@ -30,6 +30,7 @@ export class SliderMode extends ColorMode {
     /** updateColorDisplay: updates the color display to be the current color  */
     updateColorDisplay() {
         const colorDisplay = document.querySelector('.cp-slider-color-display');
+        console.log("update Color display called");
         colorDisplay.style.backgroundColor = `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]})`;
     }
     /** setupSavedColors: sets up saved colors by adding event handlers */
@@ -38,17 +39,36 @@ export class SliderMode extends ColorMode {
         const addButton = document.querySelector(".cp-saved-color-add");
         addButton === null || addButton === void 0 ? void 0 : addButton.addEventListener("click", () => {
             const savedColors = this.state.savedColors;
-            // Create a shallow copy of the current color
             const colorCopy = [...this.state.currentColor];
-            savedColors.push(colorCopy);
-            if (savedColors.length > 4)
-                savedColors.shift();
+            savedColors.unshift(colorCopy);
+            // if saved colors is length 5, remove the last element
+            if (savedColors.length == 5)
+                savedColors.pop();
             this.state.savedColors = savedColors;
-            console.log(this.state.savedColors);
             this.updateSavedColors();
         });
         // update the appearance of each color grid based on the queue 
         this.updateSavedColors();
+        // add event handler to each color button
+        const savedButtons = document.querySelectorAll(".cp-saved-colors");
+        for (let i = 0; i < savedButtons.length; i++) {
+            const button = savedButtons[i];
+            button.addEventListener("click", () => {
+                if (button.dataset.value) {
+                    // has a color so return it 
+                    const colorsAsArr = button.dataset.value.split(",");
+                    const colorIntArr = [];
+                    colorsAsArr.forEach((color) => {
+                        colorIntArr.push(Number(color));
+                    });
+                    this.setState({ currentColor: colorIntArr });
+                    this.state.currentColor = colorIntArr;
+                    this.updateColorDisplay();
+                }
+                else
+                    return;
+            });
+        }
     }
     /** updatedSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
     updateSavedColors() {
@@ -63,6 +83,7 @@ export class SliderMode extends ColorMode {
             if (savedSquares[squareIndex]) {
                 const square = savedSquares[squareIndex];
                 square.style.backgroundColor = arrToString(savedColors[i]);
+                square.setAttribute('data-value', savedColors[i] + "");
             }
         }
     }
