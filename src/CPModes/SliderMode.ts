@@ -77,6 +77,7 @@ export class SliderMode extends ColorMode {
     /** updatedSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
     private updateSavedColors() {
         const savedColors = this.state.savedColors;
+        console.log(savedColors);
         const savedSquares = document.querySelectorAll(".cp-saved-colors");
         console.log(savedColors);
         savedSquares.forEach(square => {

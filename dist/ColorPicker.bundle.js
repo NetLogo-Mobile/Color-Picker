@@ -349,6 +349,32 @@ class GridMode extends ColorMode {
     }
 }
 
+/** dragHelpers.ts: defines helper functions useful for the dragging and clicking feature of the Wheel Mode */
+/** getMousePosition: Gets the mouse position of an MouseEvent(evt) in an SVG element(svg) */
+function getMousePosition(evt, svg) {
+    evt = evt; // standardize evt as MouseEvent
+    let CTM = svg.getScreenCTM();
+    if (CTM != null) {
+        return {
+            x: (evt.clientX - CTM.e) / CTM.a,
+            y: (evt.clientY - CTM.f) / CTM.d,
+        };
+    }
+}
+/** findAngle: Calculates the angle between three points with coordinates (a, b), (c, d), and (e, f) */
+function findAngle(a, b, c, d, e, f) {
+    let AB = Math.sqrt(Math.pow(c - a, 2) + Math.pow(d - b, 2));
+    let BC = Math.sqrt(Math.pow(c - e, 2) + Math.pow(d - f, 2));
+    let AC = Math.sqrt(Math.pow(e - a, 2) + Math.pow(f - b, 2));
+    let outOf180Degrees = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB)) *
+        (180 / Math.PI);
+    // if we are "positive" relative to the axis -- the center point to the top "zero" point, then we just return, else we return 360 - outOf180
+    if (e < c) {
+        return 360 - outOf180Degrees;
+    }
+    return outOf180Degrees;
+}
+
 /** GridMode: A mode for the ColorPicker that shows a wheel of colors */
 class WheelMode extends ColorMode {
     constructor(parent, state, setState) {
@@ -477,6 +503,16 @@ class WheelMode extends ColorMode {
         //     svg.appendChild(text);
         // }
     }
+    /** updateInnerWheel: Updates the color of the wheel based on the location of the inner thumb */
+    updateInnerWheel(inner) {
+        let innerX = Number(inner.getAttribute('cx'));
+        let innerY = Number(inner.getAttribute('cy'));
+        const angle = findAngle(55, 20, 55, 55, innerX, innerY);
+        let degreesPerIndex = 360 / 14; // the number of degrees per slice of the inner wheel
+        let innerColor = netlogoBaseColors[Math.floor(angle / degreesPerIndex)];
+        inner.setAttribute('fill', `rgba(${innerColor[0]}, ${innerColor[1]}, ${innerColor[2]}, 255)`);
+        console.log(angle);
+    }
     /** setThumbs: creates the thumbs and sets them in the right spot  */
     setThumbs() {
         let innerThumb = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -487,9 +523,21 @@ class WheelMode extends ColorMode {
         innerThumb.setAttribute('fill', 'black');
         innerThumb.setAttribute('stroke', 'white');
         innerThumb.setAttribute('stroke-width', '1.2');
-        innerThumb.setAttribute('class', 'cp-thumb');
+        innerThumb.classList.add("cp-inner-thumb");
+        innerThumb.classList.add("cp-draggable");
+        let outerThumbCor = [50, 50];
+        let outerThumb = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        outerThumb.setAttribute('cx', `${outerThumbCor[0]}`);
+        outerThumb.setAttribute('cy', `${outerThumbCor[1]}`);
+        outerThumb.setAttribute('r', '2');
+        outerThumb.setAttribute('fill', 'orange');
+        outerThumb.setAttribute("stroke", "white");
+        outerThumb.setAttribute('stroke-width', '1.2');
+        outerThumb.classList.add("cp-outer-thumb");
+        outerThumb.classList.add("cp-draggable");
         const svg = document.querySelector('.cp-wheel-svg');
         svg.appendChild(innerThumb);
+        svg.appendChild(outerThumb);
     }
     /** outerWheelSetup(): sets up the color of the outer wheel */
     outerWheelSetup() {
@@ -514,6 +562,51 @@ class WheelMode extends ColorMode {
             this.outerWheelColors[numColors - 1] + ` ${degreeTracker}deg 0deg`;
         const outerWheel = document.querySelector('.cp-outer-wheel');
         outerWheel.setAttribute('style', cssFormat + `);`);
+    }
+    /** makeDraggable(): makes the thumbs of the color wheel draggable */
+    makeDraggable(wheel) {
+        document.querySelector(".cp-inner-thumb");
+        const cpWindow = document.querySelector(".cp");
+        function makeDraggable(cpWindow) {
+            // confinement code should go here
+            console.log("make draggable called");
+            cpWindow.addEventListener("mousedown", startDrag);
+            cpWindow.addEventListener("mousemove", drag);
+            cpWindow.addEventListener("mouseup", endDrag);
+            cpWindow.addEventListener("mouseleave", endDrag);
+            let svg = document.querySelector(".cp-wheel-svg");
+            let selectedElement;
+            /** startDrag: start drag event for draggable elements */
+            function startDrag(evt) {
+                let element = evt.target;
+                console.log("start drag");
+                // select the element, and make sure it is a dragable element
+                if (element.classList.contains('cp-draggable')) {
+                    selectedElement = element;
+                }
+            }
+            /** drag: dragEvent for draggable elements */
+            function drag(evt) {
+                if (selectedElement != null) {
+                    evt.preventDefault();
+                    let mousePosition = getMousePosition(evt, svg);
+                    if (mousePosition != null) {
+                        const x = mousePosition.x;
+                        const y = mousePosition.y;
+                        wheel.updateInnerWheel(selectedElement);
+                        selectedElement === null || selectedElement === void 0 ? void 0 : selectedElement.setAttribute('cx', x.toString());
+                        selectedElement === null || selectedElement === void 0 ? void 0 : selectedElement.setAttribute('cy', y.toString());
+                    }
+                }
+            }
+            /** endDrag: ends the drag event for draggable elements */
+            function endDrag(evt) {
+                selectedElement = null;
+            }
+        }
+        if (cpWindow) {
+            makeDraggable(cpWindow);
+        }
     }
     /** updateIncrementApperance: updates the increment button apperance based on which increment is on */
     updateIncrementAppearance() {
@@ -559,6 +652,7 @@ class WheelMode extends ColorMode {
         this.updateIncrementAppearance();
         this.attachEventListeners();
         this.setThumbs();
+        this.makeDraggable(this);
     }
 }
 
@@ -729,6 +823,7 @@ class SliderMode extends ColorMode {
     /** updatedSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
     updateSavedColors() {
         const savedColors = this.state.savedColors;
+        console.log(savedColors);
         const savedSquares = document.querySelectorAll(".cp-saved-colors");
         console.log(savedColors);
         savedSquares.forEach(square => {
@@ -805,11 +900,19 @@ class ColorPicker {
         // click the grid button to start
         document.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
-    /** updateColorParameters: updates the displayed color parameters to reflect the current Color */
+    /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     updateColorParameters() {
         let colorParamDisplay = document.querySelectorAll('.cp-values-display');
         colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
         colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
+        this.updateAlphaSlider();
+    }
+    /** updateAlphaSlider(): updates the appearance of the alpha slider to match the current alpha value */
+    updateAlphaSlider() {
+        const val = this.state.currentColor[3];
+        const alphaSlider = document.querySelector(".cp-alpha-slider");
+        if (alphaSlider)
+            alphaSlider.value = val.toString();
     }
     /** updateModelDisplay: updates the color of the model/background  */
     updateModelDisplay() {

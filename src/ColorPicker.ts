@@ -50,11 +50,19 @@ export default class ColorPicker {
         document.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
 
-    /** updateColorParameters: updates the displayed color parameters to reflect the current Color */
+    /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     private updateColorParameters() {
         let colorParamDisplay = document.querySelectorAll('.cp-values-display');
         colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
         colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
+        this.updateAlphaSlider();
+    }
+
+    /** updateAlphaSlider(): updates the appearance of the alpha slider to match the current alpha value */
+    private updateAlphaSlider() {
+        const val = this.state.currentColor[3];
+        const alphaSlider = document.querySelector(".cp-alpha-slider") as HTMLInputElement;
+        if(alphaSlider) alphaSlider.value = val.toString();
     }
 
     /** updateModelDisplay: updates the color of the model/background  */

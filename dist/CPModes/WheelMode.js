@@ -1,5 +1,6 @@
 import { ColorMode } from "./ColorMode";
 import * as color from '../helpers/colors';
+import * as dragHelper from '../helpers/dragHelpers';
 /** GridMode: A mode for the ColorPicker that shows a wheel of colors */
 export class WheelMode extends ColorMode {
     constructor(parent, state, setState) {
@@ -128,6 +129,16 @@ export class WheelMode extends ColorMode {
         //     svg.appendChild(text);
         // }
     }
+    /** updateInnerWheel: Updates the color of the wheel based on the location of the inner thumb */
+    updateInnerWheel(inner) {
+        let innerX = Number(inner.getAttribute('cx'));
+        let innerY = Number(inner.getAttribute('cy'));
+        const angle = dragHelper.findAngle(55, 20, 55, 55, innerX, innerY);
+        let degreesPerIndex = 360 / 14; // the number of degrees per slice of the inner wheel
+        let innerColor = color.netlogoBaseColors[Math.floor(angle / degreesPerIndex)];
+        inner.setAttribute('fill', `rgba(${innerColor[0]}, ${innerColor[1]}, ${innerColor[2]}, 255)`);
+        console.log(angle);
+    }
     /** setThumbs: creates the thumbs and sets them in the right spot  */
     setThumbs() {
         let innerThumb = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -138,9 +149,21 @@ export class WheelMode extends ColorMode {
         innerThumb.setAttribute('fill', 'black');
         innerThumb.setAttribute('stroke', 'white');
         innerThumb.setAttribute('stroke-width', '1.2');
-        innerThumb.setAttribute('class', 'cp-thumb');
+        innerThumb.classList.add("cp-inner-thumb");
+        innerThumb.classList.add("cp-draggable");
+        let outerThumbCor = [50, 50];
+        let outerThumb = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        outerThumb.setAttribute('cx', `${outerThumbCor[0]}`);
+        outerThumb.setAttribute('cy', `${outerThumbCor[1]}`);
+        outerThumb.setAttribute('r', '2');
+        outerThumb.setAttribute('fill', 'orange');
+        outerThumb.setAttribute("stroke", "white");
+        outerThumb.setAttribute('stroke-width', '1.2');
+        outerThumb.classList.add("cp-outer-thumb");
+        outerThumb.classList.add("cp-draggable");
         const svg = document.querySelector('.cp-wheel-svg');
         svg.appendChild(innerThumb);
+        svg.appendChild(outerThumb);
     }
     /** outerWheelSetup(): sets up the color of the outer wheel */
     outerWheelSetup() {
@@ -165,6 +188,51 @@ export class WheelMode extends ColorMode {
             this.outerWheelColors[numColors - 1] + ` ${degreeTracker}deg 0deg`;
         const outerWheel = document.querySelector('.cp-outer-wheel');
         outerWheel.setAttribute('style', cssFormat + `);`);
+    }
+    /** makeDraggable(): makes the thumbs of the color wheel draggable */
+    makeDraggable(wheel) {
+        const innerThumb = document.querySelector(".cp-inner-thumb");
+        const cpWindow = document.querySelector(".cp");
+        function makeDraggable(cpWindow) {
+            // confinement code should go here
+            console.log("make draggable called");
+            cpWindow.addEventListener("mousedown", startDrag);
+            cpWindow.addEventListener("mousemove", drag);
+            cpWindow.addEventListener("mouseup", endDrag);
+            cpWindow.addEventListener("mouseleave", endDrag);
+            let svg = document.querySelector(".cp-wheel-svg");
+            let selectedElement;
+            /** startDrag: start drag event for draggable elements */
+            function startDrag(evt) {
+                let element = evt.target;
+                console.log("start drag");
+                // select the element, and make sure it is a dragable element
+                if (element.classList.contains('cp-draggable')) {
+                    selectedElement = element;
+                }
+            }
+            /** drag: dragEvent for draggable elements */
+            function drag(evt) {
+                if (selectedElement != null) {
+                    evt.preventDefault();
+                    let mousePosition = dragHelper.getMousePosition(evt, svg);
+                    if (mousePosition != null) {
+                        const x = mousePosition.x;
+                        const y = mousePosition.y;
+                        wheel.updateInnerWheel(selectedElement);
+                        selectedElement === null || selectedElement === void 0 ? void 0 : selectedElement.setAttribute('cx', x.toString());
+                        selectedElement === null || selectedElement === void 0 ? void 0 : selectedElement.setAttribute('cy', y.toString());
+                    }
+                }
+            }
+            /** endDrag: ends the drag event for draggable elements */
+            function endDrag(evt) {
+                selectedElement = null;
+            }
+        }
+        if (cpWindow) {
+            makeDraggable(cpWindow);
+        }
     }
     /** updateIncrementApperance: updates the increment button apperance based on which increment is on */
     updateIncrementAppearance() {
@@ -211,5 +279,6 @@ export class WheelMode extends ColorMode {
         this.updateIncrementAppearance();
         this.attachEventListeners();
         this.setThumbs();
+        this.makeDraggable(this);
     }
 }

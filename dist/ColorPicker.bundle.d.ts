@@ -13,8 +13,10 @@ declare class ColorPicker {
     private setState;
     /** init: initializes the ColorPicker */
     private init;
-    /** updateColorParameters: updates the displayed color parameters to reflect the current Color */
+    /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     private updateColorParameters;
+    /** updateAlphaSlider(): updates the appearance of the alpha slider to match the current alpha value */
+    private updateAlphaSlider;
     /** updateModelDisplay: updates the color of the model/background  */
     private updateModelDisplay;
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
