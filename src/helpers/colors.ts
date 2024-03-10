@@ -72,6 +72,21 @@ function componentToHex(c: number): string {
   const hex = c.toString(16);
   return hex.length == 1 ? "0" + hex : hex;
 }
+/** hexToRgb: converts a hex value to rgb  */
+function hexToRgb(hex: string): [number, number, number] {  
+  let sanitizedHex = hex.replace(/^#/, '');
+  
+  // If it's a three-character hex code, convert to six-character
+  if (sanitizedHex.length === 3) {
+    sanitizedHex = sanitizedHex[0] + sanitizedHex[0] + sanitizedHex[1] + sanitizedHex[1] + sanitizedHex[2] + sanitizedHex[2];
+  }
+  const bigint = parseInt(sanitizedHex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  return [r, g, b];
+}
 
 // Consolidate RGB(A) to Hex conversion
 function colorToHex(r: number, g: number, b: number, a?: number): string {
@@ -204,5 +219,6 @@ export {
   baseIndex,
   colorTimesTen,
   rgbToNetlogo,
-  arrToString
+  arrToString,
+  hexToRgb
 };

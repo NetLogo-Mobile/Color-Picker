@@ -67,6 +67,19 @@ function componentToHex(c) {
     const hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
 }
+/** hexToRgb: converts a hex value to rgb  */
+function hexToRgb(hex) {
+    let sanitizedHex = hex.replace(/^#/, '');
+    // If it's a three-character hex code, convert to six-character
+    if (sanitizedHex.length === 3) {
+        sanitizedHex = sanitizedHex[0] + sanitizedHex[0] + sanitizedHex[1] + sanitizedHex[1] + sanitizedHex[2] + sanitizedHex[2];
+    }
+    const bigint = parseInt(sanitizedHex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return [r, g, b];
+}
 // Consolidate RGB(A) to Hex conversion
 function colorToHex(r, g, b, a) {
     if (a !== undefined) {
@@ -163,4 +176,4 @@ function netlogoColorToRGBA(netlogoColor, alpha = 255) {
     let temp = cached[Math.floor(netlogoColor * 10)];
     return [temp[0], temp[1], temp[2], alpha];
 }
-export { netlogoColorToHex, netlogoColorToRGBA, mappedColors, cachedNetlogoColors, netlogoBaseColors, cached, RGBAToHSLA, rgbToHex, rgbaToHex, componentToHex, r, g, b, step, baseIndex, colorTimesTen, rgbToNetlogo, arrToString };
+export { netlogoColorToHex, netlogoColorToRGBA, mappedColors, cachedNetlogoColors, netlogoBaseColors, cached, RGBAToHSLA, rgbToHex, rgbaToHex, componentToHex, r, g, b, step, baseIndex, colorTimesTen, rgbToNetlogo, arrToString, hexToRgb };

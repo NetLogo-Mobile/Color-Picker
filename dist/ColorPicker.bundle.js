@@ -109,6 +109,19 @@ function componentToHex(c) {
     const hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
 }
+/** hexToRgb: converts a hex value to rgb  */
+function hexToRgb(hex) {
+    let sanitizedHex = hex.replace(/^#/, '');
+    // If it's a three-character hex code, convert to six-character
+    if (sanitizedHex.length === 3) {
+        sanitizedHex = sanitizedHex[0] + sanitizedHex[0] + sanitizedHex[1] + sanitizedHex[1] + sanitizedHex[2] + sanitizedHex[2];
+    }
+    const bigint = parseInt(sanitizedHex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return [r, g, b];
+}
 // Consolidate RGB(A) to Hex conversion
 function colorToHex(r, g, b, a) {
     if (a !== undefined) {
@@ -544,6 +557,7 @@ class WheelMode extends ColorMode {
         svg.appendChild(outerThumb);
         const innerAsSVG = innerThumb;
         this.updateInnerWheel(innerAsSVG);
+        this.changeColor(); // update the outer wheel 
     }
     /** changeColor: changes the color based on the position of the outerwheel */
     changeColor() {
@@ -556,8 +570,11 @@ class WheelMode extends ColorMode {
             const degreesPerIndex = 360 / (10 / this.state.increment + 1);
             const index = Math.floor(angle / degreesPerIndex);
             const color = this.outerWheelColors[index];
+            outerThumb.setAttribute('fill', color);
             // set the color to the current color 
-            console.log(color);
+            const colorAsRGB = hexToRgb(color);
+            const colorAsRGBA = [colorAsRGB[0], colorAsRGB[1], colorAsRGB[2], this.state.currentColor[3]];
+            this.setState({ currentColor: colorAsRGBA });
         }
     }
     /** outerWheelSetup(): sets up the color of the outer wheel */
@@ -582,6 +599,8 @@ class WheelMode extends ColorMode {
             this.outerWheelColors[numColors - 1] + ` ${degreeTracker}deg 0deg`;
         const outerWheel = document.querySelector('.cp-outer-wheel');
         outerWheel.setAttribute('style', cssFormat + `);`);
+        // also update the color based on the changed outer wheel since the color will be different 
+        this.changeColor();
     }
     /** makeDraggable(): makes the thumbs of the color wheel draggable */
     makeDraggable(wheel) {
@@ -658,6 +677,7 @@ class WheelMode extends ColorMode {
                             y = restrict.y;
                             selectedElement === null || selectedElement === void 0 ? void 0 : selectedElement.setAttribute('cx', x.toString());
                             selectedElement === null || selectedElement === void 0 ? void 0 : selectedElement.setAttribute('cy', y.toString());
+                            wheel.changeColor();
                         }
                     }
                 }
@@ -1026,7 +1046,7 @@ class ColorPicker {
         // attach event listener to model indicator button
         let modelIndicatorButton = document.querySelector('.cp-model-indicator');
         modelIndicatorButton === null || modelIndicatorButton === void 0 ? void 0 : modelIndicatorButton.addEventListener('click', () => {
-            this.state.changeModelColor = !this.state.changeModelColor;
+            this.state.changeModelColor = !this.state.changeModelColor; // we don't want to call set state, because it updates the appearance as well 
             modelIndicatorButton.querySelector('.cp-mode-btn-text').innerHTML = this.state.changeModelColor ? ' Model Color Selected ' : ' Background Color Selected ';
             changeButtonColor(modelIndicatorButton, !this.state.changeModelColor);
         });

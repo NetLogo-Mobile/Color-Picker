@@ -1,6 +1,6 @@
 import { ColorMode } from "./ColorMode";
 import { ColorPickerState } from "./ColorMode";
-import * as color from '../helpers/colors';
+import * as colors from '../helpers/colors';
 import * as dragHelper from '../helpers/dragHelpers';
 
 /** GridMode: A mode for the ColorPicker that shows a wheel of colors */
@@ -50,7 +50,7 @@ export class WheelMode extends ColorMode {
     </svg></div><div class="cp-grid-btn-cont"><div class="cp-increment-cont"><button class="cp-numbers-btn"></button><span class="cp-increment-label">Numbers</span></div><div class="cp-increment-cont"><div class="cp-btn-label-cont"><button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button><span class="cp-increment-label">1</span></div><div class="cp-btn-label-cont"><button data-increment="0.5" class="cp-numbers-btn"></button><span class="cp-increment-label">0.5</span></div><div class="cp-btn-label-cont"><button data-increment="0.1" class="cp-numbers-btn"></button><span class="cp-increment-label">0.1</span></div><span class="cp-increment-label">Increment</span></div></div></div>
         `
         this.innerWheelSetup();
-        this.outerWheelSetup(Math.floor(color.rgbToNetlogo(this.state.currentColor) / 10) * 10);
+        this.outerWheelSetup(Math.floor(colors.rgbToNetlogo(this.state.currentColor) / 10) * 10);
         this.numbersSetup();
     }
 
@@ -59,10 +59,10 @@ export class WheelMode extends ColorMode {
         // get the inner wheel 
         console.log('inner wheel setup');
         const innerWheel = document.querySelector('.cp-inner-wheel');
-        let netlogoColors = Object.keys(color.mappedColors);
+        let netlogoColors = Object.keys(colors.mappedColors);
         let hexColors = [];
         for (let i = 0; i < netlogoColors.length; i++) {
-            hexColors.push(color.netlogoColorToHex(Number(color.mappedColors[netlogoColors[i]])));
+            hexColors.push(colors.netlogoColorToHex(Number(colors.mappedColors[netlogoColors[i]])));
         }
         let degreesPerSV = 360 / netlogoColors.length;
         let cssFormat = `background-image: conic-gradient(`;
@@ -146,7 +146,7 @@ export class WheelMode extends ColorMode {
         let innerY = Number(inner.getAttribute('cy'));
         const angle = dragHelper.findAngle(55, 20, 55, 55, innerX, innerY);
         let degreesPerIndex = 360 / 14; // the number of degrees per slice of the inner wheel
-        let innerColor = color.netlogoBaseColors[Math.floor(angle / degreesPerIndex)];
+        let innerColor = colors.netlogoBaseColors[Math.floor(angle / degreesPerIndex)];
         inner.setAttribute('fill', `rgba(${innerColor[0]}, ${innerColor[1]}, ${innerColor[2]}, 255)`);
         this.outerWheelSetup(Math.floor(angle / degreesPerIndex) * 10);
     }
@@ -180,6 +180,7 @@ export class WheelMode extends ColorMode {
         svg!.appendChild(outerThumb);
         const innerAsSVG = innerThumb as unknown as SVGSVGElement;
         this.updateInnerWheel(innerAsSVG);
+        this.changeColor(); // update the outer wheel 
     }
     /** changeColor: changes the color based on the position of the outerwheel */
     private changeColor() {
@@ -192,8 +193,11 @@ export class WheelMode extends ColorMode {
             const degreesPerIndex = 360 / ( 10 / this.state.increment + 1 );
             const index = Math.floor(angle / degreesPerIndex);
             const color = this.outerWheelColors[index];
+            outerThumb.setAttribute('fill', color);
             // set the color to the current color 
-            console.log(color);
+            const colorAsRGB = colors.hexToRgb(color);
+            const colorAsRGBA = [colorAsRGB[0], colorAsRGB[1], colorAsRGB[2], this.state.currentColor[3]];
+            this.setState({currentColor: colorAsRGBA});
         }
     }
 
@@ -204,9 +208,9 @@ export class WheelMode extends ColorMode {
         const numColors = 10 / this.state.increment + 1;
         this.outerWheelColors = [];
         for (let i = 0; i< numColors - 1; i++) {
-            this.outerWheelColors.push(color.netlogoColorToHex(baseColor + i * this.state.increment));
+            this.outerWheelColors.push(colors.netlogoColorToHex(baseColor + i * this.state.increment));
         }
-        this.outerWheelColors.push(color.netlogoColorToHex(baseColor + 9.9));
+        this.outerWheelColors.push(colors.netlogoColorToHex(baseColor + 9.9));
         const degreesPerSV = 360 / numColors;
         let cssFormat = `background-image: conic-gradient(`;
         let degreeTracker = 0;
@@ -220,7 +224,8 @@ export class WheelMode extends ColorMode {
             this.outerWheelColors[numColors - 1] + ` ${degreeTracker}deg 0deg`;
         const outerWheel = document.querySelector('.cp-outer-wheel');
         outerWheel!.setAttribute('style', cssFormat + `);`);
-
+        // also update the color based on the changed outer wheel since the color will be different 
+        this.changeColor();
     }
 
     /** makeDraggable(): makes the thumbs of the color wheel draggable */
@@ -303,6 +308,7 @@ export class WheelMode extends ColorMode {
                             y = restrict.y;
                             selectedElement?.setAttribute('cx', x.toString());
                             selectedElement?.setAttribute('cy', y.toString());
+                            wheel.changeColor();
                         }                       
                     }
                 }
