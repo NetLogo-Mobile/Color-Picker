@@ -223,14 +223,15 @@ input[type='range'].cp-styled-slider.color-alpha {
 }
 
 /* Red slider */
-input[type='range'].cp-styled-slider.slider-progress::-webkit-slider-runnable-track {
+input[type='range'].cp-styled-slider.color-red.slider-progress::-webkit-slider-runnable-track {
   background: linear-gradient(#fb4d46, #fb4d46) 0 / var(--sx) 100% no-repeat,
     #efefef;
 }
 
-input[type='range'].cp-styled-slider.slider-progress:hover::-webkit-slider-runnable-track {
+input[type='range'].cp-styled-slider.color-red.slider-progress:hover::-webkit-slider-runnable-track {
   background: linear-gradient(red, red) 0 / var(--sx) 100% no-repeat, #e5e5e5;
 }
+
 
 /* Alpha slider track color with simplified repeating background */
 input[type='range'].cp-styled-slider.color-alpha::-webkit-slider-runnable-track{
@@ -243,6 +244,7 @@ input[type='range'].cp-styled-slider.color-alpha::-webkit-slider-runnable-track{
   background-position: 0 0, 0 0.313rem, 0.313rem -0.313rem, -0.313rem 0rem, 0 0;
   background-repeat: repeat, repeat, repeat, repeat, no-repeat;
 }
+
 .cp-color-param-txt {
   font-weight: bold;
   font-size: 0.7504rem;

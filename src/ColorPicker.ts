@@ -114,7 +114,7 @@ export default class ColorPicker {
         // attach event listener to model indicator button
         let modelIndicatorButton = document.querySelector('.cp-model-indicator');
         modelIndicatorButton?.addEventListener('click', () => {
-            this.setState({ changeModelColor: !this.state.changeModelColor });
+            this.state.changeModelColor = !this.state.changeModelColor; // we don't want to call set state, because it updates the appearance as well 
             modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? ' Model Color Selected ' : ' Background Color Selected ';
             changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);
         });

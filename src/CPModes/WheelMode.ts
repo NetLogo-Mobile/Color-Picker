@@ -50,7 +50,7 @@ export class WheelMode extends ColorMode {
     </svg></div><div class="cp-grid-btn-cont"><div class="cp-increment-cont"><button class="cp-numbers-btn"></button><span class="cp-increment-label">Numbers</span></div><div class="cp-increment-cont"><div class="cp-btn-label-cont"><button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button><span class="cp-increment-label">1</span></div><div class="cp-btn-label-cont"><button data-increment="0.5" class="cp-numbers-btn"></button><span class="cp-increment-label">0.5</span></div><div class="cp-btn-label-cont"><button data-increment="0.1" class="cp-numbers-btn"></button><span class="cp-increment-label">0.1</span></div><span class="cp-increment-label">Increment</span></div></div></div>
         `
         this.innerWheelSetup();
-        this.outerWheelSetup();
+        this.outerWheelSetup(Math.floor(color.rgbToNetlogo(this.state.currentColor) / 10) * 10);
         this.numbersSetup();
     }
 
@@ -148,7 +148,7 @@ export class WheelMode extends ColorMode {
         let degreesPerIndex = 360 / 14; // the number of degrees per slice of the inner wheel
         let innerColor = color.netlogoBaseColors[Math.floor(angle / degreesPerIndex)];
         inner.setAttribute('fill', `rgba(${innerColor[0]}, ${innerColor[1]}, ${innerColor[2]}, 255)`);
-        console.log(angle);
+        this.outerWheelSetup(Math.floor(angle / degreesPerIndex) * 10);
     }
 
     /** setThumbs: creates the thumbs and sets them in the right spot  */
@@ -164,7 +164,7 @@ export class WheelMode extends ColorMode {
         innerThumb.classList.add("cp-inner-thumb");
         innerThumb.classList.add("cp-draggable");
 
-        let outerThumbCor = [50, 50];
+        let outerThumbCor = [19, 18];
         let outerThumb = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         outerThumb.setAttribute('cx', `${outerThumbCor[0]}`);
         outerThumb.setAttribute('cy', `${outerThumbCor[1]}`);
@@ -178,12 +178,28 @@ export class WheelMode extends ColorMode {
         const svg = document.querySelector('.cp-wheel-svg');
         svg!.appendChild(innerThumb);
         svg!.appendChild(outerThumb);
+        const innerAsSVG = innerThumb as unknown as SVGSVGElement;
+        this.updateInnerWheel(innerAsSVG);
+    }
+    /** changeColor: changes the color based on the position of the outerwheel */
+    private changeColor() {
+        // calculate the outer thumb angle
+        const outerThumb = document.querySelector(".cp-outer-thumb");
+        if(outerThumb) {
+            const outerX = Number(Number(outerThumb.getAttribute('cx'))!.toFixed(4));
+            const outerY = Math.round(Number(outerThumb.getAttribute('cy')));
+            const angle = dragHelper.findAngle(50, 20, 50, 50, outerX, outerY);
+            const degreesPerIndex = 360 / ( 10 / this.state.increment + 1 );
+            const index = Math.floor(angle / degreesPerIndex);
+            const color = this.outerWheelColors[index];
+            // set the color to the current color 
+            console.log(color);
+        }
     }
 
     /** outerWheelSetup(): sets up the color of the outer wheel */
-    private outerWheelSetup() {
+    private outerWheelSetup(baseColor: number) {
         // solve base color based on current color
-        const baseColor = Math.floor(color.rgbToNetlogo(this.state.currentColor) / 10) * 10;
 
         const numColors = 10 / this.state.increment + 1;
         this.outerWheelColors = [];
@@ -211,6 +227,7 @@ export class WheelMode extends ColorMode {
     public makeDraggable(wheel: WheelMode) {
         const innerThumb = document.querySelector(".cp-inner-thumb") as HTMLElement;
         const cpWindow = document.querySelector(".cp") as HTMLElement;
+        const center = [55, 55];
 
         function makeDraggable(cpWindow: HTMLElement) {
             // confinement code should go here
@@ -232,18 +249,61 @@ export class WheelMode extends ColorMode {
                 }
             }
 
+            function confinementInner(x: number, y: number) {
+                let xRestrict = x;
+                let yRestrict = y;
+                let angle = dragHelper.findAngle(55, 20, 55, 55, x, y); // Given the reference point [55, 20] (straight up), and [55, 55] the center
+                const angleInRadians = wheel.toRadians(angle);
+                const innerLowerBound = 20;
+                const innerUpperBound = 42;
+                const dist = dragHelper.distance(x, y, center[0], center[1]);
+                if(dist > innerUpperBound) {
+                    xRestrict = center[0] + innerUpperBound * Math.sin(angleInRadians);
+                    yRestrict = center[1] - innerUpperBound * Math.cos(angleInRadians);
+                }
+                else if (dist < innerLowerBound) {
+                    xRestrict = center[0] + innerLowerBound * Math.sin(angleInRadians);
+                    yRestrict = center[1] - innerLowerBound * Math.cos(angleInRadians);
+                }
+                return {x: xRestrict, y: yRestrict};
+            };
+
+            function confinementOuter(x: number, y: number) {
+                let xRestrict = x;
+                let yRestrict = y;
+                const dist = dragHelper.distance(x, y, center[0], center[1]);
+                const angle = dragHelper.findAngle(55, 20, 55, 55, x, y); 
+                const angleInRadians = wheel.toRadians(angle);
+                const outerLowerBound = 53;
+                xRestrict = center[0] + outerLowerBound * Math.sin(angleInRadians);
+                yRestrict = center[1] - outerLowerBound * Math.cos(angleInRadians);
+                return {x: xRestrict, y: yRestrict};
+            }
+
             /** drag: dragEvent for draggable elements */
             function drag(evt: MouseEvent | TouchEvent) {
                 if(selectedElement != null) {
                     evt.preventDefault();
                     let mousePosition = dragHelper.getMousePosition(evt, svg);
                     if(mousePosition != null) {
-                        const x = mousePosition.x;
-                        const y = mousePosition.y;
-                        wheel.updateInnerWheel(selectedElement as SVGSVGElement);
-                        
-                        selectedElement?.setAttribute('cx', x.toString());
-                        selectedElement?.setAttribute('cy', y.toString());
+                        let x;
+                        let y;
+                        if(selectedElement.classList.contains('cp-inner-thumb')) {
+                            let restrict = confinementInner(mousePosition.x, mousePosition.y);
+                            x = restrict.x;
+                            y = restrict.y;
+                            selectedElement?.setAttribute('cx', x.toString());
+                            selectedElement?.setAttribute('cy', y.toString());
+                            wheel.updateInnerWheel(selectedElement as SVGSVGElement);
+                        } else {
+                            x = mousePosition.x;
+                            y = mousePosition.y;
+                            let restrict = confinementOuter(x, y);
+                            x = restrict.x;
+                            y = restrict.y;
+                            selectedElement?.setAttribute('cx', x.toString());
+                            selectedElement?.setAttribute('cy', y.toString());
+                        }                       
                     }
                 }
             }
