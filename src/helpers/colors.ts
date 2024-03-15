@@ -191,6 +191,40 @@ function RGBAToHSLA(r: number, g: number, b: number, a: number): number[] {
   return [h, s, l, a];
 }
 
+/** HSLAToRGBA: Converts hsla color array to rgba color array. */
+function HSLAToRGBA(h: number, s: number, l: number, alpha: number) {
+  // divide h, s, and l by 360, 100, and 100 respectively
+  h /= 360;
+  s /= 100;
+  l /= 100;
+  let r, g, b;
+  if (s === 0) {
+      // if saturation is 0, it's an achromatic color (gray)
+      r = g = b = l;
+  }
+  else {
+      const hueToRGB = (p: number, q: number, t: number) => {
+          if (t < 0)
+              t += 1;
+          if (t > 1)
+              t -= 1;
+          if (t < 1 / 6)
+              return p + (q - p) * 6 * t;
+          if (t < 1 / 2)
+              return q;
+          if (t < 2 / 3)
+              return p + (q - p) * (2 / 3 - t) * 6;
+          return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hueToRGB(p, q, h + 1 / 3) * 255;
+      g = hueToRGB(p, q, h) * 255;
+      b = hueToRGB(p, q, h - 1 / 3) * 255;
+  }
+  return [Math.round(r), Math.round(g), Math.round(b), alpha];
+}
+
 
 /** netlogoColorToRGBA: Converts NetLogo color to rgba color array. */
 function netlogoColorToRGBA(
@@ -220,5 +254,6 @@ export {
   colorTimesTen,
   rgbToNetlogo,
   arrToString,
-  hexToRgb
+  hexToRgb,
+  HSLAToRGBA
 };

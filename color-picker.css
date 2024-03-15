@@ -1,4 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+:root {
+  /* gradient-colors: for hue color changing gradient */
+  --gradient-colors: linear-gradient(to right,
+    hsla(0, 100%, 50%, 1),
+    hsla(10, 100%, 50%, 1),
+    hsla(20, 100%, 50%, 1),
+    hsla(30, 100%, 50%, 1),
+    hsla(40, 100%, 50%, 1),
+    hsla(50, 100%, 50%, 1),
+    hsla(60, 100%, 50%, 1),
+    hsla(70, 100%, 50%, 1),
+    hsla(80, 100%, 50%, 1),
+    hsla(90, 100%, 50%, 1),
+    hsla(100, 100%, 50%, 1),
+    hsla(110, 100%, 50%, 1),
+    hsla(120, 100%, 50%, 1),
+    hsla(130, 100%, 50%, 1),
+    hsla(140, 100%, 50%, 1),
+    hsla(150, 100%, 50%, 1),
+    hsla(160, 100%, 50%, 1),
+    hsla(170, 100%, 50%, 1),
+    hsla(180, 100%, 50%, 1),
+    hsla(190, 100%, 50%, 1),
+    hsla(200, 100%, 50%, 1),
+    hsla(210, 100%, 50%, 1),
+    hsla(220, 100%, 50%, 1),
+    hsla(230, 100%, 50%, 1),
+    hsla(240, 100%, 50%, 1),
+    hsla(250, 100%, 50%, 1),
+    hsla(260, 100%, 50%, 1),
+    hsla(270, 100%, 50%, 1),
+    hsla(280, 100%, 50%, 1),
+    hsla(290, 100%, 50%, 1),
+    hsla(300, 100%, 50%, 1),
+    hsla(310, 100%, 50%, 1),
+    hsla(320, 100%, 50%, 1),
+    hsla(330, 100%, 50%, 1),
+    hsla(340, 100%, 50%, 1),
+    hsla(350, 100%, 50%, 1),
+    hsla(360, 100%, 50%, 1)
+  );
+}
 
 /* cp-body: main body, everything in the color picker goes in here */
 .cp {
@@ -115,6 +157,7 @@
   background-color: white;
   width: 20.89rem;
   height: 19.59rem;
+  user-select: none;
 }
 
 .cp-space-container {
@@ -408,7 +451,6 @@ input[type='range'].cp-styled-slider.color-blue.slider-progress:hover::-webkit-s
 .cp-slider-changer {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
 
 .cp-slider-display-container {
@@ -453,6 +495,23 @@ input[type='number'].cp-slider-value-display-cont {
   padding-bottom: 0.2rem;
 }
 
+.cp-slider-changer {
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-left: 60%;
+  margin-bottom: -1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cp-dropdown-text {
+  color: gray;
+  font-size: 0.7rem;
+}
+
 /** Wheel mode */
 .cp-saved-colors-cont {
   display: flex;
@@ -480,5 +539,52 @@ input[type='number'].cp-slider-value-display-cont {
   background-position: center;
   background-size: 50% 0.125rem, 0.125rem 50%; 
   background-repeat: no-repeat;
+}
+
+/* Hue slider */
+input[type='range'].cp-styled-slider.color-hue::-webkit-slider-runnable-track {
+  height: 1em;
+  border: 1px solid #b2b2b2;
+  border-radius: 0.5em;
+  background: var(--gradient-colors);
+  box-shadow: none;
+}
+
+input[type='range'].cp-styled-slider.color-hue::-webkit-slider-thumb:hover {
+  background: hsl(var(--value), 100%, 60%);
+}
+
+input[type='range'].cp-styled-slider.color-hue.slider-progress:hover::-webkit-slider-runnable-track {
+  background: var(--gradient-colors);
+}
+
+/* Saturation slider */
+input[type='range'].cp-styled-slider.color-saturation::-webkit-slider-runnable-track {
+  height: 1em;
+  border: 1px solid #b2b2b2;
+  border-radius: 0.5em;
+  background: linear-gradient(to right, #808080 0%, #003348 100%);
+  box-shadow: none;
+}
+
+input[type='range'].cp-styled-slider.color-saturation.slider-progress:hover::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #808080 0%, #003348 100%);
+}
+
+/** Luminance slider */
+input[type='range'].cp-styled-slider.color-luminance::-webkit-slider-runnable-track {
+  height: 1em;
+  border: 1px solid #b2b2b2;
+  border-radius: 0.5em;
+  background: linear-gradient(to right, #000 0%, #fff 100%);
+  box-shadow: none;
+}
+
+input[type='range'].cp-styled-slider.color-luminance::-webkit-slider-thumb:hover {
+  background: #666;
+}
+
+input[type='range'].cp-styled-slider.color-luminance.slider-progress:hover::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #000 0%, #fff 100%);
 }
 
