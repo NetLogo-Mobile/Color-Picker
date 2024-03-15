@@ -529,6 +529,37 @@ class WheelMode extends ColorMode {
             hexColors[netlogoColors.length - 1] + ` ${degreeTracker}deg 0deg`;
         innerWheel.setAttribute('style', cssFormat + `);`);
     }
+    /** setInner: takes the current NetLogo color and places the draggable thumbs in the approximate location they should be  */
+    setInner() {
+        let radius, degreesPerIncrement, baseColorIndex, angle;
+        let center = [55, 55];
+        radius = 30; // inner thumb is going to be here
+        degreesPerIncrement = 360 / 14;
+        const netlogoColor = rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]);
+        baseColorIndex = Math.floor(netlogoColor / 10);
+        angle = baseColorIndex * degreesPerIncrement + degreesPerIncrement / 2;
+        let angleInRadians = (angle * Math.PI) / 180;
+        let x = center[0] + radius * Math.sin(angleInRadians);
+        let y = center[1] - radius * Math.cos(angleInRadians);
+        return [x, y];
+    }
+    /** setOuter: takes the current NetLogo color and places the draggable thumb in the approximate lcoaiton */
+    setOuter() {
+        let radius, degreesPerIncrement, angle;
+        let center = [55, 55];
+        radius = 54; // inner thumb is going to be here
+        degreesPerIncrement = 360 / (10 / this.state.increment + 1);
+        const netLogoColor = rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]);
+        let value = netLogoColor % 10;
+        if (Math.abs(value - 9.9) < 0.00001)
+            value = 10;
+        let index = Math.floor(value / this.state.increment);
+        angle = index * degreesPerIncrement + degreesPerIncrement / 2;
+        let angleInRadians = (angle * Math.PI) / 180;
+        let x = center[0] + radius * Math.sin(angleInRadians);
+        let y = center[1] - radius * Math.cos(angleInRadians);
+        return [x, y];
+    }
     /** toRadians: Coverts degress to radians  */
     toRadians(degrees) {
         return degrees * Math.PI / 180;
@@ -599,7 +630,7 @@ class WheelMode extends ColorMode {
     /** setThumbs: creates the thumbs and sets them in the right spot  */
     setThumbs() {
         let innerThumb = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        let innerThumbCor = [30, 30];
+        let innerThumbCor = this.setInner();
         innerThumb.setAttribute('cx', `${innerThumbCor[0]}`);
         innerThumb.setAttribute('cy', `${innerThumbCor[1]}`);
         innerThumb.setAttribute('r', '2');
@@ -608,7 +639,7 @@ class WheelMode extends ColorMode {
         innerThumb.setAttribute('stroke-width', '1.2');
         innerThumb.classList.add("cp-inner-thumb");
         innerThumb.classList.add("cp-draggable");
-        let outerThumbCor = [19, 18];
+        let outerThumbCor = this.setOuter();
         let outerThumb = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         outerThumb.setAttribute('cx', `${outerThumbCor[0]}`);
         outerThumb.setAttribute('cy', `${outerThumbCor[1]}`);
