@@ -27,9 +27,11 @@ export class Slider {
         this.inputElement.type = 'range';
         this.inputElement.style.width = sliderWidth;
         this.inputElement.value = startValue.toString();
+        
         this.inputElement.min = min.toString();
         this.inputElement.max = max.toString();
         this.inputElement.classList.add('cp-styled-slider');
+        this.inputElement.value = startValue + '';
 
         if (sliderColor === 'alpha') {
             this.inputElement.classList.add('alpha-slider');
@@ -96,7 +98,7 @@ export class Slider {
         let e = this.inputElement;
         e.style.setProperty('--value', e.value);
         e.style.setProperty('--min', e.min === '' ? '0' : e.min);
-        e.style.setProperty('--max', e.max === '' ? '100' : e.max);
+        e.style.setProperty('--max', e.max === '' ? '255' : e.max);
         e.addEventListener('input', this.sliderChangedValue.bind(this));
     }
 
