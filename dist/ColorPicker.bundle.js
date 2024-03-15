@@ -547,7 +547,7 @@ class WheelMode extends ColorMode {
     setOuter() {
         let radius, degreesPerIncrement, angle;
         let center = [55, 55];
-        radius = 54; // inner thumb is going to be here
+        radius = 52.5; // inner thumb is going to be here
         degreesPerIncrement = 360 / (10 / this.state.increment + 1);
         const netLogoColor = rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]);
         let value = netLogoColor % 10;
