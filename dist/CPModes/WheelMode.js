@@ -90,7 +90,7 @@ export class WheelMode extends ColorMode {
     setOuter() {
         let radius, degreesPerIncrement, baseColorIndex, angle;
         let center = [55, 55];
-        radius = 52.5; // inner thumb is going to be here
+        radius = 52.5;
         degreesPerIncrement = 360 / (10 / this.state.increment + 1);
         const netLogoColor = colors.rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]);
         let value = netLogoColor % 10;
@@ -247,11 +247,24 @@ export class WheelMode extends ColorMode {
         const innerThumb = document.querySelector(".cp-inner-thumb");
         const cpWindow = document.querySelector(".cp");
         const center = [55, 55];
+        /** throttle function to reduce number of event listener calls */
+        function throttle(func, limit) {
+            let inThrottle;
+            return function () {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        }
         function makeDraggable(cpWindow) {
             // confinement code should go here
             console.log("make draggable called");
             cpWindow.addEventListener("mousedown", startDrag);
-            cpWindow.addEventListener("mousemove", drag);
+            cpWindow.addEventListener("mousemove", throttle(drag, 5));
             cpWindow.addEventListener("mouseup", endDrag);
             cpWindow.addEventListener("mouseleave", endDrag);
             let svg = document.querySelector(".cp-wheel-svg");
@@ -290,7 +303,7 @@ export class WheelMode extends ColorMode {
                 const dist = dragHelper.distance(x, y, center[0], center[1]);
                 const angle = dragHelper.findAngle(55, 20, 55, 55, x, y);
                 const angleInRadians = wheel.toRadians(angle);
-                const outerLowerBound = 53;
+                const outerLowerBound = 52.5;
                 xRestrict = center[0] + outerLowerBound * Math.sin(angleInRadians);
                 yRestrict = center[1] - outerLowerBound * Math.cos(angleInRadians);
                 return { x: xRestrict, y: yRestrict };

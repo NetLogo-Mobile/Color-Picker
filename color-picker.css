@@ -588,3 +588,6 @@ input[type='range'].cp-styled-slider.color-luminance.slider-progress:hover::-web
   background: linear-gradient(to right, #000 0%, #fff 100%);
 }
 
+.cp-draggable {
+  cursor: pointer;
+}
