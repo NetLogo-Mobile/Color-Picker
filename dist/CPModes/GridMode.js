@@ -133,7 +133,6 @@ export class GridMode extends ColorMode {
         // event listener of the numbers button 
         gridBtns[0].addEventListener('click', () => {
             this.setState({ showNumbers: !this.state.showNumbers });
-            this.state.showNumbers = !this.state.showNumbers;
             this.toggleTextVisibility();
             this.updateIncrementAppearance();
         });

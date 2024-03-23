@@ -384,10 +384,9 @@ export class WheelMode extends ColorMode {
         const gridBtns = document.querySelectorAll('.cp-numbers-btn');
         // event listener of the numbers button 
         gridBtns[0].addEventListener('click', () => {
-        this.setState({showNumbers: !this.state.showNumbers});
-        this.state.showNumbers = !this.state.showNumbers;
-        this.toggleTextVisibility();
-        this.updateIncrementAppearance();
+            this.setState({showNumbers: !this.state.showNumbers});
+            this.toggleTextVisibility();
+            this.updateIncrementAppearance();
         });
         // the increment buttons 
         for(let i = 1; i < gridBtns.length; i++) {
@@ -412,5 +411,4 @@ export class WheelMode extends ColorMode {
         this.setThumbs();
         this.makeDraggable(this);
     }
-    
 }
