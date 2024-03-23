@@ -40,9 +40,10 @@ export class GridMode extends ColorMode {
                 let colorIndex = Number(rect.dataset.value);
                 // Convert the selected color to RGBA format
                 let newColor = netlogoColorToRGBA(this.colorArray[colorIndex]);
+                // netlogoColor defaults to 255 for the alpha value
+                newColor[3] = this.state.currentColor[3];
                 // Use setState to update the currentColor in the component's state
                 this.setState({ currentColor: newColor });
-                console.log("clicked");
             }
         }
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

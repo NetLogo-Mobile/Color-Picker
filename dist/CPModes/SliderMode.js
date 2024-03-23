@@ -5,11 +5,12 @@ import cpDropdown from '../assets/drop-down.svg';
 import * as color from '../helpers/colors';
 /** GridMode: A mode for the ColorPicker that shows a grid of colors */
 export class SliderMode extends ColorMode {
-    constructor(parent, state, setState) {
+    constructor(parent, state, setState, colorPickerInstance) {
         super(parent, state, setState);
         this.isRGB = true; // true if the current mode is RGB, false if it is HSL
         this.HSL = [0, 0, 0];
         this.parent.replaceChildren();
+        this.cpInstance = colorPickerInstance;
         this.init();
     }
     /** toDOM: creates the body of the Grid */
@@ -38,7 +39,6 @@ export class SliderMode extends ColorMode {
     /** updateColorDisplay: updates the color display to be the current color  */
     updateColorDisplay() {
         const colorDisplay = document.querySelector('.cp-slider-color-display');
-        console.log("update Color display called");
         colorDisplay.style.backgroundColor = `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]})`;
     }
     /** setupSavedColors: sets up saved colors by adding event handlers */
@@ -52,7 +52,7 @@ export class SliderMode extends ColorMode {
             // if saved colors is length 5, remove the last element
             if (savedColors.length == 5)
                 savedColors.pop();
-            this.state.savedColors = savedColors;
+            this.setState({ savedColors });
             this.updateSavedColors();
         });
         // update the appearance of each color grid based on the queue 
@@ -70,7 +70,7 @@ export class SliderMode extends ColorMode {
                         colorIntArr.push(Number(color));
                     });
                     this.setState({ currentColor: colorIntArr });
-                    this.state.currentColor = colorIntArr;
+                    //this.state.currentColor = colorIntArr;
                     this.updateColorDisplay();
                 }
                 else
@@ -100,9 +100,7 @@ export class SliderMode extends ColorMode {
     /** updatedSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
     updateSavedColors() {
         const savedColors = this.state.savedColors;
-        console.log(savedColors);
         const savedSquares = document.querySelectorAll(".cp-saved-colors");
-        console.log(savedColors);
         savedSquares.forEach(square => {
             square.style.backgroundColor = '#f1f1f1';
         });
@@ -124,9 +122,8 @@ export class SliderMode extends ColorMode {
         let slider3 = new Slider(parent, this.state.currentColor[2], 0, 255, 'Blue', '200px', 'Blue', true);
         /** add event listeners for every slider */
         slider1.inputElement.addEventListener('input', () => {
-            this.state.currentColor[0] = slider1.getValue();
-            this.updateColorDisplay();
             this.setState({ currentColor: [slider1.getValue(), this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]] });
+            this.updateColorDisplay();
         });
         slider2.inputElement.addEventListener('input', () => {
             this.state.currentColor[1] = slider2.getValue();
@@ -156,8 +153,6 @@ export class SliderMode extends ColorMode {
             this.state.currentColor = newRGB;
             this.setState({ currentColor: newRGB });
             this.updateColorDisplay();
-            this.setState({ currentColor: this.state.currentColor });
-            console.log(this.state.currentColor);
         });
         slider2.inputElement.addEventListener('input', () => {
             this.HSL[1] = slider2.getValue();
@@ -165,17 +160,12 @@ export class SliderMode extends ColorMode {
             this.state.currentColor = newRGB;
             this.setState({ currentColor: newRGB });
             this.updateColorDisplay();
-            this.setState({ currentColor: this.state.currentColor });
-            console.log(this.state.currentColor);
         });
         slider3.inputElement.addEventListener('input', () => {
             this.HSL[2] = slider3.getValue();
             const newRGB = color.HSLAToRGBA(this.HSL[0], this.HSL[1], this.HSL[2], this.state.currentColor[3]);
-            console.log(newRGB);
-            this.state.currentColor = newRGB;
             this.setState({ currentColor: newRGB });
             this.updateColorDisplay();
-            this.setState({ currentColor: this.state.currentColor });
         });
     }
     /** init(): initializes the grid  */

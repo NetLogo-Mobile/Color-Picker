@@ -13,7 +13,7 @@ import { ColorPickerState } from './CPModes/ColorMode';
 
 export default class ColorPicker {
     // state: the state of the ColorPicker
-    private state: ColorPickerState;
+    public state: ColorPickerState;
     //parent: the parent element of the ColorPicker
     private parent: HTMLElement;
     // onColorSelect: a callback function that is called when a color is selected
@@ -35,7 +35,12 @@ export default class ColorPicker {
 
     /** setState: used to change the state of the color picker and call all update functions */
     private setState(newState: Partial<typeof this.state>) {
-        this.state = { ...this.state, ...newState };
+        // Directly update properties of the existing state object
+        Object.keys(newState).forEach(key => {
+            this.state[key] = newState[key];
+        });
+
+        // Call update functions to reflect changes
         this.updateColorParameters();
         this.updateModelDisplay();
     }
@@ -108,7 +113,7 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[2] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
-            new SliderMode(document.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
+            new SliderMode(document.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this);
         });
 
         // attach event listener to model indicator button
@@ -130,9 +135,10 @@ export default class ColorPicker {
     /** initAlphaSlider: initializes the alpha slider */
     private initAlphaSlider() {
         let alphaSlider = document.querySelector('.cp-alpha-slider') as HTMLInputElement;
-        console.log(alphaSlider);
+        (alphaSlider);
         alphaSlider.addEventListener('input', () => {
             this.setState({ currentColor: [this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], parseInt(alphaSlider.value)] });
+            (this.state);
         });
     }
 

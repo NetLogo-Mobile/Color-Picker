@@ -26,7 +26,11 @@ export default class ColorPicker {
     }
     /** setState: used to change the state of the color picker and call all update functions */
     setState(newState) {
-        this.state = Object.assign(Object.assign({}, this.state), newState);
+        // Directly update properties of the existing state object
+        Object.keys(newState).forEach(key => {
+            this.state[key] = newState[key];
+        });
+        // Call update functions to reflect changes
         this.updateColorParameters();
         this.updateModelDisplay();
     }
@@ -97,7 +101,7 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[2], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[1], false);
-            new SliderMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
+            new SliderMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this);
         });
         // attach event listener to model indicator button
         let modelIndicatorButton = document.querySelector('.cp-model-indicator');
@@ -116,9 +120,10 @@ export default class ColorPicker {
     /** initAlphaSlider: initializes the alpha slider */
     initAlphaSlider() {
         let alphaSlider = document.querySelector('.cp-alpha-slider');
-        console.log(alphaSlider);
+        (alphaSlider);
         alphaSlider.addEventListener('input', () => {
             this.setState({ currentColor: [this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], parseInt(alphaSlider.value)] });
+            (this.state);
         });
     }
     /** toDOM: creates and attaches the ColorPicker body to parent */

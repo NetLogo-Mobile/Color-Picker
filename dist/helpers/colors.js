@@ -132,7 +132,7 @@ function arrToString(colorArray) {
     }
     if (colorArray.length === 4) {
         const [r, g, b, a] = colorArray;
-        return `rgba(${r}, ${g}, ${b}, ${a})`;
+        return `rgba(${r}, ${g}, ${b}, ${a / 255})`; //alpha defaults to values between 0 and 1 in css
     }
     // If not RGBA, assume it's RGB
     const [r, g, b] = colorArray;

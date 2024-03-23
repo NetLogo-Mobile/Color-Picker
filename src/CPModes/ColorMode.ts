@@ -5,6 +5,7 @@ type ColorPickerState = {
     increment: number;
     showNumbers: boolean;
     savedColors: number[][];
+    [key: string]: any;
 };
 
 /** ColorMode: Base class for each of the ColorPicker Modes */

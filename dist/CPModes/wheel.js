@@ -372,7 +372,6 @@ export class WheelMode extends ColorMode {
             let mousePosition = this.svgMousePosition(e);
             this.innerThumb.setAttribute('cx', mousePosition.x.toString());
             this.innerThumb.setAttribute('cy', mousePosition.y.toString());
-            console.log('wtf');
             this.updateInnerWheel();
             this.updateOuterWheel();
         });

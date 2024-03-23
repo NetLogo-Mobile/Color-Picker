@@ -171,7 +171,7 @@ function arrToString(colorArray) {
     }
     if (colorArray.length === 4) {
         const [r, g, b, a] = colorArray;
-        return `rgba(${r}, ${g}, ${b}, ${a})`;
+        return `rgba(${r}, ${g}, ${b}, ${a / 255})`; //alpha defaults to values between 0 and 1 in css
     }
     // If not RGBA, assume it's RGB
     const [r, g, b] = colorArray;
@@ -310,9 +310,10 @@ class GridMode extends ColorMode {
                 let colorIndex = Number(rect.dataset.value);
                 // Convert the selected color to RGBA format
                 let newColor = netlogoColorToRGBA(this.colorArray[colorIndex]);
+                // netlogoColor defaults to 255 for the alpha value
+                newColor[3] = this.state.currentColor[3];
                 // Use setState to update the currentColor in the component's state
                 this.setState({ currentColor: newColor });
-                console.log("clicked");
             }
         }
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -509,7 +510,6 @@ class WheelMode extends ColorMode {
     /** innerWheelSetup() : sets up the color of the inner wheel  */
     innerWheelSetup() {
         // get the inner wheel 
-        console.log('inner wheel setup');
         const innerWheel = document.querySelector('.cp-inner-wheel');
         let netlogoColors = Object.keys(mappedColors);
         let hexColors = [];
@@ -571,7 +571,6 @@ class WheelMode extends ColorMode {
         const center = [55, 55];
         const svg = document.querySelector(".cp-wheel-svg");
         if (svg === null) {
-            console.log("null");
             return;
         }
         /** calculate the correct x and y coords in the svg viewbox for each text element  */
@@ -719,7 +718,6 @@ class WheelMode extends ColorMode {
         }
         function makeDraggable(cpWindow) {
             // confinement code should go here
-            console.log("make draggable called");
             cpWindow.addEventListener("mousedown", startDrag);
             cpWindow.addEventListener("mousemove", throttle(drag, 5));
             cpWindow.addEventListener("mouseup", endDrag);
@@ -729,7 +727,6 @@ class WheelMode extends ColorMode {
             /** startDrag: start drag event for draggable elements */
             function startDrag(evt) {
                 let element = evt.target;
-                console.log("start drag");
                 // select the element, and make sure it is a dragable element
                 if (element.classList.contains('cp-draggable')) {
                     selectedElement = element;
@@ -949,11 +946,12 @@ var img = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='1
 
 /** GridMode: A mode for the ColorPicker that shows a grid of colors */
 class SliderMode extends ColorMode {
-    constructor(parent, state, setState) {
+    constructor(parent, state, setState, colorPickerInstance) {
         super(parent, state, setState);
         this.isRGB = true; // true if the current mode is RGB, false if it is HSL
         this.HSL = [0, 0, 0];
         this.parent.replaceChildren();
+        this.cpInstance = colorPickerInstance;
         this.init();
     }
     /** toDOM: creates the body of the Grid */
@@ -982,7 +980,6 @@ class SliderMode extends ColorMode {
     /** updateColorDisplay: updates the color display to be the current color  */
     updateColorDisplay() {
         const colorDisplay = document.querySelector('.cp-slider-color-display');
-        console.log("update Color display called");
         colorDisplay.style.backgroundColor = `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]})`;
     }
     /** setupSavedColors: sets up saved colors by adding event handlers */
@@ -996,7 +993,7 @@ class SliderMode extends ColorMode {
             // if saved colors is length 5, remove the last element
             if (savedColors.length == 5)
                 savedColors.pop();
-            this.state.savedColors = savedColors;
+            this.setState({ savedColors });
             this.updateSavedColors();
         });
         // update the appearance of each color grid based on the queue 
@@ -1014,7 +1011,7 @@ class SliderMode extends ColorMode {
                         colorIntArr.push(Number(color));
                     });
                     this.setState({ currentColor: colorIntArr });
-                    this.state.currentColor = colorIntArr;
+                    //this.state.currentColor = colorIntArr;
                     this.updateColorDisplay();
                 }
                 else
@@ -1044,9 +1041,7 @@ class SliderMode extends ColorMode {
     /** updatedSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
     updateSavedColors() {
         const savedColors = this.state.savedColors;
-        console.log(savedColors);
         const savedSquares = document.querySelectorAll(".cp-saved-colors");
-        console.log(savedColors);
         savedSquares.forEach(square => {
             square.style.backgroundColor = '#f1f1f1';
         });
@@ -1068,9 +1063,8 @@ class SliderMode extends ColorMode {
         let slider3 = new Slider(parent, this.state.currentColor[2], 0, 255, 'Blue', '200px', 'Blue', true);
         /** add event listeners for every slider */
         slider1.inputElement.addEventListener('input', () => {
-            this.state.currentColor[0] = slider1.getValue();
-            this.updateColorDisplay();
             this.setState({ currentColor: [slider1.getValue(), this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]] });
+            this.updateColorDisplay();
         });
         slider2.inputElement.addEventListener('input', () => {
             this.state.currentColor[1] = slider2.getValue();
@@ -1100,8 +1094,6 @@ class SliderMode extends ColorMode {
             this.state.currentColor = newRGB;
             this.setState({ currentColor: newRGB });
             this.updateColorDisplay();
-            this.setState({ currentColor: this.state.currentColor });
-            console.log(this.state.currentColor);
         });
         slider2.inputElement.addEventListener('input', () => {
             this.HSL[1] = slider2.getValue();
@@ -1109,17 +1101,12 @@ class SliderMode extends ColorMode {
             this.state.currentColor = newRGB;
             this.setState({ currentColor: newRGB });
             this.updateColorDisplay();
-            this.setState({ currentColor: this.state.currentColor });
-            console.log(this.state.currentColor);
         });
         slider3.inputElement.addEventListener('input', () => {
             this.HSL[2] = slider3.getValue();
             const newRGB = HSLAToRGBA(this.HSL[0], this.HSL[1], this.HSL[2], this.state.currentColor[3]);
-            console.log(newRGB);
-            this.state.currentColor = newRGB;
             this.setState({ currentColor: newRGB });
             this.updateColorDisplay();
-            this.setState({ currentColor: this.state.currentColor });
         });
     }
     /** init(): initializes the grid  */
@@ -1149,7 +1136,11 @@ class ColorPicker {
     }
     /** setState: used to change the state of the color picker and call all update functions */
     setState(newState) {
-        this.state = Object.assign(Object.assign({}, this.state), newState);
+        // Directly update properties of the existing state object
+        Object.keys(newState).forEach(key => {
+            this.state[key] = newState[key];
+        });
+        // Call update functions to reflect changes
         this.updateColorParameters();
         this.updateModelDisplay();
     }
@@ -1220,7 +1211,7 @@ class ColorPicker {
             changeButtonColor(modeButtons[2], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[1], false);
-            new SliderMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
+            new SliderMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this);
         });
         // attach event listener to model indicator button
         let modelIndicatorButton = document.querySelector('.cp-model-indicator');
@@ -1239,9 +1230,9 @@ class ColorPicker {
     /** initAlphaSlider: initializes the alpha slider */
     initAlphaSlider() {
         let alphaSlider = document.querySelector('.cp-alpha-slider');
-        console.log(alphaSlider);
         alphaSlider.addEventListener('input', () => {
             this.setState({ currentColor: [this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], parseInt(alphaSlider.value)] });
+            (this.state);
         });
     }
     /** toDOM: creates and attaches the ColorPicker body to parent */

@@ -52,7 +52,6 @@ export class WheelMode extends ColorMode {
     /** innerWheelSetup() : sets up the color of the inner wheel  */
     innerWheelSetup() {
         // get the inner wheel 
-        console.log('inner wheel setup');
         const innerWheel = document.querySelector('.cp-inner-wheel');
         let netlogoColors = Object.keys(colors.mappedColors);
         let hexColors = [];
@@ -114,7 +113,6 @@ export class WheelMode extends ColorMode {
         const center = [55, 55];
         const svg = document.querySelector(".cp-wheel-svg");
         if (svg === null) {
-            console.log("null");
             return;
         }
         /** calculate the correct x and y coords in the svg viewbox for each text element  */
@@ -262,7 +260,6 @@ export class WheelMode extends ColorMode {
         }
         function makeDraggable(cpWindow) {
             // confinement code should go here
-            console.log("make draggable called");
             cpWindow.addEventListener("mousedown", startDrag);
             cpWindow.addEventListener("mousemove", throttle(drag, 5));
             cpWindow.addEventListener("mouseup", endDrag);
@@ -272,7 +269,6 @@ export class WheelMode extends ColorMode {
             /** startDrag: start drag event for draggable elements */
             function startDrag(evt) {
                 let element = evt.target;
-                console.log("start drag");
                 // select the element, and make sure it is a dragable element
                 if (element.classList.contains('cp-draggable')) {
                     selectedElement = element;
