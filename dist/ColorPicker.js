@@ -9,9 +9,13 @@ import { rgbToNetlogo } from './helpers/colors';
 import { GridMode } from './CPModes/GridMode';
 import { WheelMode } from './CPModes/WheelMode';
 import { SliderMode } from './CPModes/SliderMode';
+import cpDropdown from './assets/drop-down.svg';
 export default class ColorPicker {
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(parent, initColor, onColorSelect) {
+        // color display states that only ColorPicker needs to know about
+        this.isRGBDisplay = true; // true if the color display is in RGB mode, false if it is in HSLA mode
+        this.isNetLogoNum = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
         this.state = {
             currentColor: initColor,
             currentMode: 'grid',
@@ -45,7 +49,11 @@ export default class ColorPicker {
     }
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     updateColorParameters() {
-        let colorParamDisplay = document.querySelectorAll('.cp-values-display');
+        // update the color parameter type display
+        const colorParamType = document.querySelectorAll('.cp-values-type-text');
+        colorParamType[0].innerHTML = this.isRGBDisplay ? 'RGBA' : 'HSLA';
+        colorParamType[1].innerHTML = 'NetLogo';
+        let colorParamDisplay = document.querySelectorAll('.cp-values-value');
         colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
         colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
         this.updateAlphaSlider();
@@ -173,8 +181,24 @@ export default class ColorPicker {
                     </div>
                     <div class="cp-values-display-cont">
                         <span class="cp-color-param-txt"> Color Parameters </span>
-                        <div class="cp-values-display"></div>
-                        <div class="cp-values-display"></div>
+                        <div class="cp-values-display">
+                            <div class="cp-values-type">
+                                <div class="cp-values-cont">
+                                    <span class="cp-values-type-text"></span>
+                                    <img class="cp-values-img" src="${cpDropdown}">
+                                </div>
+                                <span class="cp-values-value"></span>
+                            </div>
+                        </div>
+                        <div class="cp-values-display">
+                            <div class="cp-values-type">
+                                <div class="cp-values-cont">
+                                    <span class="cp-values-type-text"></span>
+                                    <img class="cp-values-img" src="${cpDropdown}">
+                                </div>
+                                <span class="cp-values-value"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -141,31 +141,34 @@ export class WheelMode extends ColorMode {
         }
         
         // create text elements for the outer wheel 
-        // if(this.state.increment == 0.01) return;
-        // const outerRadius = 51;
-        // const numIncrements = 10 / this.state.increment;
-        // const outerDegreesPerIncrement = 360 / numIncrements;
+        const numIncrements = 10 / this.state.increment + 1;
+        const degreesPerIncrementOuter = 360 / numIncrements;
+        const outerRadius = 55;
+        const arcOffsetFactor = (this.state.increment == 1) ? 1.75 : 1.6;
+        let angle;
+        let angleInRadians;
+        for(let i = 0; i < numIncrements + 1; i++) {
+            angle = i * degreesPerIncrementOuter + degreesPerIncrementOuter / arcOffsetFactor;
+            angleInRadians = this.toRadians(angle);
+            const x = center[0] + outerRadius * Math.sin(angleInRadians);
+            const y = center[1] - outerRadius * Math.cos(angleInRadians);
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', `${x}`);
+            text.setAttribute('y', `${y}`);
+            text.setAttribute('text-anchor', 'middle');
+            const textOffsetX = x + 2;
+            const textOffsetY = y - 2;
+            text.setAttribute('transform', `rotate(${angle}, ${textOffsetX}, ${textOffsetY})`);
+            text.classList.add('cp-wheel-numbers');
+            if( i > (numIncrements / 3)) {
+                text.style.fill = "black";
+                text.style.fontSize = '1rem';
+            }
+            this.textElements.push(text);
+            svg.appendChild(text);
+            console.log("run");
+        }
         
-        // for(let i = 0; i <= numIncrements; i++) {
-        //     let angle = outerDegreesPerIncrement * i - 90; // Adjusting starting angle to -90 degrees for correct orientation
-        //     let angleInRadians = this.toRadians(angle);
-        //     const x = center[0] + outerRadius * Math.sin(angleInRadians);
-        //     const y = center[1] + outerRadius * Math.cos(angleInRadians);
-        //     let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        //     text.setAttribute('x', `${x}`);
-        //     text.setAttribute('y', `${y}`);
-        //     text.setAttribute('fill', 'white');
-        //     text.setAttribute('font-size', '0.2rem');
-        //     text.setAttribute('text-anchor', 'middle');
-        //     text.setAttribute('dominant-baseline', 'central'); // Ensuring vertical alignment is centered
-        //     // Apply rotation directly at the text's position without offset
-        //     text.setAttribute('transform', `rotate(${angle + 90}, ${x}, ${y})`); // Correcting rotation to make text upright
-        //     text.classList.add('cp-wheel-text');
-        //     text.setAttribute('visibility', this.state.showNumbers ? 'visible' : 'hidden');
-        //     text.textContent = `${(i * this.state.increment).toFixed(2)}`; // Adjust text content as needed
-        //     this.textElements.push(text);
-        //     svg.appendChild(text);
-        // }
         
     }
 
