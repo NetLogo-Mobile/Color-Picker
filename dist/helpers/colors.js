@@ -23,6 +23,87 @@ const netlogoBaseColors = [
     [0, 0, 0], // black
     [255, 255, 255], // white
 ];
+const baseColorsToRGB = {
+    gray: 'rgb(141, 141, 141)',
+    red: 'rgb(215, 50, 41)',
+    orange: 'rgb(241, 106, 21)',
+    brown: 'rgb(157, 110, 72)',
+    yellow: 'rgb(237, 237, 49)',
+    green: 'rgb(89, 176, 60)',
+    lime: 'rgb(44, 209, 59)',
+    turquoise: 'rgb(29, 159, 120)',
+    cyan: 'rgb(84, 196, 196)',
+    sky: 'rgb(45, 141, 190)',
+    blue: 'rgb(52, 93, 169)',
+    violet: 'rgb(124, 80, 164)',
+    magenta: 'rgb(167, 27, 106)',
+    pink: 'rgb(224, 127, 150)',
+    black: 'rgb(0, 0, 0)',
+    white: 'rgb(255, 255, 255)',
+};
+/** colorToNumberMapping: maps the NetLogo Base colors to their corresponding numeric value  */
+const colorToNumberMapping = {
+    gray: 5,
+    red: 15,
+    orange: 25,
+    brown: 35,
+    yellow: 45,
+    green: 55,
+    lime: 65,
+    turquoise: 75,
+    cyan: 85,
+    sky: 95,
+    blue: 105,
+    violet: 115,
+    magenta: 125,
+    pink: 135,
+    black: 145,
+    white: 155,
+};
+/** netlogoToRGB: converts netlogo colors to rgb string  */
+function netlogoToRGB(netlogoColor) {
+    let temp = cached[Math.floor(netlogoColor * 10)];
+    return `rgb(${temp[0]}, ${temp[1]}, ${temp[2]})`;
+}
+/* compoundToRGB: return the compound string (red + 5) to a regular number */
+function compoundToRGB(content) {
+    let stringSplit = content.split(' ');
+    try {
+        if (stringSplit[1] == '+') {
+            return netlogoToRGB(colorToNumberMapping[stringSplit[0]] + Number(stringSplit[2]));
+        }
+        else if (stringSplit[1] == '-') {
+            return netlogoToRGB(colorToNumberMapping[stringSplit[0]] - Number(stringSplit[2]));
+        }
+    }
+    catch (_a) {
+        return '';
+    }
+    return '';
+}
+/** netlogoArrToRGB: returns the rgb string from a netlogo color array */
+function netlogoArrToRGB(inputString) {
+    // Check for valid opening and closing brackets
+    if (!inputString.startsWith('[') || !inputString.endsWith(']')) {
+        return '';
+    }
+    const numbers = inputString
+        .slice(1, -1)
+        .split(/\s+/)
+        .filter((n) => n);
+    if (numbers.length === 3 || numbers.length === 4) {
+        const validNumbers = numbers.map(Number).every((num) => !isNaN(num) && num >= 0 && num <= 255);
+        if (validNumbers) {
+            if (numbers.length === 3) {
+                return `rgb(${numbers.join(', ')})`;
+            }
+            else {
+                return `rgba(${numbers.join(', ')})`;
+            }
+        }
+    }
+    return '';
+}
 /** mappedColors: Maps the name of the base colors to their corresponding NetLogo representation*/
 var mappedColors = {
     gray: 5,
