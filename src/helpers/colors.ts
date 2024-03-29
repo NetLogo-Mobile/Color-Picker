@@ -356,5 +356,12 @@ export {
   arrToString,
   hexToRgb,
   HSLAToRGBA,
-  netlogoToCompound
+  netlogoToCompound,
+  netlogoArrToRGB,
+  compoundToRGB,
+  colorToNumberMapping,
+  baseColorsToRGB,
+  colorToHex,
+  netlogoToRGB,
+
 };
