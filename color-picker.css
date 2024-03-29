@@ -322,7 +322,6 @@ input[type='range'].cp-styled-slider.color-blue.slider-progress:hover::-webkit-s
   width: 100%;
   border: 1px solid #c0c0c0;
   border-radius: 0.15rem;
-  justify-content: center;
   align-items: center;
 }
 
@@ -334,6 +333,17 @@ input[type='range'].cp-styled-slider.color-blue.slider-progress:hover::-webkit-s
 
 .cp-values-type-text {
   font-weight: 500;
+  padding-left: 10%;
+}
+
+.cp-values-value-cont {
+  display: flex;
+  width: 65%;
+  justify-content: center;
+}
+/* the first value cont should have a greater width*/
+.cp-values-value-cont-1 {
+  width: 75%;
 }
 
 .cp-values-type {
@@ -341,6 +351,13 @@ input[type='range'].cp-styled-slider.color-blue.slider-progress:hover::-webkit-s
   font-size: 0.6rem;
   display: flex;
   flex-direction: row;
+  width: 35%;
+  height: 100%;
+  cursor: pointer;
+}
+/* the first cp-values-type should have a smaller width */
+.cp-values-type-1 {
+  width: 25%;
 }
 
 .cp-values-value {
@@ -358,6 +375,7 @@ input[type='range'].cp-styled-slider.color-blue.slider-progress:hover::-webkit-s
   display: flex;
   flex-direction: column;
   gap: 0.53rem;
+  user-select: none;
 }
 
 /** grid stylings */

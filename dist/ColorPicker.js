@@ -10,6 +10,7 @@ import { GridMode } from './CPModes/GridMode';
 import { WheelMode } from './CPModes/WheelMode';
 import { SliderMode } from './CPModes/SliderMode';
 import cpDropdown from './assets/drop-down.svg';
+import * as colors from './helpers/colors';
 export default class ColorPicker {
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(parent, initColor, onColorSelect) {
@@ -54,7 +55,14 @@ export default class ColorPicker {
         colorParamType[0].innerHTML = this.isRGBDisplay ? 'RGBA' : 'HSLA';
         colorParamType[1].innerHTML = 'NetLogo';
         let colorParamDisplay = document.querySelectorAll('.cp-values-value');
-        colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
+        console.log(colorParamDisplay);
+        if (this.isRGBDisplay) {
+            colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
+        }
+        else {
+            // hsla display
+            console.log(colors.RGBAToHSLA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]));
+        }
         colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
         this.updateAlphaSlider();
     }
@@ -75,6 +83,7 @@ export default class ColorPicker {
     }
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
     attachEventListeners() {
+        var _a, _b;
         /** changeButtonColor: Helper function to toggle button color */
         function changeButtonColor(button, isPressed) {
             // Set styles based on isPressed
@@ -123,6 +132,18 @@ export default class ColorPicker {
         closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => {
             this.parent.replaceChildren();
             this.onColorSelect(this.state.currentColor);
+        });
+        // attach switch color display parameters event listeners 
+        const paramSwitchBtns = document.querySelectorAll('.cp-values-type');
+        // this is the RGBA / HSLA param button
+        (_a = paramSwitchBtns[0]) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
+            this.isRGBDisplay = !this.isRGBDisplay;
+            this.updateColorParameters();
+        });
+        // NetLogo number --> doesn't have to switch text but does switch the display value 
+        (_b = paramSwitchBtns[1]) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => {
+            this.isNetLogoNum = !this.isNetLogoNum;
+            this.updateColorParameters();
         });
     }
     /** initAlphaSlider: initializes the alpha slider */
@@ -182,13 +203,16 @@ export default class ColorPicker {
                     <div class="cp-values-display-cont">
                         <span class="cp-color-param-txt"> Color Parameters </span>
                         <div class="cp-values-display">
-                            <div class="cp-values-type">
+                            <div class="cp-values-type cp-values-type-1">
                                 <div class="cp-values-cont">
                                     <span class="cp-values-type-text"></span>
                                     <img class="cp-values-img" src="${cpDropdown}">
                                 </div>
+                            </div>
+                            <div class="cp-values-value-cont cp-values-value-cont-1">
                                 <span class="cp-values-value"></span>
                             </div>
+                            
                         </div>
                         <div class="cp-values-display">
                             <div class="cp-values-type">
@@ -196,6 +220,8 @@ export default class ColorPicker {
                                     <span class="cp-values-type-text"></span>
                                     <img class="cp-values-img" src="${cpDropdown}">
                                 </div>
+                            </div>
+                            <div class="cp-values-value-cont">
                                 <span class="cp-values-value"></span>
                             </div>
                         </div>
