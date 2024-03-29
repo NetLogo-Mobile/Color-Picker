@@ -17,7 +17,7 @@ declare class ColorPicker {
     state: ColorPickerState;
     private parent;
     private onColorSelect;
-    private isRGBDisplay;
+    private displayParameter;
     private isNetLogoNum;
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(parent: HTMLElement, initColor: number[], onColorSelect: (color: any) => void);

@@ -15,7 +15,7 @@ export default class ColorPicker {
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(parent, initColor, onColorSelect) {
         // color display states that only ColorPicker needs to know about
-        this.isRGBDisplay = true; // true if the color display is in RGB mode, false if it is in HSLA mode
+        this.displayParameter = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
         this.isNetLogoNum = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
         this.state = {
             currentColor: initColor,
@@ -52,18 +52,31 @@ export default class ColorPicker {
     updateColorParameters() {
         // update the color parameter type display
         const colorParamType = document.querySelectorAll('.cp-values-type-text');
-        colorParamType[0].innerHTML = this.isRGBDisplay ? 'RGBA' : 'HSLA';
+        colorParamType[0].innerHTML = this.displayParameter;
         colorParamType[1].innerHTML = 'NetLogo';
         let colorParamDisplay = document.querySelectorAll('.cp-values-value');
-        console.log(colorParamDisplay);
-        if (this.isRGBDisplay) {
+        if (this.displayParameter == 'RGBA') {
             colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
         }
-        else {
-            // hsla display
-            console.log(colors.RGBAToHSLA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]));
+        else if (this.displayParameter == 'HEX') {
+            // hex display
+            colorParamDisplay[0].innerHTML = `${colors.rgbaToHex(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3])}`;
         }
-        colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
+        else {
+            // HSLA display
+            const hsla = colors.RGBAToHSLA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
+            colorParamDisplay[0].innerHTML = `(${hsla[0]}, ${hsla[1]}, ${hsla[2]}, ${hsla[3]})`;
+        }
+        // netlogo color parameter update
+        if (this.isNetLogoNum) {
+            // netlogo number
+            colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
+        }
+        else {
+            const compoundColor = `${colors.netlogoToCompound(colors.rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]))}`;
+            const formattedColor = compoundColor.charAt(0).toUpperCase() + compoundColor.slice(1);
+            colorParamDisplay[1].innerHTML = formattedColor;
+        }
         this.updateAlphaSlider();
     }
     /** updateAlphaSlider(): updates the appearance of the alpha slider to match the current alpha value */
@@ -137,7 +150,15 @@ export default class ColorPicker {
         const paramSwitchBtns = document.querySelectorAll('.cp-values-type');
         // this is the RGBA / HSLA param button
         (_a = paramSwitchBtns[0]) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
-            this.isRGBDisplay = !this.isRGBDisplay;
+            if (this.displayParameter == 'RGBA') {
+                this.displayParameter = 'HEX';
+            }
+            else if (this.displayParameter == 'HEX') {
+                this.displayParameter = "HSLA";
+            }
+            else if (this.displayParameter == 'HSLA') {
+                this.displayParameter = 'RGBA';
+            }
             this.updateColorParameters();
         });
         // NetLogo number --> doesn't have to switch text but does switch the display value 

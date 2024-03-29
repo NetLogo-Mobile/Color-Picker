@@ -158,7 +158,6 @@ export class WheelMode extends ColorMode {
             }
             this.textElements.push(text);
             svg.appendChild(text);
-            console.log("run");
         }
     }
     /** updateInnerWheel: Updates the color of the wheel based on the location of the inner thumb */
@@ -264,7 +263,7 @@ export class WheelMode extends ColorMode {
         function makeDraggable(cpWindow) {
             // confinement code should go here
             cpWindow.addEventListener("mousedown", startDrag);
-            cpWindow.addEventListener("mousemove", throttle(drag, 5));
+            cpWindow.addEventListener("mousemove", throttle(drag, 1));
             cpWindow.addEventListener("mouseup", endDrag);
             cpWindow.addEventListener("mouseleave", endDrag);
             let svg = document.querySelector(".cp-wheel-svg");

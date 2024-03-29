@@ -235,6 +235,23 @@ function netlogoColorToRGBA(
   return [temp[0], temp[1], temp[2], alpha];
 }
 
+/** netlogoToCompound: Converts a numeric NetLogo Color to a compound color string */
+function netlogoToCompound(netlogoColor: number): string {
+  let baseColorIndex = Math.floor(netlogoColor / 10);
+  let baseColorName = Object.keys(mappedColors)[baseColorIndex];
+  // Calculate offset and immediately round to one decimal point
+  let offset = Number(((netlogoColor % 10) - 5).toFixed(1));
+
+  if (offset === 0) {
+    // If the color is a base color, return only the base color name
+    return baseColorName;
+  } else if (offset > 0) {
+    return `${baseColorName} + ${offset}`;
+  } else {
+    return `${baseColorName} - ${Math.abs(offset)}`;
+  }
+}
+
 export {
   netlogoColorToHex,
   netlogoColorToRGBA,
@@ -255,5 +272,6 @@ export {
   rgbToNetlogo,
   arrToString,
   hexToRgb,
-  HSLAToRGBA
+  HSLAToRGBA,
+  netlogoToCompound
 };

@@ -166,7 +166,6 @@ export class WheelMode extends ColorMode {
             }
             this.textElements.push(text);
             svg.appendChild(text);
-            console.log("run");
         }
         
         
@@ -283,7 +282,7 @@ export class WheelMode extends ColorMode {
         function makeDraggable(cpWindow: HTMLElement) {
             // confinement code should go here
             cpWindow.addEventListener("mousedown", startDrag);
-            cpWindow.addEventListener("mousemove", throttle(drag, 5));
+            cpWindow.addEventListener("mousemove", throttle(drag, 1));
             cpWindow.addEventListener("mouseup", endDrag);
             cpWindow.addEventListener("mouseleave", endDrag);
             let svg = document.querySelector(".cp-wheel-svg") as SVGSVGElement;
