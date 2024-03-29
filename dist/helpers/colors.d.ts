@@ -8,6 +8,18 @@ declare var b: number;
 declare var step: number;
 /** netlogoBaseColors: The array of NetLogo base colors in [r, g, b] form. */
 declare const netlogoBaseColors: [number, number, number][];
+declare const baseColorsToRGB: {
+    [key: string]: string;
+};
+/** colorToNumberMapping: maps the NetLogo Base colors to their corresponding numeric value  */
+declare const colorToNumberMapping: {
+    [key: string]: number;
+};
+/** netlogoToRGB: converts netlogo colors to rgb string  */
+declare function netlogoToRGB(netlogoColor: number): string;
+declare function compoundToRGB(content: string): string;
+/** netlogoArrToRGB: returns the rgb string from a netlogo color array */
+declare function netlogoArrToRGB(inputString: string): string;
 /** mappedColors: Maps the name of the base colors to their corresponding NetLogo representation*/
 declare var mappedColors: {
     [key: string]: number;
@@ -18,6 +30,7 @@ declare let cachedNetlogoColors: number[][];
 declare function componentToHex(c: number): string;
 /** hexToRgb: converts a hex value to rgb  */
 declare function hexToRgb(hex: string): [number, number, number];
+declare function colorToHex(r: number, g: number, b: number, a?: number): string;
 declare function rgbToHex(r: number, g: number, b: number): string;
 declare function rgbaToHex(r: number, g: number, b: number, a: number): string;
 declare function rgbToNetlogo([r, g, b]: number[]): number;
@@ -37,4 +50,4 @@ declare function netlogoColorToRGBA(netlogoColor: number, alpha?: number): numbe
 /** netlogoToCompound: Converts a numeric NetLogo Color to a compound color string */
 declare function netlogoToCompound(netlogoColor: number): string;
 
-export { HSLAToRGBA, RGBAToHSLA, arrToString, b, baseIndex, cached, cachedNetlogoColors, colorTimesTen, componentToHex, g, hexToRgb, mappedColors, netlogoBaseColors, netlogoColorToHex, netlogoColorToRGBA, netlogoToCompound, r, rgbToHex, rgbToNetlogo, rgbaToHex, step };
+export { HSLAToRGBA, RGBAToHSLA, arrToString, b, baseColorsToRGB, baseIndex, cached, cachedNetlogoColors, colorTimesTen, colorToHex, colorToNumberMapping, componentToHex, compoundToRGB, g, hexToRgb, mappedColors, netlogoArrToRGB, netlogoBaseColors, netlogoColorToHex, netlogoColorToRGBA, netlogoToCompound, netlogoToRGB, r, rgbToHex, rgbToNetlogo, rgbaToHex, step };

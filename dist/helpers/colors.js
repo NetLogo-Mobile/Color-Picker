@@ -307,4 +307,4 @@ function netlogoToCompound(netlogoColor) {
         return `${baseColorName} - ${Math.abs(offset)}`;
     }
 }
-export { netlogoColorToHex, netlogoColorToRGBA, mappedColors, cachedNetlogoColors, netlogoBaseColors, cached, RGBAToHSLA, rgbToHex, rgbaToHex, componentToHex, r, g, b, step, baseIndex, colorTimesTen, rgbToNetlogo, arrToString, hexToRgb, HSLAToRGBA, netlogoToCompound };
+export { netlogoColorToHex, netlogoColorToRGBA, mappedColors, cachedNetlogoColors, netlogoBaseColors, cached, RGBAToHSLA, rgbToHex, rgbaToHex, componentToHex, r, g, b, step, baseIndex, colorTimesTen, rgbToNetlogo, arrToString, hexToRgb, HSLAToRGBA, netlogoToCompound, netlogoArrToRGB, compoundToRGB, colorToNumberMapping, baseColorsToRGB, colorToHex, netlogoToRGB, };
