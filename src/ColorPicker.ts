@@ -19,19 +19,19 @@ export default class ColorPicker {
     //parent: the parent element of the ColorPicker
     private parent: HTMLElement;
     // onColorSelect: a callback function that is called when a color is selected
-    private onColorSelect: (color: number[]) => void;
+    private onColorSelect: (colorData: [number[], number[][]]) => void;
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
-    constructor(parent: HTMLElement, initColor: number[], onColorSelect: (color: any) => void) {
+    constructor(parent: HTMLElement, initColor: number[], onColorSelect: (colorData: [number[], number[][]]) => void, savedColors: number[][] = []) {
         this.state = {
             currentColor: initColor,
             currentMode: 'grid',
             changeModelColor: true,
             increment : 1,
             showNumbers: false,
-            savedColors: [],  // queue of saved colors 
+            savedColors: savedColors,  // queue of saved colors 
         }
         this.parent = parent;
         this.onColorSelect = onColorSelect;
@@ -154,8 +154,8 @@ export default class ColorPicker {
         //attach event listener to close button
         const closeButton = document.querySelector('.cp-close');
         closeButton?.addEventListener('click', () => {
-            this.parent.replaceChildren();
-            this.onColorSelect(this.state.currentColor);
+            // return the selected color, as well as the saved colors for "memory"
+            this.onColorSelect([this.state.currentColor, this.state.savedColors]);
         });
 
         // attach switch color display parameters event listeners 

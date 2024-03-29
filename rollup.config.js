@@ -38,4 +38,16 @@ export default [
         tsconfig: './tsconfig.json',
       }),],
   },
+  {
+    input: './src/helpers/colors.ts',
+    output: [
+      {
+        file: './dist/helpers/colors.d.ts',
+        format: 'es',
+      },
+    ],
+    plugins: [
+      dts(),
+    ],
+  },
 ];
