@@ -279,6 +279,7 @@ export class WheelMode extends ColorMode {
             }
         }
 
+    
         function makeDraggable(cpWindow: HTMLElement) {
             // confinement code should go here
             cpWindow.addEventListener("mousedown", startDrag);
@@ -287,6 +288,35 @@ export class WheelMode extends ColorMode {
             cpWindow.addEventListener("mouseleave", endDrag);
             let svg = document.querySelector(".cp-wheel-svg") as SVGSVGElement;
             let selectedElement: SVGSVGElement | null;
+
+            /** makeClickable: makes the inner and outer wheels clickable to move the thumb to that location */
+            function makeClickable() {
+                const innerThumb = document.querySelector('.cp-inner-thumb');
+                const outerThumb = document.querySelector('.cp-outer-thumb');
+                const innerWheel = document.querySelector('.cp-inner-wheel');
+                const outerWheel = document.querySelector('.cp-outer-wheel');
+                const svg = document.querySelector(".cp-wheel-svg") as SVGSVGElement;
+                innerWheel?.addEventListener('click', (evt) => {
+                    const pos = dragHelper.getMousePosition(evt as MouseEvent, svg as SVGSVGElement);
+                    if(pos != null) {
+                        innerThumb?.setAttribute('cx', pos.x.toString());
+                        innerThumb?.setAttribute('cy', pos.y.toString());
+                        wheel.updateInnerWheel(innerThumb as SVGSVGElement);
+                    }
+                }); 
+                outerWheel?.addEventListener('click', (evt) => {
+                    // outer wheel clicked so move the outer thumb to the location of the click
+                    const pos = dragHelper.getMousePosition(evt as MouseEvent, svg as SVGSVGElement);
+                    if(pos != null) {
+                        // use outer thumb confinement to restrict the movement of the outer thumb
+                        const confined = confinementOuter(pos.x, pos.y);
+                        outerThumb?.setAttribute('cx', confined.x.toString());
+                        outerThumb?.setAttribute('cy', confined.y.toString());
+                        wheel.changeColor();
+                    }
+                });
+            }
+            makeClickable();
 
             /** startDrag: start drag event for draggable elements */
             function startDrag(evt: MouseEvent | TouchEvent) {
@@ -361,8 +391,8 @@ export class WheelMode extends ColorMode {
             function endDrag(evt: MouseEvent | TouchEvent) {
                 selectedElement = null;
             }
-
         }
+
         if(cpWindow) {
             makeDraggable(cpWindow)
         }
@@ -404,6 +434,7 @@ export class WheelMode extends ColorMode {
     private toggleTextVisibility() {
         this.state.showNumbers ? this.textElements.forEach((text) => text.setAttribute('visibility', 'visible')) : this.textElements.forEach((text) => text.setAttribute('visibility', 'hidden'));
     }
+
 
     /** init: initializes a wheel mode  */
     private init() { 

@@ -1,1 +1,48 @@
-## Rewrite of netlogo color picker 
+## Introducing the Color Picker Feature for NetLogo Web
+
+This is a guide to the Color Picker feature for NetLogo Web. The Color Picker is a user interface that allows a user to explore and experiment with different colors, and finally select one. The selected color can then be provided to the program using the Color Picker in the form of a callback function. The Color Picker is still in the experimental stage, all feedback is welcome. 
+
+### Usage
+
+To integrate the Color Picker into your NetLogo Web project, start by installing the Color Picker npm package:
+
+```bash
+npm i @netlogo/netlogo-color-picker
+```
+
+After importing it into your project, you can create a Color Picker by calling the constructor.
+
+
+The `ColorPicker` class constructor requires several parameters for initialization:
+
+- `parent`: The HTML element that will host the Color Picker. This ensures the picker is embedded in the correct location in your UI.
+- `initColor`: The initial color selected in the Color Picker, expressed as an RGB array (e.g., `[255, 0, 0]` for red).
+- `onColorSelect`: A callback function that is invoked when a color is selected. This function should handle the selected color data. The returned color data is an array, where the first element is the selected color, and the second element is an array of the saved colors. 
+- `savedColors`: An optional array of colors that the user can save for later use. Each color is also represented as an RGB array.
+
+Here is a basic example of how to instantiate the Color Picker:
+
+```javascript
+const colorPicker = new ColorPicker(
+  document.getElementById('color-picker-container'),
+  [255, 255, 255], // Initial color as rgb (white)
+  (colorData) => {
+    console.log('Selected color:', colorData);
+  },
+  [[255, 0, 0], [0, 255, 0]] // Optional saved colors
+);
+```
+### Feature Overview
+
+The Color Picker consists of three modes, Grid, Wheel, and Slider. Each mode provides a different way of selecting colors.
+
+- `Grid`: Grid mode provides the standard NetLogo grid for selecting NetLogo colors. The grid contains cells of NetLogo colors from 0 - 139.9, moving up by a default of increment 1, which a user can change in the increment bar at the bottom of the feature.
+
+- `Wheel`: Wheel mode provides another way to select NetLogo colors, but with an inner and outer wheel. The outer wheel selects the base color for the outer wheel, and the outer wheel allows you to change the brightness of the base color. This provides a more intuitive way to select colors, especially on touch screens and mobile.
+
+- `Slider`: Slider mode comes in two sub-modes, RGB and HSL. This mode provides the traditional way of choosing a color by adjusting three sliders. You can choose an RGB color by specifying each individual value in the corresponding slider. Likewise you can choose an HSL color in HSL mode in the same way.
+
+Additionally, you can access the saved colors tab in the Slider mode. The saved colors tab allows you to "save" a color by pressing the button with a `+` sign. This color is saved in one of the squares, and you can set the color back to this color by pressing on it. 
+
+### Limitations 
+There are many limitations as this project is still in experimental stage. As such, all feedback and contributions are welcome. 

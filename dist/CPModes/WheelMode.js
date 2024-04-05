@@ -268,6 +268,34 @@ export class WheelMode extends ColorMode {
             cpWindow.addEventListener("mouseleave", endDrag);
             let svg = document.querySelector(".cp-wheel-svg");
             let selectedElement;
+            /** makeClickable: makes the inner and outer wheels clickable to move the thumb to that location */
+            function makeClickable() {
+                const innerThumb = document.querySelector('.cp-inner-thumb');
+                const outerThumb = document.querySelector('.cp-outer-thumb');
+                const innerWheel = document.querySelector('.cp-inner-wheel');
+                const outerWheel = document.querySelector('.cp-outer-wheel');
+                const svg = document.querySelector(".cp-wheel-svg");
+                innerWheel === null || innerWheel === void 0 ? void 0 : innerWheel.addEventListener('click', (evt) => {
+                    const pos = dragHelper.getMousePosition(evt, svg);
+                    if (pos != null) {
+                        innerThumb === null || innerThumb === void 0 ? void 0 : innerThumb.setAttribute('cx', pos.x.toString());
+                        innerThumb === null || innerThumb === void 0 ? void 0 : innerThumb.setAttribute('cy', pos.y.toString());
+                        wheel.updateInnerWheel(innerThumb);
+                    }
+                });
+                outerWheel === null || outerWheel === void 0 ? void 0 : outerWheel.addEventListener('click', (evt) => {
+                    // outer wheel clicked so move the outer thumb to the location of the click
+                    const pos = dragHelper.getMousePosition(evt, svg);
+                    if (pos != null) {
+                        // use outer thumb confinement to restrict the movement of the outer thumb
+                        const confined = confinementOuter(pos.x, pos.y);
+                        outerThumb === null || outerThumb === void 0 ? void 0 : outerThumb.setAttribute('cx', confined.x.toString());
+                        outerThumb === null || outerThumb === void 0 ? void 0 : outerThumb.setAttribute('cy', confined.y.toString());
+                        wheel.changeColor();
+                    }
+                });
+            }
+            makeClickable();
             /** startDrag: start drag event for draggable elements */
             function startDrag(evt) {
                 let element = evt.target;

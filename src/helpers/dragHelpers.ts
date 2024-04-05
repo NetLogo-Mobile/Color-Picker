@@ -12,6 +12,8 @@ function getMousePosition(evt: MouseEvent | TouchEvent, svg: SVGSVGElement) {
     }
 }
 
+
+
 /** distance: Calculates the distance between two points with coordinates (x1, y1), and (x2, y2) */
 function distance(x1: number, y1: number, x2: number, y2: number) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
