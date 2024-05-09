@@ -125,7 +125,7 @@ export class GridMode extends ColorMode {
 
   /** updateIncrementApperance: updates the increment button apperance based on which increment is on */
   public updateIncrementAppearance(): void {
-    const incrementBtns = document.querySelectorAll('.cp-numbers-btn');
+    const incrementBtns = this.parent.querySelectorAll('.cp-numbers-btn');
     incrementBtns[0].classList.toggle('cp-numbers-clicked', this.state.showNumbers);
     for(let i = 1; i < incrementBtns.length; i++) {
       const btn = incrementBtns[i];
@@ -138,7 +138,7 @@ export class GridMode extends ColorMode {
 
   /** attachEventListeners: Attaches the event listeners to the GridMode body */
   private attachEventListeners() {
-    const gridBtns = document.querySelectorAll('.cp-numbers-btn');
+    const gridBtns = this.parent.querySelectorAll('.cp-numbers-btn');
     // event listener of the numbers button 
     gridBtns[0].addEventListener('click', () => {
       this.setState({showNumbers: !this.state.showNumbers});

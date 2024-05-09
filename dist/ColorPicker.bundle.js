@@ -406,7 +406,7 @@ class GridMode extends ColorMode {
     /** updateIncrementApperance: updates the increment button apperance based on which increment is on */
     updateIncrementAppearance() {
         var _a;
-        const incrementBtns = document.querySelectorAll('.cp-numbers-btn');
+        const incrementBtns = this.parent.querySelectorAll('.cp-numbers-btn');
         incrementBtns[0].classList.toggle('cp-numbers-clicked', this.state.showNumbers);
         for (let i = 1; i < incrementBtns.length; i++) {
             const btn = incrementBtns[i];
@@ -418,7 +418,7 @@ class GridMode extends ColorMode {
     }
     /** attachEventListeners: Attaches the event listeners to the GridMode body */
     attachEventListeners() {
-        const gridBtns = document.querySelectorAll('.cp-numbers-btn');
+        const gridBtns = this.parent.querySelectorAll('.cp-numbers-btn');
         // event listener of the numbers button 
         gridBtns[0].addEventListener('click', () => {
             this.setState({ showNumbers: !this.state.showNumbers });
@@ -1169,20 +1169,20 @@ class SliderMode extends ColorMode {
 
 class ColorPicker {
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
-    constructor(parent, initColor, onColorSelect, savedColors = []) {
+    constructor(config) {
         // color display states that only ColorPicker needs to know about
         this.displayParameter = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
         this.isNetLogoNum = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
         this.state = {
-            currentColor: initColor,
+            currentColor: config.initColor,
             currentMode: 'grid',
             changeModelColor: true,
             increment: 1,
             showNumbers: false,
-            savedColors: savedColors, // queue of saved colors 
+            savedColors: config.savedColors || [], // Use an empty array as default if savedColors is not provided
         };
-        this.parent = parent;
-        this.onColorSelect = onColorSelect;
+        this.parent = config.parent;
+        this.onColorSelect = config.onColorSelect;
         this.init();
     }
     /** setState: used to change the state of the color picker and call all update functions */
@@ -1202,15 +1202,17 @@ class ColorPicker {
         this.attachEventListeners();
         this.initAlphaSlider();
         // click the grid button to start
-        document.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
+        this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     updateColorParameters() {
         // update the color parameter type display
-        const colorParamType = document.querySelectorAll('.cp-values-type-text');
+        console.log(this.parent);
+        const colorParamType = this.parent.querySelectorAll('.cp-values-type-text');
+        console.log(colorParamType);
         colorParamType[0].innerHTML = this.displayParameter;
         colorParamType[1].innerHTML = 'NetLogo';
-        let colorParamDisplay = document.querySelectorAll('.cp-values-value');
+        let colorParamDisplay = this.parent.querySelectorAll('.cp-values-value');
         if (this.displayParameter == 'RGBA') {
             colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
         }
@@ -1238,7 +1240,7 @@ class ColorPicker {
     /** updateAlphaSlider(): updates the appearance of the alpha slider to match the current alpha value */
     updateAlphaSlider() {
         const val = this.state.currentColor[3];
-        const alphaSlider = document.querySelector(".cp-alpha-slider");
+        const alphaSlider = this.parent.querySelector(".cp-alpha-slider");
         if (alphaSlider)
             alphaSlider.value = val.toString();
     }
@@ -1246,9 +1248,9 @@ class ColorPicker {
     updateModelDisplay() {
         var _a, _b;
         if (this.state.changeModelColor)
-            (_a = document.querySelector('.cp-model-preview')) === null || _a === void 0 ? void 0 : _a.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3] / 255})`);
+            (_a = this.parent.querySelector('.cp-model-preview')) === null || _a === void 0 ? void 0 : _a.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3] / 255})`);
         else
-            (_b = document.querySelector('.cp-model-background')) === null || _b === void 0 ? void 0 : _b.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, 1)`);
+            (_b = this.parent.querySelector('.cp-model-background')) === null || _b === void 0 ? void 0 : _b.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, 1)`);
     }
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
     attachEventListeners() {
@@ -1264,14 +1266,14 @@ class ColorPicker {
             }
         }
         // attach event listeners to the mode buttons 
-        let modeButtons = document.querySelectorAll('.cp-mode-btn');
+        let modeButtons = this.parent.querySelectorAll('.cp-mode-btn');
         modeButtons[0].addEventListener('click', () => {
             // grid button
             this.setState({ currentMode: 'grid' });
             changeButtonColor(modeButtons[0], true);
             changeButtonColor(modeButtons[1], false);
             changeButtonColor(modeButtons[2], false);
-            new GridMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
+            new GridMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
         modeButtons[1].addEventListener('click', () => {
             // wheel button
@@ -1279,7 +1281,7 @@ class ColorPicker {
             changeButtonColor(modeButtons[1], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[2], false);
-            new WheelMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
+            new WheelMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
         modeButtons[2].addEventListener('click', () => {
             // slider button
@@ -1287,23 +1289,23 @@ class ColorPicker {
             changeButtonColor(modeButtons[2], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[1], false);
-            new SliderMode(document.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this);
+            new SliderMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this);
         });
         // attach event listener to model indicator button
-        let modelIndicatorButton = document.querySelector('.cp-model-indicator');
+        let modelIndicatorButton = this.parent.querySelector('.cp-model-indicator');
         modelIndicatorButton === null || modelIndicatorButton === void 0 ? void 0 : modelIndicatorButton.addEventListener('click', () => {
             this.state.changeModelColor = !this.state.changeModelColor; // we don't want to call set state, because it updates the appearance as well 
             modelIndicatorButton.querySelector('.cp-mode-btn-text').innerHTML = this.state.changeModelColor ? ' Model Color Selected ' : ' Background Color Selected ';
             changeButtonColor(modelIndicatorButton, !this.state.changeModelColor);
         });
         //attach event listener to close button
-        const closeButton = document.querySelector('.cp-close');
+        const closeButton = this.parent.querySelector('.cp-close');
         closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => {
             // return the selected color, as well as the saved colors for "memory"
             this.onColorSelect([this.state.currentColor, this.state.savedColors]);
         });
         // attach switch color display parameters event listeners 
-        const paramSwitchBtns = document.querySelectorAll('.cp-values-type');
+        const paramSwitchBtns = this.parent.querySelectorAll('.cp-values-type');
         // this is the RGBA / HSLA param button
         (_a = paramSwitchBtns[0]) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
             if (this.displayParameter == 'RGBA') {
@@ -1325,7 +1327,7 @@ class ColorPicker {
     }
     /** initAlphaSlider: initializes the alpha slider */
     initAlphaSlider() {
-        let alphaSlider = document.querySelector('.cp-alpha-slider');
+        let alphaSlider = this.parent.querySelector('.cp-alpha-slider');
         alphaSlider.addEventListener('input', () => {
             this.setState({ currentColor: [this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], parseInt(alphaSlider.value)] });
             (this.state);

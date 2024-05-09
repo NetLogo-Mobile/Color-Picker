@@ -24,17 +24,22 @@ export default class ColorPicker {
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
-    constructor(parent: HTMLElement, initColor: number[], onColorSelect: (colorData: [number[], number[][]]) => void, savedColors: number[][] = []) {
+    constructor(config: {
+        parent: HTMLElement,
+        initColor: number[],
+        onColorSelect: (colorData: [number[], number[][]]) => void,
+        savedColors?: number[][]
+    }) {
         this.state = {
-            currentColor: initColor,
+            currentColor: config.initColor,
             currentMode: 'grid',
             changeModelColor: true,
             increment : 1,
             showNumbers: false,
-            savedColors: savedColors,  // queue of saved colors 
+            savedColors: config.savedColors || [],  // Use an empty array as default if savedColors is not provided
         }
-        this.parent = parent;
-        this.onColorSelect = onColorSelect;
+        this.parent = config.parent;
+        this.onColorSelect = config.onColorSelect;
         this.init();
     }
 
@@ -57,16 +62,18 @@ export default class ColorPicker {
         this.attachEventListeners();
         this.initAlphaSlider();
         // click the grid button to start
-        document.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
+        this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
 
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     private updateColorParameters() {
         // update the color parameter type display
-        const colorParamType = document.querySelectorAll('.cp-values-type-text');
+        console.log(this.parent)
+        const colorParamType = this.parent.querySelectorAll('.cp-values-type-text');
+        console.log(colorParamType)
         colorParamType[0].innerHTML = this.displayParameter;
         colorParamType[1].innerHTML = 'NetLogo';
-        let colorParamDisplay = document.querySelectorAll('.cp-values-value');
+        let colorParamDisplay = this.parent.querySelectorAll('.cp-values-value');
         if(this.displayParameter == 'RGBA') {
             colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
         } else if (this.displayParameter == 'HEX') {
@@ -93,14 +100,14 @@ export default class ColorPicker {
     /** updateAlphaSlider(): updates the appearance of the alpha slider to match the current alpha value */
     private updateAlphaSlider() {
         const val = this.state.currentColor[3];
-        const alphaSlider = document.querySelector(".cp-alpha-slider") as HTMLInputElement;
+        const alphaSlider = this.parent.querySelector(".cp-alpha-slider") as HTMLInputElement;
         if(alphaSlider) alphaSlider.value = val.toString();
     }
 
     /** updateModelDisplay: updates the color of the model/background  */
     private updateModelDisplay() {
-        if(this.state.changeModelColor) document.querySelector('.cp-model-preview')?.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3] / 255})`);
-        else document.querySelector('.cp-model-background')?.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, 1)`);
+        if(this.state.changeModelColor) this.parent.querySelector('.cp-model-preview')?.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3] / 255})`);
+        else this.parent.querySelector('.cp-model-background')?.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, 1)`);
     }
 
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
@@ -117,14 +124,14 @@ export default class ColorPicker {
         }
 
         // attach event listeners to the mode buttons 
-        let modeButtons = document.querySelectorAll('.cp-mode-btn');
+        let modeButtons = this.parent.querySelectorAll('.cp-mode-btn');
         modeButtons[0].addEventListener('click', () => {
             // grid button
             this.setState({ currentMode: 'grid' });
             changeButtonColor(modeButtons[0] as HTMLElement, true);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
-            new GridMode(document.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
+            new GridMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
         modeButtons[1].addEventListener('click', () => {
             // wheel button
@@ -132,7 +139,7 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[1] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
-            new WheelMode(document.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
+            new WheelMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
         modeButtons[2].addEventListener('click', () => {
             // slider button
@@ -140,11 +147,11 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[2] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
-            new SliderMode(document.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this);
+            new SliderMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this);
         });
 
         // attach event listener to model indicator button
-        let modelIndicatorButton = document.querySelector('.cp-model-indicator');
+        let modelIndicatorButton = this.parent.querySelector('.cp-model-indicator');
         modelIndicatorButton?.addEventListener('click', () => {
             this.state.changeModelColor = !this.state.changeModelColor; // we don't want to call set state, because it updates the appearance as well 
             modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? ' Model Color Selected ' : ' Background Color Selected ';
@@ -152,14 +159,14 @@ export default class ColorPicker {
         });
 
         //attach event listener to close button
-        const closeButton = document.querySelector('.cp-close');
+        const closeButton = this.parent.querySelector('.cp-close');
         closeButton?.addEventListener('click', () => {
             // return the selected color, as well as the saved colors for "memory"
             this.onColorSelect([this.state.currentColor, this.state.savedColors]);
         });
 
         // attach switch color display parameters event listeners 
-        const paramSwitchBtns = document.querySelectorAll('.cp-values-type');
+        const paramSwitchBtns = this.parent.querySelectorAll('.cp-values-type');
         // this is the RGBA / HSLA param button
         paramSwitchBtns[0]?.addEventListener('click', () => {
             if(this.displayParameter == 'RGBA') {
@@ -181,7 +188,7 @@ export default class ColorPicker {
 
     /** initAlphaSlider: initializes the alpha slider */
     private initAlphaSlider() {
-        let alphaSlider = document.querySelector('.cp-alpha-slider') as HTMLInputElement;
+        let alphaSlider = this.parent.querySelector('.cp-alpha-slider') as HTMLInputElement;
         (alphaSlider);
         alphaSlider.addEventListener('input', () => {
             this.setState({ currentColor: [this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], parseInt(alphaSlider.value)] });
