@@ -32,6 +32,17 @@ const colorPickerConfig = {
 const colorPicker = new ColorPicker(colorPickerConfig);
 ```
 
+## TypeScript 
+You can import import the ColorPickerConfig interface. 
+```typescript
+export interface ColorPickerConfig {
+    parent: HTMLElement;
+    initColor: number[];
+    onColorSelect: (colorData: [number[], number[][]]) => void;
+    savedColors?: number[][];
+}
+```
+
 ## Feature Overview
 
 The Color Picker consists of three modes: Grid, Wheel, and Slider. Each mode provides a different way of selecting colors.

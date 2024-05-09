@@ -13,6 +13,13 @@ import { ColorPickerState } from './CPModes/ColorMode';
 import cpDropdown from './assets/drop-down.svg';
 import * as colors from './helpers/colors'
 
+export interface ColorPickerConfig {
+    parent: HTMLElement;
+    initColor: number[];
+    onColorSelect: (colorData: [number[], number[][]]) => void;
+    savedColors?: number[][];
+}
+
 export default class ColorPicker {
     // state: the state of the ColorPicker
     public state: ColorPickerState;

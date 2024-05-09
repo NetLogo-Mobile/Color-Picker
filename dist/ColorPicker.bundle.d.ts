@@ -13,6 +13,12 @@ type ColorPickerState = {
     [key: string]: any;
 };
 
+interface ColorPickerConfig {
+    parent: HTMLElement;
+    initColor: number[];
+    onColorSelect: (colorData: [number[], number[][]]) => void;
+    savedColors?: number[][];
+}
 declare class ColorPicker {
     state: ColorPickerState;
     private parent;
@@ -44,4 +50,4 @@ declare class ColorPicker {
     private toDOM;
 }
 
-export { ColorPicker as default };
+export { type ColorPickerConfig, ColorPicker as default };

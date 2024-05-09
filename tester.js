@@ -8,8 +8,6 @@ const savedColors = [
 
 function init() {
     let codeEditor = document.createElement("editor");
-
-    // Create the configuration object
     const colorPickerConfig = {
         parent: codeEditor,
         initColor: [165, 234, 251, 255],
@@ -19,7 +17,6 @@ function init() {
         savedColors: savedColors
     };
 
-    // Pass the configuration object to the ColorPicker constructor
     let colorPicker = new ColorPicker(colorPickerConfig);
 
     return codeEditor;
