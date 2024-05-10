@@ -51,9 +51,7 @@ export default class ColorPicker {
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     updateColorParameters() {
         // update the color parameter type display
-        console.log(this.parent);
         const colorParamType = this.parent.querySelectorAll('.cp-values-type-text');
-        console.log(colorParamType);
         colorParamType[0].innerHTML = this.displayParameter;
         colorParamType[1].innerHTML = 'NetLogo';
         let colorParamDisplay = this.parent.querySelectorAll('.cp-values-value');
