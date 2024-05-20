@@ -151,6 +151,8 @@ export class GridMode extends ColorMode {
         let increment = parseFloat(gridBtns[i].getAttribute('data-increment') ?? "0");
         this.setState({increment: increment});
         this.state.increment = increment;// weird bug, did we create a copy of the state?
+        // reset the colorArray
+        this.colorArray = [];
         this.init();
       });
     }

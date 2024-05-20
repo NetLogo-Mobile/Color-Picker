@@ -330,6 +330,8 @@ class GridMode extends ColorMode {
                 let colorIndex = Number(rect.dataset.value);
                 // Convert the selected color to RGBA format
                 let newColor = netlogoColorToRGBA(this.colorArray[colorIndex]);
+                console.log(this.colorArray.length);
+                console.log(this.colorArray[colorIndex]);
                 // netlogoColor defaults to 255 for the alpha value
                 newColor[3] = this.state.currentColor[3];
                 // Use setState to update the currentColor in the component's state
@@ -432,6 +434,8 @@ class GridMode extends ColorMode {
                 let increment = parseFloat((_a = gridBtns[i].getAttribute('data-increment')) !== null && _a !== void 0 ? _a : "0");
                 this.setState({ increment: increment });
                 this.state.increment = increment; // weird bug, did we create a copy of the state?
+                // reset the colorArray
+                this.colorArray = [];
                 this.init();
             });
         }
