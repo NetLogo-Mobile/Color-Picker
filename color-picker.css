@@ -46,7 +46,8 @@
 .cp {
     position: absolute;
     border-radius: 0.625rem;
-    border: solid 1px #c0c0c0;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
     background-color: #eeeff0;
     width: 38.4rem;
     height: 27.6rem;

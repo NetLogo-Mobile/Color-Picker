@@ -286,6 +286,11 @@ export class WheelMode extends ColorMode {
             cpWindow.addEventListener("mousemove", throttle(drag, 1));
             cpWindow.addEventListener("mouseup", endDrag);
             cpWindow.addEventListener("mouseleave", endDrag);
+            // mobile support
+            cpWindow.addEventListener("touchstart", startDrag);
+            cpWindow.addEventListener("touchmove", throttle(drag, 1));
+            cpWindow.addEventListener("touchend", endDrag);
+            cpWindow.addEventListener("mouseleave", endDrag);
             let svg = document.querySelector(".cp-wheel-svg") as SVGSVGElement;
             let selectedElement: SVGSVGElement | null;
 
