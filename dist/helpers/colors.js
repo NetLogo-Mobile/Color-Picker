@@ -113,7 +113,7 @@ var mappedColors = {
     yellow: 45,
     green: 55,
     lime: 65,
-    turqoise: 75,
+    turquoise: 75,
     cyan: 85,
     sky: 95,
     blue: 105,
