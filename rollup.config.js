@@ -6,7 +6,7 @@ import image from '@rollup/plugin-image';
 
 export default [
   {
-    input: './src/ColorPicker.ts',
+    input: './src/color-picker.ts',
     output: {
       file: './dist/ColorPicker.bundle.js',
       format: 'es',

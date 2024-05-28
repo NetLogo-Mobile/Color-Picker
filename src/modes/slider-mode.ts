@@ -4,7 +4,7 @@ import { Slider } from "../helpers/slider";
 import { arrToString } from "../helpers/colors";
 import cpDropdown from '../assets/drop-down.svg';
 import * as color from '../helpers/colors';
-import ColorPicker from "../ColorPicker";
+import ColorPicker from "../color-picker";
 
 /** GridMode: A mode for the ColorPicker that shows a grid of colors */
 export class SliderMode extends ColorMode {

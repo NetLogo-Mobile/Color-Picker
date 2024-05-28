@@ -27,9 +27,9 @@ abstract class ColorMode {
     /** toDOM: A mode of the colorPicker will change the body of the color picker*/
     public abstract toDOM() : void;
     /** showNumbers: will show numbers in the mode */
-    public abstract showNumbers() : void;
+    public showNumbers() : void {};
     /** hideNumbers: nhide the numbers in the ColorPicker preview */
-    public abstract hideNumbers() : void;
+    public hideNumbers() : void {};
 }
 
 export { ColorMode, ColorPickerState };

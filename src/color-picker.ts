@@ -280,3 +280,15 @@ export default class ColorPicker {
     }
 }
 
+/** Localized: a helper function to get localized strings from the editor. */
+// If the EditorLocalized object is available, use it to get the localized string
+// Otherwise, return the source string
+export function Localized(Source: string, ...Args: string[]): string {
+    var Localized = (window as any).EditorLocalized;
+    if (Localized) {
+        return Localized.Get(Source, Args);
+    } else {
+        return Source;
+    }
+}
+
