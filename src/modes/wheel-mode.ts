@@ -1,7 +1,7 @@
-import { ColorMode } from "./ColorMode";
-import { ColorPickerState } from "./ColorMode";
+import { ColorMode } from "./color-mode";
+import { ColorPickerState } from "./color-mode";
 import * as colors from '../helpers/colors';
-import * as dragHelper from '../helpers/dragHelpers';
+import * as dragHelper from '../helpers/drag-helper';
 
 /** GridMode: A mode for the ColorPicker that shows a wheel of colors */
 export class WheelMode extends ColorMode {

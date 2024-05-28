@@ -1,6 +1,6 @@
 import { netlogoColorToHex, netlogoColorToRGBA } from "../helpers/colors";
-import { ColorMode } from "./ColorMode";
-import { ColorPickerState } from "./ColorMode";
+import { ColorMode } from "./color-mode";
+import { ColorPickerState } from "./color-mode";
 
 /** GridMode: A mode for the ColorPicker that shows a grid of colors */
 export class GridMode extends ColorMode {

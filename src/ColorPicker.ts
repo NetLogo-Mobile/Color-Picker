@@ -6,10 +6,10 @@ import cpWheel from './assets/cp-wheel.svg';
 import cpSlider from './assets/cp-slider.svg';
 import modelIndicator from './assets/cp-model-indicator.svg';
 import { rgbToNetlogo } from './helpers/colors';
-import { GridMode } from './CPModes/GridMode';
-import { WheelMode } from './CPModes/WheelMode';
-import { SliderMode } from './CPModes/SliderMode';
-import { ColorPickerState } from './CPModes/ColorMode';
+import { GridMode } from './modes/grid-mode';
+import { WheelMode } from './modes/wheel-mode';
+import { SliderMode } from './modes/slider-mode';
+import { ColorPickerState } from './modes/color-mode';
 import cpDropdown from './assets/drop-down.svg';
 import * as colors from './helpers/colors'
 
