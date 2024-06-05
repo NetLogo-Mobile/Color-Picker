@@ -23,7 +23,7 @@ export default [
     ],
   },
   {
-    input: './src/ColorPicker.ts',
+    input: './src/color-picker.ts',
     output: [
       {
         file: './dist/ColorPicker.bundle.d.ts',
