@@ -53,6 +53,10 @@
     overflow: hidden;
 }
 
+.cp-no-padding {
+    padding: 0
+}
+
 
 /* cp-body: main body, everything in the color picker goes in here */
 .cp {
@@ -61,7 +65,6 @@
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
     background-color: #eeeff0;
-    width: 38.4rem;
     height: 27.6rem;
     box-shadow: 0 0 10px rgb(0 0 0 / 0.2);
     top: 50%;

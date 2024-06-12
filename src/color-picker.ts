@@ -65,20 +65,27 @@ export default class ColorPicker {
 
     /** resize: minimizes or maximizes the color picker based on the value of this.isMinimized. Only call resize when you know that the value of minimized changed**/
     private resize() {
-        const rightSide = document.querySelector(".cp-body-mode-right");
+        const rightSide = document.querySelector(".cp-body-mode-right") as HTMLElement;
+        // also need to access left-side to get rid of padding (since it has padding to separate the left and right side)
+        const leftSide = document.querySelector(".cp-body-left") as HTMLElement;
         if (this.isMinimized) {
             // resize to make it smaller 
             if (rightSide) {
                 rightSide.classList.add("cp-invisible");
-                // remove this 
-                this.isMinimized = false;
+            }
+            if (leftSide) {
+                leftSide.style.paddingRight ='0'
             }
         } 
         else if (!this.isMinimized) { 
 		    if(rightSide) {
                 rightSide.classList.remove("cp-invisible");
-                // remove this
-                this.isMinimized = true;
+            }
+
+            if (leftSide) {
+                leftSide.classList.remove("cp-no-padding");
+                // reset the padding back to the regular amount
+                leftSide.style.paddingRight = '1.52rem';
             }
         }
     }
