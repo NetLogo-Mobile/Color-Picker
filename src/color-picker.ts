@@ -30,7 +30,6 @@ export default class ColorPicker {
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
-    private minimized: boolean = false;
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config: {
         parent: HTMLElement,
@@ -73,12 +72,6 @@ export default class ColorPicker {
         this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
     
-    /** minimizes the color picker to only show the left portion if the container is too small
-    * Adjusts appearance when this happens **/
-    private minimize() {
-        this.minimize = true;
-    }
-
 
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     private updateColorParameters() {
