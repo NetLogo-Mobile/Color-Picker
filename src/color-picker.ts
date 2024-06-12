@@ -30,6 +30,7 @@ export default class ColorPicker {
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
+    private isMinimized: boolean = true; // state var to indicate if the color picker should be minimized or not 
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config: {
         parent: HTMLElement,
@@ -60,6 +61,26 @@ export default class ColorPicker {
         // Call update functions to reflect changes
         this.updateColorParameters();
         this.updateModelDisplay();
+    }
+
+    /** resize: minimizes or maximizes the color picker based on the value of this.isMinimized. Only call resize when you know that the value of minimized changed**/
+    private resize() {
+        const rightSide = document.querySelector(".cp-body-mode-right");
+        if (this.isMinimized) {
+            // resize to make it smaller 
+            if (rightSide) {
+                rightSide.classList.add("cp-invisible");
+                // remove this 
+                this.isMinimized = false;
+            }
+        } 
+        else if (!this.isMinimized) { 
+		    if(rightSide) {
+                rightSide.classList.remove("cp-invisible");
+                // remove this
+                this.isMinimized = true;
+            }
+        }
     }
 
     /** init: initializes the ColorPicker */
@@ -137,6 +158,7 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[0] as HTMLElement, true);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
+            this.resize();
             new GridMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
         modeButtons[1].addEventListener('click', () => {
@@ -145,6 +167,7 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[1] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
+            this.resize();
             new WheelMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
         modeButtons[2].addEventListener('click', () => {

@@ -42,6 +42,18 @@
   );
 }
 
+/* helper classes */
+.cp-invisible {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    overflow: hidden;
+}
+
+
 /* cp-body: main body, everything in the color picker goes in here */
 .cp {
     position: absolute;
