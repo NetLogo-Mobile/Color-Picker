@@ -30,12 +30,13 @@ export default class ColorPicker {
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
+    private minimized: boolean = false;
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config: {
         parent: HTMLElement,
         initColor: number[],
         onColorSelect: (colorData: [number[], number[][]]) => void,
-        savedColors?: number[][]
+        savedColors?: number[][],
     }) {
         this.state = {
             currentColor: config.initColor,
@@ -71,6 +72,13 @@ export default class ColorPicker {
         // click the grid button to start
         this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
+    
+    /** minimizes the color picker to only show the left portion if the container is too small
+    * Adjusts appearance when this happens **/
+    private minimize() {
+        this.minimize = true;
+    }
+
 
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     private updateColorParameters() {
@@ -203,12 +211,15 @@ export default class ColorPicker {
 
     /** toDOM: creates and attaches the ColorPicker body to parent */
     private toDOM() {
+        // localize strings before adding to dom
+        const gridString = Localized('Grid')
+
         const cpBody = `
         <div class="cp">
             <div class="cp-header">
                 <div class="cp-title">
                     <img class="cp-icon" src="${icon}">
-                    <span class="cp-title-text"> Color Swatches </span>
+                    <span class="cp-title-text"> ${Localized('Color Swatches')} </span>
                 </div>
                 <img class="cp-close" src="${closeIcon}"/>
             </div>
@@ -218,15 +229,15 @@ export default class ColorPicker {
                     <div class="cp-mode-btn-cont">
                         <button class="cp-mode-btn">
                             <img class="cp-mode-btn-img" src="${cpGrid}"/>
-                            <span class="cp-mode-btn-text"> Grid </span> 
+                            <span class="cp-mode-btn-text"> ${Localized('Grid')} </span> 
                         </button>
                         <button class="cp-mode-btn">
                             <img class="cp-mode-btn-img" src="${cpWheel}"/>
-                            <span class="cp-mode-btn-text"> Wheel </span> 
+                            <span class="cp-mode-btn-text">${Localized('Wheel')} </span> 
                         </button>
                         <button class="cp-mode-btn">
                             <img class="cp-mode-btn-img" src="${cpSlider}"/>
-                            <span class="cp-mode-btn-text"> Slider </span> 
+                            <span class="cp-mode-btn-text"> ${Localized('Slider')} </span> 
                         </button>
                     </div>
                     <div class="cp-body-mode-main"></div>
@@ -243,11 +254,11 @@ export default class ColorPicker {
                         </svg>
                     </div>
                     <div class="cp-alpha-cont">
-                        <span class="cp-alpha-text"> Alpha </span>
+                        <span class="cp-alpha-text"> ${Localized('Alpha')} </span>
                         <input type="range" min="0" max="255" value="${this.state.currentColor[3]}" class="cp-styled-slider cp-alpha-slider color-alpha slider-progress">
                     </div>
                     <div class="cp-values-display-cont">
-                        <span class="cp-color-param-txt"> Color Parameters </span>
+                        <span class="cp-color-param-txt"> ${Localized('Color Parameters')}  </span>
                         <div class="cp-values-display">
                             <div class="cp-values-type cp-values-type-1">
                                 <div class="cp-values-cont">
