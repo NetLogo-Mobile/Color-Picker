@@ -6,10 +6,9 @@ const savedColors = [
     [157, 110, 72, 255]
 ];
 
-function init() {
-    let codeEditor = document.createElement("editor");
+function init(parent) {
     const colorPickerConfig = {
-        parent: codeEditor,
+        parent: parent,
         initColor: [165, 234, 251, 255],
         onColorSelect: (selectedColor) => {
             console.log("Color selected:", selectedColor);
@@ -18,15 +17,7 @@ function init() {
     };
 
     let colorPicker = new ColorPicker(colorPickerConfig);
-
-    return codeEditor;
 }
+var ce = document.querySelector(".code-editor");
+var editor = init(ce);
 
-var editor = init();
-
-function attach(editor) {
-    var ce = document.querySelector(".code-editor");
-    ce.appendChild(editor);
-}
-
-attach(editor);

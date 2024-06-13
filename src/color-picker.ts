@@ -30,7 +30,7 @@ export default class ColorPicker {
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
-    private isMinimized: boolean = true; // state var to indicate if the color picker should be minimized or not 
+    private isMinimized: boolean = false; // state var to indicate if the color picker should be minimized or not 
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config: {
         parent: HTMLElement,
@@ -69,7 +69,6 @@ export default class ColorPicker {
         // also need to access left-side to get rid of padding (since it has padding to separate the left and right side)
         const leftSide = document.querySelector(".cp-body-left") as HTMLElement;
         if (this.isMinimized) {
-            // resize to make it smaller 
             if (rightSide) {
                 rightSide.classList.add("cp-invisible");
             }
@@ -98,6 +97,16 @@ export default class ColorPicker {
         this.initAlphaSlider();
         // click the grid button to start
         this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
+        // trigger a resize event if parent container is smaller 
+        requestAnimationFrame(() => {
+            const cpContainer = this.parent.querySelector('.cp') as HTMLElement;
+            if (cpContainer) {
+                if (this.parent.offsetWidth < cpContainer.offsetWidth || window.innerWidth < cpContainer.offsetWidth) {
+                    this.isMinimized = true;
+                    this.resize();
+                }
+            }
+        });
     }
     
 
@@ -156,6 +165,23 @@ export default class ColorPicker {
                 image.style.filter = `invert(${isPressed ? '100%' : '0%'})`;
             }
         }
+        // attach event listener to listen to possible resizes but for the window -- assume that the parent container changes with the window changing 
+        const cpContainerWidth = 601.46; //hardcoded value for max size of window 
+        window.addEventListener('resize', () => {
+            if ( window.innerWidth < cpContainerWidth) {
+                // this should minimize only if its not already minimized
+                if (!this.isMinimized) {
+                    this.isMinimized = true;
+                    this.resize();
+                }
+            } else {
+                // only maximize if its not already minimized 
+                if (this.isMinimized) {
+                    this.isMinimized = false;
+                    this.resize();
+                }
+            }
+        });
 
         // attach event listeners to the mode buttons 
         let modeButtons = this.parent.querySelectorAll('.cp-mode-btn');
@@ -165,7 +191,6 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[0] as HTMLElement, true);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
-            this.resize();
             new GridMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
         modeButtons[1].addEventListener('click', () => {
@@ -174,7 +199,6 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[1] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
-            this.resize();
             new WheelMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
         modeButtons[2].addEventListener('click', () => {
