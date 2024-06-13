@@ -259,7 +259,6 @@ export class WheelMode extends ColorMode {
         // also update the color based on the changed outer wheel since the color will be different 
         this.changeColor();
     }
-
     /** makeDraggable(): makes the thumbs of the color wheel draggable */
     public makeDraggable(wheel: WheelMode) {
         const innerThumb = document.querySelector(".cp-inner-thumb") as HTMLElement;
@@ -280,7 +279,6 @@ export class WheelMode extends ColorMode {
             }
         }
 
-    
         function makeDraggable(cpWindow: HTMLElement) {
             // confinement code should go here
             cpWindow.addEventListener("mousedown", startDrag);
@@ -291,7 +289,8 @@ export class WheelMode extends ColorMode {
             cpWindow.addEventListener("touchstart", startDrag);
             cpWindow.addEventListener("touchmove", throttle(drag, 1));
             cpWindow.addEventListener("touchend", endDrag);
-            cpWindow.addEventListener("mouseleave", endDrag);
+            cpWindow.addEventListener("touchcancel", endDrag);
+
             let svg = document.querySelector(".cp-wheel-svg") as SVGSVGElement;
             let selectedElement: SVGSVGElement | null;
 
@@ -327,9 +326,10 @@ export class WheelMode extends ColorMode {
             /** startDrag: start drag event for draggable elements */
             function startDrag(evt: MouseEvent | TouchEvent) {
                 let element = evt.target as SVGSVGElement;
-                // select the element, and make sure it is a dragable element
+                // select the element, and make sure it is a draggable element
                 if (element.classList.contains('cp-draggable')) {
                     selectedElement = element;
+                    evt.preventDefault();  // Add this to prevent default behavior
                 }
             }
 
@@ -367,8 +367,13 @@ export class WheelMode extends ColorMode {
             /** drag: dragEvent for draggable elements */
             function drag(evt: MouseEvent | TouchEvent) {
                 if(selectedElement != null) {
-                    evt.preventDefault();
-                    let mousePosition = dragHelper.getMousePosition(evt, svg);
+                    evt.preventDefault();  // Add this to prevent default behavior
+                    let mousePosition;
+                    if (evt instanceof MouseEvent) {
+                        mousePosition = dragHelper.getMousePosition(evt, svg);
+                    } else if (evt instanceof TouchEvent) {
+                        mousePosition = dragHelper.getTouchPosition(evt, svg);  // Use touch helper function
+                    }
                     if(mousePosition != null) {
                         let x;
                         let y;
@@ -403,6 +408,7 @@ export class WheelMode extends ColorMode {
             makeDraggable(cpWindow)
         }
     }
+
      
     /** updateIncrementApperance: updates the increment button apperance based on which increment is on */
     public updateIncrementAppearance(): void {

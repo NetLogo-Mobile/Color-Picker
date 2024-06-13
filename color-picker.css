@@ -57,6 +57,14 @@
     padding: 0
 }
 
+.no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none; 
+  -khtml-user-select: none;
+  -moz-user-select: none; 
+  -ms-user-select: none; 
+  user-select: none;
+}
 
 /* cp-body: main body, everything in the color picker goes in here */
 .cp {
@@ -170,6 +178,7 @@
 }
 /** cp-body-mode-main: the changing portion of the color picker (white section in the middle) */
 .cp-body-mode-main {
+  user-select: none;
   background-color: white;
   width: 20.89rem;
   height: 19.59rem;

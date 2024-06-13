@@ -165,23 +165,6 @@ export default class ColorPicker {
                 image.style.filter = `invert(${isPressed ? '100%' : '0%'})`;
             }
         }
-        // attach event listener to listen to possible resizes but for the window -- assume that the parent container changes with the window changing 
-        const cpContainerWidth = 601.46; //hardcoded value for max size of window 
-        window.addEventListener('resize', () => {
-            if ( window.innerWidth < cpContainerWidth) {
-                // this should minimize only if its not already minimized
-                if (!this.isMinimized) {
-                    this.isMinimized = true;
-                    this.resize();
-                }
-            } else {
-                // only maximize if its not already minimized 
-                if (this.isMinimized) {
-                    this.isMinimized = false;
-                    this.resize();
-                }
-            }
-        });
 
         // attach event listeners to the mode buttons 
         let modeButtons = this.parent.querySelectorAll('.cp-mode-btn');
@@ -287,7 +270,7 @@ export default class ColorPicker {
                             <span class="cp-mode-btn-text"> ${Localized('Slider')} </span> 
                         </button>
                     </div>
-                    <div class="cp-body-mode-main"></div>
+                    <div class="cp-body-mode-main no-select"></div>
                 </div>
                 <div class="cp-body-mode-right">
                     <button class="cp-mode-btn cp-model-indicator"> 

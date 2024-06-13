@@ -12,6 +12,19 @@ function getMousePosition(evt: MouseEvent | TouchEvent, svg: SVGSVGElement) {
     }
 }
 
+/** getTouchPosition: get the position of the touch event */
+function getTouchPosition(evt: TouchEvent, svg: SVGSVGElement) {
+  const touch = evt.touches[0];
+  const CTM = svg.getScreenCTM();
+  if (CTM != null) {
+      return {
+          x: (touch.clientX - CTM.e) / CTM.a,
+          y: (touch.clientY - CTM.f) / CTM.d
+      };
+  }
+  return null;
+}
+
 
 
 /** distance: Calculates the distance between two points with coordinates (x1, y1), and (x2, y2) */
@@ -41,4 +54,4 @@ function findAngle(
     return outOf180Degrees;
   }
 
-export { getMousePosition, distance, findAngle };
+export { getMousePosition, distance, findAngle, getTouchPosition };

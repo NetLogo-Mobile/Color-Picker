@@ -19,5 +19,8 @@ function init(parent) {
     let colorPicker = new ColorPicker(colorPickerConfig);
 }
 var ce = document.querySelector(".code-editor");
+ce.style.width = '10%';
+ce.style.height ='20px';
+ce.style.bordeer = '1px solid red';
 var editor = init(ce);
 
