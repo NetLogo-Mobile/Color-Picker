@@ -9,6 +9,9 @@
     "build": "tsc && cp -R src/assets/ dist/assets/ && rollup -c"
   },
   "type": "module",
+  "files": [
+      "dist"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
