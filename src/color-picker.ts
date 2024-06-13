@@ -214,7 +214,7 @@ export default class ColorPicker {
         let modelIndicatorButton = this.parent.querySelector('.cp-model-indicator');
         modelIndicatorButton?.addEventListener('click', () => {
             this.state.changeModelColor = !this.state.changeModelColor; // we don't want to call set state, because it updates the appearance as well 
-            modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? ' Model Color Selected ' : ' Background Color Selected ';
+            modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? Localized('Model Color Selected') : Localized('Background Color Selected');
             changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);
         });
 
@@ -292,7 +292,7 @@ export default class ColorPicker {
                 <div class="cp-body-mode-right">
                     <button class="cp-mode-btn cp-model-indicator"> 
                         <img class="cp-mode-btn-img" src="${modelIndicator}"/>
-                        <span class="cp-mode-btn-text"> Model Color Selected </span>
+                        <span class="cp-mode-btn-text"> ${Localized('Model Color Selected')} </span>
                     </button>
                     <div class="cp-color-preview">
                         <svg viewBox="0 0 100 100">

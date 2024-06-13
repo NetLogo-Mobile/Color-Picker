@@ -1,6 +1,7 @@
 import { netlogoColorToHex, netlogoColorToRGBA } from "../helpers/colors";
 import { ColorMode } from "./color-mode";
 import { ColorPickerState } from "./color-mode";
+import { Localized } from "../color-picker";
 
 /** GridMode: A mode for the ColorPicker that shows a grid of colors */
 export class GridMode extends ColorMode {
@@ -117,7 +118,7 @@ export class GridMode extends ColorMode {
       spaceContainer.classList.add("cp-space-container");
       spaceContainer.appendChild(gridContainer);
       let incrementBtns = `
-      <div class="cp-grid-btn-cont"><div class="cp-increment-cont"><button class="cp-numbers-btn"></button><span class="cp-increment-label">Numbers</span></div><div class="cp-increment-cont"><div class="cp-btn-label-cont"><button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button><span class="cp-increment-label">1</span></div><div class="cp-btn-label-cont"><button data-increment="0.5" class="cp-numbers-btn"></button><span class="cp-increment-label">0.5</span></div><div class="cp-btn-label-cont"><button data-increment="0.1" class="cp-numbers-btn"></button><span class="cp-increment-label">0.1</span></div><span class="cp-increment-label">Increment</span></div></div>
+      <div class="cp-grid-btn-cont"><div class="cp-increment-cont"><button class="cp-numbers-btn"></button><span class="cp-increment-label">${Localized('Numbers')}</span></div><div class="cp-increment-cont"><div class="cp-btn-label-cont"><button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button><span class="cp-increment-label">1</span></div><div class="cp-btn-label-cont"><button data-increment="0.5" class="cp-numbers-btn"></button><span class="cp-increment-label">0.5</span></div><div class="cp-btn-label-cont"><button data-increment="0.1" class="cp-numbers-btn"></button><span class="cp-increment-label">0.1</span></div><span class="cp-increment-label">${Localized('Increment')}</span></div></div>
       `;
       spaceContainer.insertAdjacentHTML('beforeend', incrementBtns);
       this.parent.appendChild(spaceContainer);

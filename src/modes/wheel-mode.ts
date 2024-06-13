@@ -1,5 +1,6 @@
 import { ColorMode } from "./color-mode";
 import { ColorPickerState } from "./color-mode";
+import { Localized } from "../color-picker";
 import * as colors from '../helpers/colors';
 import * as dragHelper from '../helpers/drag-helper';
 
@@ -47,7 +48,7 @@ export class WheelMode extends ColorMode {
             <div xmlns="http://www.w3.org/1999/xhtml" class="cp-outer-wheel"></div>
         </foreignObject>
 
-    </svg></div><div class="cp-grid-btn-cont"><div class="cp-increment-cont"><button class="cp-numbers-btn"></button><span class="cp-increment-label">Numbers</span></div><div class="cp-increment-cont"><div class="cp-btn-label-cont"><button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button><span class="cp-increment-label">1</span></div><div class="cp-btn-label-cont"><button data-increment="0.5" class="cp-numbers-btn"></button><span class="cp-increment-label">0.5</span></div><div class="cp-btn-label-cont"><button data-increment="0.1" class="cp-numbers-btn"></button><span class="cp-increment-label">0.1</span></div><span class="cp-increment-label">Increment</span></div></div></div>
+    </svg></div><div class="cp-grid-btn-cont"><div class="cp-increment-cont"><button class="cp-numbers-btn"></button><span class="cp-increment-label">${Localized('Numbers')}</span></div><div class="cp-increment-cont"><div class="cp-btn-label-cont"><button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button><span class="cp-increment-label">1</span></div><div class="cp-btn-label-cont"><button data-increment="0.5" class="cp-numbers-btn"></button><span class="cp-increment-label">0.5</span></div><div class="cp-btn-label-cont"><button data-increment="0.1" class="cp-numbers-btn"></button><span class="cp-increment-label">0.1</span></div><span class="cp-increment-label">${Localized('Increment')}</span></div></div></div>
         `
         this.innerWheelSetup();
         this.outerWheelSetup(Math.floor(colors.rgbToNetlogo(this.state.currentColor) / 10) * 10);
