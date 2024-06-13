@@ -1,6 +1,6 @@
 {
   "name": "@netlogo/netlogo-color-picker",
-  "version": "1.9.18",
+  "version": "1.9.19",
   "description": "Color Picker for NetLogo Web",
   "main": "./dist/ColorPicker.bundle.js",
   "module": "./dist/ColorPicker.bundle.js",
@@ -10,7 +10,7 @@
   },
   "type": "module",
   "files": [
-      "dist"
+    "dist"
   ],
   "author": "",
   "license": "ISC",
