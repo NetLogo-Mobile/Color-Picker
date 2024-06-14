@@ -23,7 +23,7 @@ export interface ColorPickerConfig {
 // Object type for returned color (the object passed to the callback fn)
 interface SelectedColor {
     netlogo: number; 
-    rgb: number[]; 
+    rgba: number[]; 
 }
 
 export default class ColorPicker {
@@ -213,7 +213,7 @@ export default class ColorPicker {
             // return the selected color, as well as the saved colors for "memory"
     		const selectedColorObj: SelectedColor = {
         		netlogo: colors.rgbToNetlogo(this.state.currentColor),
-        		rgb: this.state.currentColor,
+        		rgba: this.state.currentColor,
     		};
             // the first element will be the different representations of selected color as an Object
 			this.onColorSelect([selectedColorObj, this.state.savedColors]);

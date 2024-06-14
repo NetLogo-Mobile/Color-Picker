@@ -20,7 +20,7 @@ After importing it into your project, you can create a Color Picker by calling t
 
 - `parent`: The HTML element that will host the Color Picker. This ensures the picker is embedded in the correct location in your UI.
 - `initColor`: The initial color selected in the Color Picker, expressed as an RGB array (e.g., `[255, 0, 0]` for red).
-- `onColorSelect`: A callback function that is invoked when a color is selected. This function should handle the selected color data. The returned color data is an array, where the first element is the selected color, and the second element is an array of the saved colors.
+- `onColorSelect`: A callback function that is invoked when a color is selected. This function should handle the selected color data. **The returned color data is an array, where the first element is an object representing the selected color in NetLogo color and RGBA, and the second element is an array of the saved colors.**. To access the NetLogo color, do `returnedArray[0]['netlogo']`, and to get the rgba array, do: `returnedArray[0]['rgba']`
 - `savedColors`: An optional array of colors that the user can save for later use. Each color is also represented as an RGB array.
 
 Here is a basic example of how to instantiate the Color Picker:
