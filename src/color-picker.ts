@@ -16,8 +16,14 @@ import * as colors from './helpers/colors'
 export interface ColorPickerConfig {
     parent: HTMLElement;
     initColor: number[];
-    onColorSelect: (colorData: [number[], number[][]]) => void;
+    onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
     savedColors?: number[][];
+}
+
+// Object type for returned color (the object passed to the callback fn)
+interface SelectedColor {
+    netlogo: number; 
+    rgb: number[]; 
 }
 
 export default class ColorPicker {
@@ -26,7 +32,7 @@ export default class ColorPicker {
     //parent: the parent element of the ColorPicker
     private parent: HTMLElement;
     // onColorSelect: a callback function that is called when a color is selected
-    private onColorSelect: (colorData: [number[], number[][]]) => void;
+    private onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
@@ -35,7 +41,7 @@ export default class ColorPicker {
     constructor(config: {
         parent: HTMLElement,
         initColor: number[],
-        onColorSelect: (colorData: [number[], number[][]]) => void,
+        onColorSelect: (colorData: [SelectedColor, number[][]]) => void,
         savedColors?: number[][],
     }) {
         this.state = {
@@ -205,7 +211,12 @@ export default class ColorPicker {
         const closeButton = this.parent.querySelector('.cp-close');
         closeButton?.addEventListener('click', () => {
             // return the selected color, as well as the saved colors for "memory"
-            this.onColorSelect([this.state.currentColor, this.state.savedColors]);
+    		const selectedColorObj: SelectedColor = {
+        		netlogo: colors.rgbToNetlogo(this.state.currentColor),
+        		rgb: this.state.currentColor,
+    		};
+            // the first element will be the different representations of selected color as an Object
+			this.onColorSelect([selectedColorObj, this.state.savedColors]);
         });
 
         // attach switch color display parameters event listeners 

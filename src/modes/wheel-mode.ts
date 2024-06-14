@@ -328,6 +328,7 @@ export class WheelMode extends ColorMode {
                 let element = evt.target as SVGSVGElement;
                 // select the element, and make sure it is a draggable element
                 if (element.classList.contains('cp-draggable')) {
+                    evt.preventDefault();
                     selectedElement = element;
                     evt.preventDefault();  // Add this to prevent default behavior
                 }
@@ -367,7 +368,7 @@ export class WheelMode extends ColorMode {
             /** drag: dragEvent for draggable elements */
             function drag(evt: MouseEvent | TouchEvent) {
                 if(selectedElement != null) {
-                    evt.preventDefault();  // Add this to prevent default behavior
+                    evt.preventDefault();
                     let mousePosition;
                     if (evt instanceof MouseEvent) {
                         mousePosition = dragHelper.getMousePosition(evt, svg);

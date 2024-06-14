@@ -363,5 +363,4 @@ export {
   baseColorsToRGB,
   colorToHex,
   netlogoToRGB,
-
 };
