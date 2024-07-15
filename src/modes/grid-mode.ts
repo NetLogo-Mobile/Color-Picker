@@ -55,13 +55,13 @@ export class GridMode extends ColorMode {
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('width', '100%');
         svg.setAttribute('height', '100%');
-        // the height of the svg is 14.01 rem, and the width is 20rem, we set the viewbox to be equal to that so its a 1:1 ratio
-        svg.setAttribute('viewBox', '0 0 20 14.01');
+        // the height of the svg is 16.5 rem, and the width is 21rem, we set the viewbox to be equal to that so its a 1:1 ratio
+        svg.setAttribute('viewBox', '0 0 21 16.5');
         // create the cells 
         let numRows: number = 14;
         let colorsPerRow = 10 / this.state.increment + 1;
-        let cellWidth = 20 / colorsPerRow;
-        let cellHeight = 14.01 / numRows;
+        let cellWidth = 21 / colorsPerRow;
+        let cellHeight = 16.5 / numRows;
         let textFontSize = this.state.increment == 1 ? 0.6 : 0.4;
         for (let j = 0; j < numRows; j++) {
             // generate the row
@@ -110,7 +110,7 @@ export class GridMode extends ColorMode {
 
     /** toDOM: creates the body of the Grid */
     public toDOM() : void {
-      this.parent.replaceChildren();
+      this.parent.innerHTML = '';
       let gridContainer = document.createElement('div');
       gridContainer.classList.add('cp-grid-cont');
       gridContainer.appendChild(this.createGrid());

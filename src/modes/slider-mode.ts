@@ -14,7 +14,6 @@ export class SliderMode extends ColorMode {
     private cpInstance: ColorPicker;
     constructor(parent: HTMLElement, state: ColorPickerState, setState: (newState: Partial<ColorPickerState>) => void, colorPickerInstance: ColorPicker){
         super(parent, state, setState);
-        this.parent.replaceChildren();
         this.cpInstance = colorPickerInstance;
         this.init();
     }
@@ -123,7 +122,7 @@ export class SliderMode extends ColorMode {
     /** createRGB: creates the RGB sliders */
     private createRGB() : void {
         const parent = document.querySelector('.cp-sliders') as HTMLElement;
-        parent.replaceChildren();
+        parent.innerHTML = '';
         let slider1 = new Slider(parent, this.state.currentColor[0], 0, 255, 'Red', '200px', Localized('Red'), true);
         let slider2 = new Slider(parent, this.state.currentColor[1], 0, 255, 'Green', '200px', Localized('Green'), true);
         let slider3 = new Slider(parent, this.state.currentColor[2], 0, 255, 'Blue', '200px', Localized('Blue'), true);
@@ -148,7 +147,7 @@ export class SliderMode extends ColorMode {
     /** createHSL: creates the HSL sliders */
     private createHSL(): void { 
         const parent = document.querySelector('.cp-sliders') as HTMLElement;
-        parent.replaceChildren();
+        parent.innerHTML = '';
         const colorAsHSL = color.RGBAToHSLA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
         this.HSL = colorAsHSL;
         let slider1 = new Slider(parent, colorAsHSL[0], 0, 360, 'Hue', '200px', Localized('Hue'), true);

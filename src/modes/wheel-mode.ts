@@ -12,13 +12,11 @@ export class WheelMode extends ColorMode {
 
     constructor(parent: HTMLElement, state: ColorPickerState, setState: (newState: Partial<ColorPickerState>) => void){
         super(parent, state, setState);
-        this.parent.replaceChildren();
         this.init();
     }
 
     /** toDOM: creates the body of the Wheel */
     public toDOM() : void {
-        this.parent.replaceChildren();
         this.parent.innerHTML = `
         <div class="cp-wheel-spacing-cont"><div class="cp-wheel-cont"><svg class="cp-wheel-svg" viewBox="0 0 110 110" width="100%" height="100%">
         <clipPath id="cp-inner-wheel-clip">

@@ -20,6 +20,7 @@ abstract class ColorMode {
     /** constructor: sets the parent, state, and setState */
     constructor(parent: HTMLElement, state: ColorPickerState, setState: (newState: Partial<ColorPickerState>) => void){
         this.parent = parent;
+        this.parent.innerHTML = '';
         this.state = state;
         this.setState = setState;
     }

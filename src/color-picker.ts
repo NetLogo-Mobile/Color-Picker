@@ -69,32 +69,6 @@ export default class ColorPicker {
         this.updateModelDisplay();
     }
 
-    /** resize: minimizes or maximizes the color picker based on the value of this.isMinimized. Only call resize when you know that the value of minimized changed**/
-    private resize() {
-        const rightSide = document.querySelector(".cp-body-mode-right") as HTMLElement;
-        // also need to access left-side to get rid of padding (since it has padding to separate the left and right side)
-        const leftSide = document.querySelector(".cp-body-left") as HTMLElement;
-        if (this.isMinimized) {
-            if (rightSide) {
-                rightSide.classList.add("cp-invisible");
-            }
-            if (leftSide) {
-                leftSide.style.paddingRight ='0'
-            }
-        } 
-        else if (!this.isMinimized) { 
-		    if(rightSide) {
-                rightSide.classList.remove("cp-invisible");
-            }
-
-            if (leftSide) {
-                leftSide.classList.remove("cp-no-padding");
-                // reset the padding back to the regular amount
-                leftSide.style.paddingRight = '1.52rem';
-            }
-        }
-    }
-
     /** init: initializes the ColorPicker */
     private init() {
         this.toDOM();
@@ -103,16 +77,6 @@ export default class ColorPicker {
         this.initAlphaSlider();
         // click the grid button to start
         this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
-        // trigger a resize event if parent container is smaller 
-        requestAnimationFrame(() => {
-            const cpContainer = this.parent.querySelector('.cp') as HTMLElement;
-            if (cpContainer) {
-                if (this.parent.offsetWidth < cpContainer.offsetWidth || window.innerWidth < cpContainer.offsetWidth) {
-                    this.isMinimized = true;
-                    this.resize();
-                }
-            }
-        });
     }
     
 
@@ -203,7 +167,7 @@ export default class ColorPicker {
         let modelIndicatorButton = this.parent.querySelector('.cp-model-indicator');
         modelIndicatorButton?.addEventListener('click', () => {
             this.state.changeModelColor = !this.state.changeModelColor; // we don't want to call set state, because it updates the appearance as well 
-            modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? Localized('Model Color Selected') : Localized('Background Color Selected');
+            modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? Localized('Foreground Color') : Localized('Background Color');
             changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);
         });
 
@@ -270,23 +234,23 @@ export default class ColorPicker {
                     <div class="cp-mode-btn-cont">
                         <button class="cp-mode-btn">
                             <img class="cp-mode-btn-img" src="${cpGrid}"/>
-                            <span class="cp-mode-btn-text"> ${Localized('Grid')} </span> 
+                            <span class="cp-mode-btn-text">${Localized('Grid')}</span> 
                         </button>
                         <button class="cp-mode-btn">
                             <img class="cp-mode-btn-img" src="${cpWheel}"/>
-                            <span class="cp-mode-btn-text">${Localized('Wheel')} </span> 
+                            <span class="cp-mode-btn-text">${Localized('Wheel')}</span> 
                         </button>
                         <button class="cp-mode-btn">
                             <img class="cp-mode-btn-img" src="${cpSlider}"/>
-                            <span class="cp-mode-btn-text"> ${Localized('Slider')} </span> 
+                            <span class="cp-mode-btn-text">${Localized('Slider')}</span> 
                         </button>
                     </div>
                     <div class="cp-body-mode-main no-select"></div>
                 </div>
-                <div class="cp-body-mode-right">
+                <div class="cp-body-right">
                     <button class="cp-mode-btn cp-model-indicator"> 
                         <img class="cp-mode-btn-img" src="${modelIndicator}"/>
-                        <span class="cp-mode-btn-text"> ${Localized('Model Color Selected')} </span>
+                        <span class="cp-mode-btn-text">${Localized('Foreground Color')}</span>
                     </button>
                     <div class="cp-color-preview">
                         <svg viewBox="0 0 100 100">
@@ -295,11 +259,11 @@ export default class ColorPicker {
                         </svg>
                     </div>
                     <div class="cp-alpha-cont">
-                        <span class="cp-alpha-text"> ${Localized('Alpha')} </span>
+                        <span class="cp-alpha-text">${Localized('Alpha')}</span>
                         <input type="range" min="0" max="255" value="${this.state.currentColor[3]}" class="cp-styled-slider cp-alpha-slider color-alpha slider-progress">
                     </div>
                     <div class="cp-values-display-cont">
-                        <span class="cp-color-param-txt"> ${Localized('Color Parameters')}  </span>
+                        <span class="cp-color-param-txt">${Localized('Color Parameters')}</span>
                         <div class="cp-values-display">
                             <div class="cp-values-type cp-values-type-1">
                                 <div class="cp-values-cont">
