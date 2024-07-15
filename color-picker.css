@@ -197,6 +197,13 @@
   flex-direction: column;
 }
 
+/* When the screen is too small, hide the right part */
+@media (max-width: 37.5rem) {
+  .cp-body-right {
+    display: none;
+  }
+}
+
 .cp-color-preview {
   width: 11rem;
   height: 11rem;
