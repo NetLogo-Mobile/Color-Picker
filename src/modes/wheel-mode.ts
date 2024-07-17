@@ -204,8 +204,26 @@ export class WheelMode extends ColorMode {
         outerThumb.setAttribute('stroke-width', '1.2');
         outerThumb.classList.add("cp-outer-thumb");
         outerThumb.classList.add("cp-draggable");
+        // Create larger invisible circle for inner thumb
+        let innerThumbHitArea = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        innerThumbHitArea.setAttribute('cx', `${innerThumbCor[0]}`);
+        innerThumbHitArea.setAttribute('cy', `${innerThumbCor[1]}`);
+        innerThumbHitArea.setAttribute('r', '10'); // Larger radius
+        innerThumbHitArea.setAttribute('fill', 'transparent');
+        innerThumbHitArea.classList.add("cp-inner-thumb-hit-area");
+        innerThumbHitArea.classList.add("cp-draggable");
 
+        // Create larger invisible circle for outer thumb
+        let outerThumbHitArea = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        outerThumbHitArea.setAttribute('cx', `${outerThumbCor[0]}`);
+        outerThumbHitArea.setAttribute('cy', `${outerThumbCor[1]}`);
+        outerThumbHitArea.setAttribute('r', '10'); // Larger radius
+        outerThumbHitArea.setAttribute('fill', 'transparent');
+        outerThumbHitArea.classList.add("cp-outer-thumb-hit-area");
+        outerThumbHitArea.classList.add("cp-draggable");
         const svg = document.querySelector('.cp-wheel-svg');
+        svg!.appendChild(innerThumbHitArea);
+        svg!.appendChild(outerThumbHitArea);
         svg!.appendChild(innerThumb);
         svg!.appendChild(outerThumb);
         const innerAsSVG = innerThumb as unknown as SVGSVGElement;
@@ -278,12 +296,10 @@ export class WheelMode extends ColorMode {
         }
 
         function makeDraggable(cpWindow: HTMLElement) {
-            // confinement code should go here
             cpWindow.addEventListener("mousedown", startDrag);
             cpWindow.addEventListener("mousemove", throttle(drag, 1));
             cpWindow.addEventListener("mouseup", endDrag);
             cpWindow.addEventListener("mouseleave", endDrag);
-            // mobile support
             cpWindow.addEventListener("touchstart", startDrag);
             cpWindow.addEventListener("touchmove", throttle(drag, 1));
             cpWindow.addEventListener("touchend", endDrag);
@@ -294,28 +310,32 @@ export class WheelMode extends ColorMode {
 
             /** makeClickable: makes the inner and outer wheels clickable to move the thumb to that location */
             function makeClickable() {
-                const innerThumb = document.querySelector('.cp-inner-thumb');
-                const outerThumb = document.querySelector('.cp-outer-thumb');
-                const innerWheel = document.querySelector('.cp-inner-wheel');
-                const outerWheel = document.querySelector('.cp-outer-wheel');
+                const innerThumbHitArea = document.querySelector('.cp-inner-thumb-hit-area');
+                const outerThumbHitArea = document.querySelector('.cp-outer-thumb-hit-area');
                 const svg = document.querySelector(".cp-wheel-svg") as SVGSVGElement;
-                innerWheel?.addEventListener('click', (evt) => {
-                    const pos = dragHelper.getMousePosition(evt as MouseEvent, svg as SVGSVGElement);
+            
+                svg.addEventListener('click', (evt) => {
+                    const pos = dragHelper.getMousePosition(evt as MouseEvent, svg);
                     if(pos != null) {
-                        innerThumb?.setAttribute('cx', pos.x.toString());
-                        innerThumb?.setAttribute('cy', pos.y.toString());
-                        wheel.updateInnerWheel(innerThumb as SVGSVGElement);
-                    }
-                }); 
-                outerWheel?.addEventListener('click', (evt) => {
-                    // outer wheel clicked so move the outer thumb to the location of the click
-                    const pos = dragHelper.getMousePosition(evt as MouseEvent, svg as SVGSVGElement);
-                    if(pos != null) {
-                        // use outer thumb confinement to restrict the movement of the outer thumb
-                        const confined = confinementOuter(pos.x, pos.y);
-                        outerThumb?.setAttribute('cx', confined.x.toString());
-                        outerThumb?.setAttribute('cy', confined.y.toString());
-                        wheel.changeColor();
+                        const dist = dragHelper.distance(pos.x, pos.y, center[0], center[1]);
+                        if(dist <= 42 && dist >= 20) {
+                            // Inner wheel area
+                            innerThumbHitArea?.setAttribute('cx', pos.x.toString());
+                            innerThumbHitArea?.setAttribute('cy', pos.y.toString());
+                            let innerThumb = document.querySelector('.cp-inner-thumb') as SVGSVGElement;
+                            innerThumb.setAttribute('cx', pos.x.toString());
+                            innerThumb.setAttribute('cy', pos.y.toString());
+                            wheel.updateInnerWheel(innerThumb);
+                        } else if(dist >= 52.5 && dist <= 55) {
+                            // Outer wheel area
+                            const confined = confinementOuter(pos.x, pos.y);
+                            outerThumbHitArea?.setAttribute('cx', confined.x.toString());
+                            outerThumbHitArea?.setAttribute('cy', confined.y.toString());
+                            let outerThumb = document.querySelector('.cp-outer-thumb') as SVGSVGElement;
+                            outerThumb.setAttribute('cx', confined.x.toString());
+                            outerThumb.setAttribute('cy', confined.y.toString());
+                            wheel.changeColor();
+                        }
                     }
                 });
             }
@@ -324,11 +344,22 @@ export class WheelMode extends ColorMode {
             /** startDrag: start drag event for draggable elements */
             function startDrag(evt: MouseEvent | TouchEvent) {
                 let element = evt.target as SVGSVGElement;
-                // select the element, and make sure it is a draggable element
-                if (element.classList.contains('cp-draggable')) {
+                
+                // check if the clicked element is a draggable element or a thumb
+                if (element.classList.contains('cp-draggable') || 
+                    element.classList.contains('cp-inner-thumb') || 
+                    element.classList.contains('cp-outer-thumb')) {
+                    
                     evt.preventDefault();
-                    selectedElement = element;
-                    evt.preventDefault();  // Add this to prevent default behavior
+                    
+                    // tf it's a thumb, select its corresponding hit area
+                    if (element.classList.contains('cp-inner-thumb')) {
+                        selectedElement = document.querySelector('.cp-inner-thumb-hit-area') as SVGSVGElement;
+                    } else if (element.classList.contains('cp-outer-thumb')) {
+                        selectedElement = document.querySelector('.cp-outer-thumb-hit-area') as SVGSVGElement;
+                    } else {
+                        selectedElement = element;
+                    }
                 }
             }
 
@@ -362,37 +393,39 @@ export class WheelMode extends ColorMode {
                 yRestrict = center[1] - outerLowerBound * Math.cos(angleInRadians);
                 return {x: xRestrict, y: yRestrict};
             }
-
-            /** drag: dragEvent for draggable elements */
             function drag(evt: MouseEvent | TouchEvent) {
                 if(selectedElement != null) {
                     evt.preventDefault();
-                    let mousePosition;
-                    if (evt instanceof MouseEvent) {
-                        mousePosition = dragHelper.getMousePosition(evt, svg);
-                    } else if (evt instanceof TouchEvent) {
-                        mousePosition = dragHelper.getTouchPosition(evt, svg);  // Use touch helper function
-                    }
+                    let mousePosition = (evt instanceof MouseEvent) 
+                        ? dragHelper.getMousePosition(evt, svg)
+                        : dragHelper.getTouchPosition(evt, svg);
+            
                     if(mousePosition != null) {
-                        let x;
-                        let y;
-                        if(selectedElement.classList.contains('cp-inner-thumb')) {
-                            let restrict = confinementInner(mousePosition.x, mousePosition.y);
+                        let x, y, restrict;
+                        let isInner = selectedElement.classList.contains('cp-inner-thumb-hit-area');
+                        let isOuter = selectedElement.classList.contains('cp-outer-thumb-hit-area');
+                        
+                        if(isInner || isOuter) {
+                            restrict = isInner ? confinementInner(mousePosition.x, mousePosition.y) 
+                                               : confinementOuter(mousePosition.x, mousePosition.y);
                             x = restrict.x;
                             y = restrict.y;
-                            selectedElement?.setAttribute('cx', x.toString());
-                            selectedElement?.setAttribute('cy', y.toString());
-                            wheel.updateInnerWheel(selectedElement as SVGSVGElement);
-                        } else {
-                            x = mousePosition.x;
-                            y = mousePosition.y;
-                            let restrict = confinementOuter(x, y);
-                            x = restrict.x;
-                            y = restrict.y;
-                            selectedElement?.setAttribute('cx', x.toString());
-                            selectedElement?.setAttribute('cy', y.toString());
-                            wheel.changeColor();
-                        }                       
+                            
+                            // Move the hit area
+                            selectedElement.setAttribute('cx', x.toString());
+                            selectedElement.setAttribute('cy', y.toString());
+                            
+                            // Move the corresponding visible thumb
+                            let visibleThumb = document.querySelector(isInner ? '.cp-inner-thumb' : '.cp-outer-thumb') as SVGSVGElement;
+                            visibleThumb.setAttribute('cx', x.toString());
+                            visibleThumb.setAttribute('cy', y.toString());
+                            
+                            if(isInner) {
+                                wheel.updateInnerWheel(visibleThumb);
+                            } else {
+                                wheel.changeColor();
+                            }
+                        }
                     }
                 }
             }
