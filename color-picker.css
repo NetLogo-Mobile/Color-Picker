@@ -125,7 +125,8 @@
 .cp-mode-btn-cont {
   display: flex;
   flex-direction: row;
-  gap: 0.4rem;
+  width: calc(21rem + 1.5px);
+  justify-content: space-between; 
   padding-bottom: 0.7rem;
 }
 
@@ -139,23 +140,24 @@
   justify-content: center;
   align-items: center;
   height: 1.8rem;
-  padding: 0 0.5rem;
+  width: 4.875rem;
   box-sizing: border-box;
   background-color: #e5e5e5;
   font-size: 0.9rem;
   cursor: pointer;
 }
 
+.cp-mode-color-display {
+  height: 1.8rem;
+  box-sizing: border-box;
+  width: 4.875rem;
+  border: #cecece 1px solid;
+  visibility: hidden;
+}
+
 .cp-mode-btn-img {
   width: 0.9rem;
   aspect-ratio: 1/1;
-}
-
-/** cp-body-btn-cont: container for the button modes of the color picker */
-.cp-body-btn-cont {
-  display: flex;
-  flex-direction: row;
-  padding-bottom: 0.7rem;
 }
 
 .cp-model-indicator {
@@ -201,6 +203,10 @@
 @media (max-width: 37.5rem) {
   .cp-body-right {
     display: none;
+  }
+  
+  .cp-mode-color-display {
+    visibility: visible;
   }
 }
 

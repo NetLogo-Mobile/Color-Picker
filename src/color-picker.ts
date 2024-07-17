@@ -117,10 +117,17 @@ export default class ColorPicker {
         if(alphaSlider) alphaSlider.value = val.toString();
     }
 
-    /** updateModelDisplay: updates the color of the model/background  */
+    /** updateModelDisplay: updates the color of the model/background and the color widget next to the mode buttons  */
     private updateModelDisplay() {
-        if(this.state.changeModelColor) this.parent.querySelector('.cp-model-preview')?.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3] / 255})`);
-        else this.parent.querySelector('.cp-model-background')?.setAttribute('fill', `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, 1)`);
+        const colorString = colors.arrToString(this.state.currentColor);
+        if (this.state.changeModelColor) {
+            this.parent.querySelector('.cp-model-preview')?.setAttribute('fill', colorString);
+        } else {
+            this.parent.querySelector('.cp-model-background')?.setAttribute('fill', colorString);
+        }
+
+        const modeColorDisplay = this.parent.querySelector('.cp-mode-color-display') as HTMLElement;
+        if (modeColorDisplay) modeColorDisplay.style.backgroundColor = colorString;
     }
 
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
@@ -244,6 +251,8 @@ export default class ColorPicker {
                             <img class="cp-mode-btn-img" src="${cpSlider}"/>
                             <span class="cp-mode-btn-text">${Localized('Slider')}</span> 
                         </button>
+                        <div class="cp-mode-color-display" style="background-color:${colors.arrToString(this.state.currentColor)}">
+                        </div>
                     </div>
                     <div class="cp-body-mode-main no-select"></div>
                 </div>
