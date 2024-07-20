@@ -6,8 +6,6 @@ This is a guide to the Color Picker feature for NetLogo Web. The Color Picker is
 https://netlogo-mobile.github.io/Color-Picker/
 - This should bring you to a page with just the standalone color picker. The callback function after selecting a color simply logs the color.
 
-![color-picker](https://raw.githubusercontent.com/NetLogo-Mobile/Color-Picker/gh-pages/images/color-picker.png) 
-
 ## Usage
 
 To integrate the Color Picker into your NetLogo Web project, start by installing the Color Picker npm package:
@@ -55,14 +53,11 @@ The Color Picker consists of three modes: Grid, Wheel, and Slider. Each mode pro
 
 - `Grid`: Grid mode provides the standard NetLogo grid for selecting NetLogo colors. The grid contains cells of NetLogo colors from 0 - 139.9, moving up by a default of increment 1, which a user can change in the increment bar at the bottom of the feature.
 <br></br>
-<img src="https://raw.githubusercontent.com/NetLogo-Mobile/Color-Picker/gh-pages/images/grid-mode.png" alt="Grid Mode" width="600">
 - `Wheel`: Wheel mode provides another way to select NetLogo colors, but with an inner and outer wheel. The outer wheel selects the base color for the outer wheel, and the outer wheel allows you to change the brightness of the base color. This provides a more intuitive way to select colors, especially on touch screens and mobile.
 <br></br>
-<img src="https://raw.githubusercontent.com/NetLogo-Mobile/Color-Picker/gh-pages/images/wheel-mode.png" alt="Grid Mode" width="600">
 
 - `Slider`: Slider mode comes in two sub-modes, RGB and HSL. This mode provides the traditional way of choosing a color by adjusting three sliders. You can choose an RGB color by specifying each individual value in the corresponding slider. Likewise, you can choose an HSL color in HSL mode in the same way. Additionally, you can access the saved colors tab in the Slider mode. The saved colors tab allows you to "save" a color by pressing the button with a `+` sign. This color is saved in one of the squares, and you can set the color back to this color by pressing on it.
 <br></br>
-<img src="https://raw.githubusercontent.com/NetLogo-Mobile/Color-Picker/gh-pages/images/slider-mode.png" alt="Grid Mode" width="600">
 
 
 ## Limitations
