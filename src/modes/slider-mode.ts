@@ -50,7 +50,6 @@ export class SliderMode extends ColorMode {
 
     /** setupSavedColors: sets up saved colors by adding event handlers */
     private setupSavedColors() {
-        // add event handler to the add button
         const addButton = document.querySelector(".cp-saved-color-add");
         addButton?.addEventListener("click", () => {
             const savedColors = this.state.savedColors;
@@ -121,64 +120,105 @@ export class SliderMode extends ColorMode {
     }
     /** createRGB: creates the RGB sliders */
     private createRGB() : void {
+        // callback function for slider to change currentColor 
+        const updateRGBColor = (colorIndex: number, sliderValue: number) => {
+            const newColor = [...this.state.currentColor];
+
+            // update the specific index with the new slider value
+            newColor[colorIndex] = sliderValue;
+            // set the state with the updated color array
+            this.setState({ currentColor: newColor });
+            this.updateColorDisplay();
+        }
+
         const parent = document.querySelector('.cp-sliders') as HTMLElement;
         parent.innerHTML = '';
-        let slider1 = new Slider(parent, this.state.currentColor[0], 0, 255, 'Red', '200px', Localized('Red'), true);
-        let slider2 = new Slider(parent, this.state.currentColor[1], 0, 255, 'Green', '200px', Localized('Green'), true);
-        let slider3 = new Slider(parent, this.state.currentColor[2], 0, 255, 'Blue', '200px', Localized('Blue'), true);
-
-        /** add event listeners for every slider */
-        slider1.inputElement.addEventListener('input', () => {
-            this.setState({currentColor: [slider1.getValue(), this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]]});
-            this.updateColorDisplay();
-        });
-        slider2.inputElement.addEventListener('input', () => {
-            this.state.currentColor[1] = slider2.getValue();
-            this.updateColorDisplay();
-            this.setState({currentColor: this.state.currentColor});
-        });
-        slider3.inputElement.addEventListener('input', () => {
-            this.state.currentColor[2] = slider3.getValue();
-            this.updateColorDisplay();
-            this.setState({currentColor: this.state.currentColor});
-        });
+        let slider1 = new Slider(
+            parent,
+            this.state.currentColor[0],
+            0,
+            255,
+            'Red', 
+            '200px', 
+            Localized('Red'), 
+            (value: number) => updateRGBColor(0, value), 
+            true);
+        let slider2 = new Slider(parent, 
+            this.state.currentColor[1], 
+            0, 
+            255, 
+            'Green', 
+            '200px', 
+            Localized('Green'),(value: number) => updateRGBColor(1, value), 
+            true);
+        let slider3 = new Slider(
+            parent, 
+            this.state.currentColor[2], 
+            0, 
+            255, 
+            'Blue', 
+            '200px', 
+            Localized('Blue'), 
+            (value: number) => updateRGBColor(2, value), 
+            true);
     }
 
-    /** createHSL: creates the HSL sliders */
+    /** createHSL: creates the HSL sliders *//** createHSL: creates the HSL sliders */
     private createHSL(): void { 
         const parent = document.querySelector('.cp-sliders') as HTMLElement;
         parent.innerHTML = '';
         const colorAsHSL = color.RGBAToHSLA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
         this.HSL = colorAsHSL;
-        let slider1 = new Slider(parent, colorAsHSL[0], 0, 360, 'Hue', '200px', Localized('Hue'), true);
-        let slider2 = new Slider(parent, colorAsHSL[1], 0, 100, 'Saturation', '200px', Localized('Saturation'), true);
-        let slider3 = new Slider(parent, colorAsHSL[2], 0, 100, 'Luminance', '200px', Localized('Luminance'), true);
-        /** add event listeners for every slider */
-        slider1.inputElement.addEventListener('input', () => {
-            this.HSL[0] = slider1.getValue();
-            // update the rgb based on the HSL 
-            const newRGB = color.HSLAToRGBA(this.HSL[0], this.HSL[1], this.HSL[2], this.state.currentColor[3]);
-            this.state.currentColor = newRGB;
-            this.setState({currentColor: newRGB});
-            this.updateColorDisplay();
-        });
-        slider2.inputElement.addEventListener('input', () => {
-            this.HSL[1] = slider2.getValue();
-            const newRGB = color.HSLAToRGBA(this.HSL[0], this.HSL[1], this.HSL[2], this.state.currentColor[3]);
-            this.state.currentColor = newRGB;
-            this.setState({currentColor: newRGB});
-            this.updateColorDisplay();
-        });
-        slider3.inputElement.addEventListener('input', () => {
-            this.HSL[2] = slider3.getValue();
+
+        // callback function for slider to change HSL and update currentColor
+        const updateHSLColor = (hslIndex: number, sliderValue: number) => {
+            // update the HSL value
+            this.HSL[hslIndex] = sliderValue;
+
+            // convert HSL to RGB
             const newRGB = color.HSLAToRGBA(this.HSL[0], this.HSL[1], this.HSL[2], this.state.currentColor[3]);
             this.setState({currentColor: newRGB});
             this.updateColorDisplay();
-        });
+        }
+
+        let slider1 = new Slider(
+            parent, 
+            colorAsHSL[0], 
+            0, 
+            360, 
+            'Hue', 
+            '200px', 
+            Localized('Hue'), 
+            (value: number) => updateHSLColor(0, value), 
+            true
+        );
+
+        let slider2 = new Slider(
+            parent, 
+            colorAsHSL[1], 
+            0, 
+            100, 
+            'Saturation', 
+            '200px', 
+            Localized('Saturation'), 
+            (value: number) => updateHSLColor(1, value), 
+            true
+        );
+
+        let slider3 = new Slider(
+            parent, 
+            colorAsHSL[2], 
+            0, 
+            100, 
+            'Luminance', 
+            '200px', 
+            Localized('Luminance'), 
+            (value: number) => updateHSLColor(2, value), 
+            true
+        );
     }
 
-
-    /** init(): initializes the grid  */
+    /** init(): initializes the slider  */
     public init(): void {
         this.toDOM();
         this.updateColorDisplay();

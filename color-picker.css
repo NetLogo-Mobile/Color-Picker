@@ -533,8 +533,6 @@ input[type='range'].cp-styled-slider.color-slider::-webkit-slider-thumb {
 }
 
 input[type='number'].cp-slider-value-display-cont {
-  user-select: none;
-  pointer-events: none;
   text-align: center;
   border-radius: 0;
   border: none;

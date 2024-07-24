@@ -1,11 +1,15 @@
+import { start } from "repl";
+
 type SliderColor = 'Red' | 'Green' | 'Blue' | 'alpha' | 'Hue' | 'Saturation' | 'Luminance';
 
 export class Slider {
-    private valueDisplayElement: HTMLInputElement | null = null;
-    private valueBubble: HTMLOutputElement | null = null;
+    private valueDisplayElement: HTMLInputElement | null = null; // the input Element defining the value indicator
 
-    public inputElement: HTMLInputElement;
+    public inputElement: HTMLInputElement; // the slider 
     private parent: HTMLElement;
+    private value: number; // the value of the current slider (from 0 to 255)
+    private onValueChange: Function; // callback function to be called when slider value changes 
+    
 
     constructor(
         parent: HTMLElement,
@@ -15,12 +19,15 @@ export class Slider {
         sliderColor: SliderColor,
         sliderWidth: string,
         text: string,
+        onValueChange: Function, // callback function to be called after slider / inputbox value change 
         hasDisplay: boolean = true
     ) {
         let r = document.querySelector(':root') as HTMLElement;
         r.style.setProperty('--slider', sliderColor);
 
         this.parent = parent;
+        this.value = startValue;
+        this.onValueChange = onValueChange;
 
         // Create the slider
         this.inputElement = document.createElement('input');
@@ -31,7 +38,7 @@ export class Slider {
         this.inputElement.min = min.toString();
         this.inputElement.max = max.toString();
         this.inputElement.classList.add('cp-styled-slider');
-        this.inputElement.value = startValue + '';
+        this.inputElement.value = startValue.toString()
 
         if (sliderColor === 'alpha') {
             this.inputElement.classList.add('alpha-slider');
@@ -63,16 +70,28 @@ export class Slider {
         sliderDisplayContainer.appendChild(sliderContainer);
 
         if (hasDisplay) {
+            // create value-display: the input element that shows the value of the slider. 
             this.valueDisplayElement = document.createElement('input');
             this.valueDisplayElement.classList.add('cp-slider-value-display-cont');
-            this.valueDisplayElement.type = 'number';
+            this.valueDisplayElement.type = 'number';this.valueDisplayElement.min = '0';
+            this.valueDisplayElement.max = max.toString();
             this.valueDisplayElement.value = startValue.toString();
             sliderDisplayContainer.appendChild(this.valueDisplayElement);
-        } else {
-            let valueBubble = document.createElement('output');
-            valueBubble.classList.add('cp-Popover', 'cp-AlphaMsg');
-            sliderContainer.appendChild(valueBubble);
-            this.valueBubble = valueBubble;
+            // add event listener for this input element as well to change the color 
+            this.valueDisplayElement.addEventListener('input', (event) => {
+                const input = event.target as HTMLInputElement;
+                let value = parseInt(input.value);
+                // If the input is not a number, reset to the previous valid value
+                if (isNaN(value)) {
+                    input.value = this.inputElement.value.toString();
+                    return;
+                }
+                value = Math.max(0, Math.min(max, value));
+                // Update the input value and the slider
+                input.value = value.toString();
+                this.setValue(value);
+                this.onValueChange(value);
+            });
         }
 
         this.parent.appendChild(sliderDisplayContainer);
@@ -85,13 +104,8 @@ export class Slider {
 
         if (this.valueDisplayElement !== null) {
             this.valueDisplayElement.value = val;
-        } else if (this.valueBubble !== null) {
-            this.valueBubble.innerHTML = val;
-            let min = Number(target.min);
-            let max = Number(target.max);
-            let newVal = Number(((Number(val) - min) * 100) / (max - min));
-            this.valueBubble.style.left = `calc(${newVal}% + (${8 - newVal * 0.25}px))`;
         }
+        this.onValueChange(val);
     }
 
     private finalize(): void {
@@ -103,8 +117,13 @@ export class Slider {
     }
 
     private sliderChangedValue = (): string => {
-        this.inputElement.style.setProperty('--value', this.inputElement.value);
-        return this.inputElement.value;
+        const value = parseInt(this.inputElement.value);
+        this.inputElement.style.setProperty('--value', value.toString());
+
+        // Call the callback function
+        this.onValueChange(value);
+
+        return value.toString();
     };
 
     public setValue(value: number): void {
@@ -117,6 +136,8 @@ export class Slider {
             this.valueDisplayElement.value = value.toString();
         }
         this.inputElement.style.setProperty('--value', value.toString());
+        // call callback function
+        this.onValueChange(value);
     }
 
     public getValue(): number {
