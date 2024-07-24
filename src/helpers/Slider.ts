@@ -73,24 +73,33 @@ export class Slider {
             // create value-display: the input element that shows the value of the slider. 
             this.valueDisplayElement = document.createElement('input');
             this.valueDisplayElement.classList.add('cp-slider-value-display-cont');
-            this.valueDisplayElement.type = 'number';this.valueDisplayElement.min = '0';
+            this.valueDisplayElement.type = 'number';
+            this.valueDisplayElement.min = '0';
             this.valueDisplayElement.max = max.toString();
             this.valueDisplayElement.value = startValue.toString();
             sliderDisplayContainer.appendChild(this.valueDisplayElement);
             // add event listener for this input element as well to change the color 
             this.valueDisplayElement.addEventListener('input', (event) => {
                 const input = event.target as HTMLInputElement;
-                let value = parseInt(input.value);
+                const value = input.value;
+                // Allow empty input (will be treated as 0)
+                if (value === '') {
+                    this.setValue(0);
+                    this.onValueChange(0);
+                    return;
+                }
+                let numValue = parseInt(value);
                 // If the input is not a number, reset to the previous valid value
-                if (isNaN(value)) {
+                if (isNaN(numValue)) {
                     input.value = this.inputElement.value.toString();
                     return;
                 }
-                value = Math.max(0, Math.min(max, value));
+                numValue = Math.max(0, Math.min(max, numValue));
                 // Update the input value and the slider
-                input.value = value.toString();
-                this.setValue(value);
-                this.onValueChange(value);
+
+                input.value = numValue.toString();
+                this.setValue(numValue);
+                this.onValueChange(numValue);
             });
         }
 
