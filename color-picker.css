@@ -90,6 +90,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 }
 
 /* cp-title: title of the color picker and icon */
@@ -100,15 +101,20 @@
   align-items: center;
   height: 100%;
   margin-left: 3.1%;
+  gap: 0.75rem;
+}
+/* inverted class for inverting image color for pressing buttons */
+.cp-inverted {
+  filter: invert(100%);
 }
 
 .cp-icon {
-  width: 2.4rem;
-  margin-top: 8%;
+  width: 1.8rem;
 }
 
 .cp-close {
   width: 1rem;
+  height: 1rem;
   margin-right: 2.51%;
   cursor:pointer;
 }

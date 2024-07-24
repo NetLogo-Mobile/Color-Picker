@@ -71,6 +71,7 @@ export class Slider {
             // create value-display: the input element that shows the value of the slider. 
             this.valueDisplayElement = document.createElement('input');
             this.valueDisplayElement.classList.add('cp-slider-value-display-cont');
+            this.valueDisplayElement.inputMode = 'numeric';
             this.valueDisplayElement.type = 'number';
             this.valueDisplayElement.min = '0';
             this.valueDisplayElement.max = max.toString();
@@ -114,7 +115,7 @@ export class Slider {
             this.valueDisplayElement.value = val;
         }
         // color value has changed so call onValueChange
-        this.onValueChange(val);
+        this.onValueChange(Number(val));
     }
 
     private finalize(): void {

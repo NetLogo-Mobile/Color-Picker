@@ -1,10 +1,10 @@
 import '../color-picker.css';
-import icon from './assets/cp-icon.svg';
-import closeIcon from './assets/cp-close.svg';
-import cpGrid from './assets/cp-grid.svg';
-import cpWheel from './assets/cp-wheel.svg';
-import cpSlider from './assets/cp-slider.svg';
-import modelIndicator from './assets/cp-model-indicator.svg';
+import icon from './assets/cp-icon.png';
+import closeIcon from './assets/cp-close.png';
+import cpGrid from './assets/cp-grid.png';
+import cpWheel from './assets/cp-wheel.png';
+import cpSlider from './assets/cp-slider.png';
+import modelIndicator from './assets/cp-model-indicator.png';
 import { rgbToNetlogo } from './helpers/colors';
 import { GridMode } from './modes/grid-mode';
 import { WheelMode } from './modes/wheel-mode';
@@ -36,7 +36,6 @@ export default class ColorPicker {
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
-    private isMinimized: boolean = false; // state var to indicate if the color picker should be minimized or not 
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config: {
         parent: HTMLElement,
@@ -135,12 +134,13 @@ export default class ColorPicker {
         /** changeButtonColor: Helper function to toggle button color */
         function changeButtonColor(button: HTMLElement, isPressed: boolean): void {
             // Set styles based on isPressed
+            console.log("change button color called");
             button.style.backgroundColor = isPressed ? '#5A648D' : '#E5E5E5';
             button.style.color = isPressed ? 'white' : 'black';
             let image = button.querySelector('.cp-mode-btn-img') as HTMLElement;
             if (image) {
-                image.style.filter = `invert(${isPressed ? '100%' : '0%'})`;
-            }
+                image.classList.toggle('cp-inverted', isPressed);
+              }
         }
 
         // attach event listeners to the mode buttons 
@@ -224,7 +224,6 @@ export default class ColorPicker {
     /** toDOM: creates and attaches the ColorPicker body to parent */
     private toDOM() {
         // localize strings before adding to dom
-        const gridString = Localized('Grid')
 
         const cpBody = `
         <div class="cp">
