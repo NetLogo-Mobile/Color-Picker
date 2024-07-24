@@ -1,0 +1,27 @@
+{
+  "name": "@netlogo/netlogo-color-picker",
+  "version": "1.9.23",
+  "description": "Color Picker for NetLogo Web",
+  "main": "./dist/ColorPicker.bundle.js",
+  "module": "./dist/ColorPicker.bundle.js",
+  "types": "./dist/ColorPicker.bundle.d.ts",
+  "scripts": {
+    "build": "tsc && cp -R src/assets/ dist/assets/ && rollup -c"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup-plugin-dts": "^6.1.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-image": "^3.0.3",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "rollup-plugin-postcss": "^4.0.2",
+    "tslib": "^2.6.2"
+  }
+}
