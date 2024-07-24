@@ -7,7 +7,6 @@ export class Slider {
 
     public inputElement: HTMLInputElement; // the slider 
     private parent: HTMLElement;
-    private value: number; // the value of the current slider (from 0 to 255)
     private onValueChange: Function; // callback function to be called when slider value changes 
     
 
@@ -26,7 +25,6 @@ export class Slider {
         r.style.setProperty('--slider', sliderColor);
 
         this.parent = parent;
-        this.value = startValue;
         this.onValueChange = onValueChange;
 
         // Create the slider
@@ -85,6 +83,7 @@ export class Slider {
                 // Allow empty input (will be treated as 0)
                 if (value === '') {
                     this.setValue(0);
+                    // color value has changed so call onValueChange
                     this.onValueChange(0);
                     return;
                 }
@@ -96,9 +95,9 @@ export class Slider {
                 }
                 numValue = Math.max(0, Math.min(max, numValue));
                 // Update the input value and the slider
-
                 input.value = numValue.toString();
                 this.setValue(numValue);
+                // color value has changed so call onValueChange
                 this.onValueChange(numValue);
             });
         }
@@ -114,6 +113,7 @@ export class Slider {
         if (this.valueDisplayElement !== null) {
             this.valueDisplayElement.value = val;
         }
+        // color value has changed so call onValueChange
         this.onValueChange(val);
     }
 
@@ -129,7 +129,7 @@ export class Slider {
         const value = parseInt(this.inputElement.value);
         this.inputElement.style.setProperty('--value', value.toString());
 
-        // Call the callback function
+        // color value has changed so call onValueChange
         this.onValueChange(value);
 
         return value.toString();
@@ -145,7 +145,7 @@ export class Slider {
             this.valueDisplayElement.value = value.toString();
         }
         this.inputElement.style.setProperty('--value', value.toString());
-        // call callback function
+        // color value has changed so call onValueChange
         this.onValueChange(value);
     }
 
