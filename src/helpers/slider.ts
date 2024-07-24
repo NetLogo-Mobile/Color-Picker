@@ -1,5 +1,3 @@
-import { start } from "repl";
-
 type SliderColor = 'Red' | 'Green' | 'Blue' | 'alpha' | 'Hue' | 'Saturation' | 'Luminance';
 
 export class Slider {
