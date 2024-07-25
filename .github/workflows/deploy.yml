@@ -1,14 +1,11 @@
 name: Build and Deploy
-
 on:
   push:
     branches:
       - main
-
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -30,6 +27,11 @@ jobs:
           echo "Error: ./dist directory does not exist."
           exit 1
         fi
+
+    - name: Copy index.html and tester.js to dist
+      run: |
+        cp index.html dist/
+        cp tester.js dist/
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
