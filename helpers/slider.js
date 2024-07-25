@@ -1,55 +1,39 @@
-type SliderColor = 'Red' | 'Green' | 'Blue' | 'alpha' | 'Hue' | 'Saturation' | 'Luminance';
-
 export class Slider {
-    private valueDisplayElement: HTMLInputElement | null = null; // the input Element defining the value indicator
-
-    public inputElement: HTMLInputElement; // the slider 
-    private parent: HTMLElement;
-    private onValueChange: Function; // callback function to be called when slider value changes 
-    
-
-    constructor(
-        parent: HTMLElement,
-        startValue: number,
-        min: number,
-        max: number,
-        sliderColor: SliderColor,
-        sliderWidth: string,
-        text: string,
-        onValueChange: Function, // callback function to be called after slider / inputbox value change 
-        hasDisplay: boolean = true
-    ) {
-        let r = document.querySelector(':root') as HTMLElement;
+    constructor(parent, startValue, min, max, sliderColor, sliderWidth, text, onValueChange, // callback function to be called after slider / inputbox value change 
+    hasDisplay = true) {
+        this.valueDisplayElement = null; // the input Element defining the value indicator
+        this.sliderChangedValue = () => {
+            const value = parseInt(this.inputElement.value);
+            this.inputElement.style.setProperty('--value', value.toString());
+            // color value has changed so call onValueChange
+            this.onValueChange(value);
+            return value.toString();
+        };
+        let r = document.querySelector(':root');
         r.style.setProperty('--slider', sliderColor);
-
         this.parent = parent;
         this.onValueChange = onValueChange;
-
         // Create the slider
         this.inputElement = document.createElement('input');
         this.inputElement.type = 'range';
         this.inputElement.style.width = sliderWidth;
         this.inputElement.value = startValue.toString();
-        
         this.inputElement.min = min.toString();
         this.inputElement.max = max.toString();
         this.inputElement.classList.add('cp-styled-slider');
-        this.inputElement.value = startValue.toString()
-
+        this.inputElement.value = startValue.toString();
         if (sliderColor === 'alpha') {
             this.inputElement.classList.add('alpha-slider');
-        } else {
+        }
+        else {
             this.inputElement.classList.add('color-slider');
         }
-
         // Add color to slider TRACK
         this.inputElement.classList.add(`color-${sliderColor.toLowerCase()}`, 'slider-progress');
         this.inputElement.addEventListener('input', this.rangeSlide.bind(this));
-
         // Create a div to hold the slider
         let sliderContainer = document.createElement('div');
         sliderContainer.classList.add('cp-slider-container');
-
         // Create the text element
         if (text !== '') {
             let textElement = document.createElement('div');
@@ -57,14 +41,11 @@ export class Slider {
             textElement.classList.add('cp-slider-text');
             sliderContainer.appendChild(textElement);
         }
-
         sliderContainer.appendChild(this.inputElement);
-
         // Create a div to hold slider and display
         let sliderDisplayContainer = document.createElement('div');
         sliderDisplayContainer.classList.add('cp-slider-display-container');
         sliderDisplayContainer.appendChild(sliderContainer);
-
         if (hasDisplay) {
             // create value-display: the input element that shows the value of the slider. 
             this.valueDisplayElement = document.createElement('input');
@@ -77,7 +58,7 @@ export class Slider {
             sliderDisplayContainer.appendChild(this.valueDisplayElement);
             // add event listener for this input element as well to change the color 
             this.valueDisplayElement.addEventListener('input', (event) => {
-                const input = event.target as HTMLInputElement;
+                const input = event.target;
                 const value = input.value;
                 // Allow empty input (will be treated as 0)
                 if (value === '') {
@@ -100,45 +81,29 @@ export class Slider {
                 this.onValueChange(numValue);
             });
         }
-
         this.parent.appendChild(sliderDisplayContainer);
         this.finalize();
     }
-
-    private rangeSlide(event: Event): void {
-        const target = event.target as HTMLInputElement;
+    rangeSlide(event) {
+        const target = event.target;
         let val = target.value;
-
         if (this.valueDisplayElement !== null) {
             this.valueDisplayElement.value = val;
         }
         // color value has changed so call onValueChange
         this.onValueChange(Number(val));
     }
-
-    private finalize(): void {
+    finalize() {
         let e = this.inputElement;
         e.style.setProperty('--value', e.value);
         e.style.setProperty('--min', e.min === '' ? '0' : e.min);
         e.style.setProperty('--max', e.max === '' ? '255' : e.max);
         e.addEventListener('input', this.sliderChangedValue.bind(this));
     }
-
-    private sliderChangedValue = (): string => {
-        const value = parseInt(this.inputElement.value);
-        this.inputElement.style.setProperty('--value', value.toString());
-
-        // color value has changed so call onValueChange
-        this.onValueChange(value);
-
-        return value.toString();
-    };
-
-    public setValue(value: number): void {
+    setValue(value) {
         const min = parseFloat(this.inputElement.min);
         const max = parseFloat(this.inputElement.max);
         value = Math.min(Math.max(value, min), max);
-
         this.inputElement.value = value.toString();
         if (this.valueDisplayElement !== null) {
             this.valueDisplayElement.value = value.toString();
@@ -147,8 +112,7 @@ export class Slider {
         // color value has changed so call onValueChange
         this.onValueChange(value);
     }
-
-    public getValue(): number {
+    getValue() {
         return parseFloat(this.inputElement.value);
     }
 }

@@ -9,67 +9,38 @@ import { rgbToNetlogo } from './helpers/colors';
 import { GridMode } from './modes/grid-mode';
 import { WheelMode } from './modes/wheel-mode';
 import { SliderMode } from './modes/slider-mode';
-import { ColorPickerState } from './modes/color-mode';
 import cpDropdown from './assets/drop-down.svg';
-import * as colors from './helpers/colors'
-
-export interface ColorPickerConfig {
-    parent: HTMLElement;
-    initColor: number[];
-    onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
-    savedColors?: number[][];
-}
-
-// Object type for returned color (the object passed to the callback fn)
-interface SelectedColor {
-    netlogo: number; 
-    rgba: number[]; 
-}
-
+import * as colors from './helpers/colors';
 export default class ColorPicker {
-    // state: the state of the ColorPicker
-    public state: ColorPickerState;
-    //parent: the parent element of the ColorPicker
-    private parent: HTMLElement;
-    // onColorSelect: a callback function that is called when a color is selected
-    private onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
-    // color display states that only ColorPicker needs to know about
-    private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
-    private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
-    constructor(config: {
-        parent: HTMLElement,
-        initColor: number[],
-        onColorSelect: (colorData: [SelectedColor, number[][]]) => void,
-        savedColors?: number[][],
-    }) {
+    constructor(config) {
+        // color display states that only ColorPicker needs to know about
+        this.displayParameter = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
+        this.isNetLogoNum = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
         this.state = {
             currentColor: config.initColor,
             currentMode: 'grid',
             changeModelColor: true,
-            increment : 1,
+            increment: 1,
             showNumbers: false,
-            savedColors: config.savedColors || [],  // Use an empty array as default if savedColors is not provided
-        }
+            savedColors: config.savedColors || [], // Use an empty array as default if savedColors is not provided
+        };
         this.parent = config.parent;
         this.onColorSelect = config.onColorSelect;
         this.init();
     }
-
     /** setState: used to change the state of the color picker and call all update functions */
-    private setState(newState: Partial<typeof this.state>) {
+    setState(newState) {
         // Directly update properties of the existing state object
         Object.keys(newState).forEach(key => {
             this.state[key] = newState[key];
         });
-
         // Call update functions to reflect changes
         this.updateColorParameters();
         this.updateModelDisplay();
     }
-
     /** init: initializes the ColorPicker */
-    private init() {
+    init() {
         this.toDOM();
         this.updateColorParameters();
         this.attachEventListeners();
@@ -77,154 +48,149 @@ export default class ColorPicker {
         // click the grid button to start
         this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
     }
-    
-
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
-    private updateColorParameters() {
+    updateColorParameters() {
         // update the color parameter type display
         const colorParamType = this.parent.querySelectorAll('.cp-values-type-text');
         colorParamType[0].innerHTML = this.displayParameter;
         colorParamType[1].innerHTML = 'NetLogo';
         let colorParamDisplay = this.parent.querySelectorAll('.cp-values-value');
-        if(this.displayParameter == 'RGBA') {
+        if (this.displayParameter == 'RGBA') {
             colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
-        } else if (this.displayParameter == 'HEX') {
+        }
+        else if (this.displayParameter == 'HEX') {
             // hex display
             colorParamDisplay[0].innerHTML = `${colors.rgbaToHex(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3])}`;
-        } else {
+        }
+        else {
             // HSLA display
             const hsla = colors.RGBAToHSLA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
             colorParamDisplay[0].innerHTML = `(${hsla[0]}, ${hsla[1]}, ${hsla[2]}, ${hsla[3]})`;
         }
         // netlogo color parameter update
-        if(this.isNetLogoNum) {
+        if (this.isNetLogoNum) {
             // netlogo number
             colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
-        } else {
+        }
+        else {
             const compoundColor = `${colors.netlogoToCompound(colors.rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]))}`;
             const formattedColor = compoundColor.charAt(0).toUpperCase() + compoundColor.slice(1);
             colorParamDisplay[1].innerHTML = formattedColor;
         }
         this.updateAlphaSlider();
     }
-
-
     /** updateAlphaSlider(): updates the appearance of the alpha slider to match the current alpha value */
-    private updateAlphaSlider() {
+    updateAlphaSlider() {
         const val = this.state.currentColor[3];
-        const alphaSlider = this.parent.querySelector(".cp-alpha-slider") as HTMLInputElement;
-        if(alphaSlider) alphaSlider.value = val.toString();
+        const alphaSlider = this.parent.querySelector(".cp-alpha-slider");
+        if (alphaSlider)
+            alphaSlider.value = val.toString();
     }
-
     /** updateModelDisplay: updates the color of the model/background and the color widget next to the mode buttons  */
-    private updateModelDisplay() {
+    updateModelDisplay() {
+        var _a, _b;
         const colorString = colors.arrToString(this.state.currentColor);
         if (this.state.changeModelColor) {
-            this.parent.querySelector('.cp-model-preview')?.setAttribute('fill', colorString);
-        } else {
-            this.parent.querySelector('.cp-model-background')?.setAttribute('fill', colorString);
+            (_a = this.parent.querySelector('.cp-model-preview')) === null || _a === void 0 ? void 0 : _a.setAttribute('fill', colorString);
         }
-
-        const modeColorDisplay = this.parent.querySelector('.cp-mode-color-display') as HTMLElement;
-        if (modeColorDisplay) modeColorDisplay.style.backgroundColor = colorString;
+        else {
+            (_b = this.parent.querySelector('.cp-model-background')) === null || _b === void 0 ? void 0 : _b.setAttribute('fill', colorString);
+        }
+        const modeColorDisplay = this.parent.querySelector('.cp-mode-color-display');
+        if (modeColorDisplay)
+            modeColorDisplay.style.backgroundColor = colorString;
     }
-
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
-    private attachEventListeners() {
+    attachEventListeners() {
+        var _a, _b;
         /** changeButtonColor: Helper function to toggle button color */
-        function changeButtonColor(button: HTMLElement, isPressed: boolean): void {
+        function changeButtonColor(button, isPressed) {
             // Set styles based on isPressed
             console.log("change button color called");
             button.style.backgroundColor = isPressed ? '#5A648D' : '#E5E5E5';
             button.style.color = isPressed ? 'white' : 'black';
-            let image = button.querySelector('.cp-mode-btn-img') as HTMLElement;
+            let image = button.querySelector('.cp-mode-btn-img');
             if (image) {
                 image.classList.toggle('cp-inverted', isPressed);
-              }
+            }
         }
-
         // attach event listeners to the mode buttons 
         let modeButtons = this.parent.querySelectorAll('.cp-mode-btn');
         modeButtons[0].addEventListener('click', () => {
             // grid button
             this.setState({ currentMode: 'grid' });
-            changeButtonColor(modeButtons[0] as HTMLElement, true);
-            changeButtonColor(modeButtons[1] as HTMLElement, false);
-            changeButtonColor(modeButtons[2] as HTMLElement, false);
-            new GridMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
+            changeButtonColor(modeButtons[0], true);
+            changeButtonColor(modeButtons[1], false);
+            changeButtonColor(modeButtons[2], false);
+            new GridMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
         modeButtons[1].addEventListener('click', () => {
             // wheel button
             this.setState({ currentMode: 'wheel' });
-            changeButtonColor(modeButtons[1] as HTMLElement, true);
-            changeButtonColor(modeButtons[0] as HTMLElement, false);
-            changeButtonColor(modeButtons[2] as HTMLElement, false);
-            new WheelMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
+            changeButtonColor(modeButtons[1], true);
+            changeButtonColor(modeButtons[0], false);
+            changeButtonColor(modeButtons[2], false);
+            new WheelMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
         modeButtons[2].addEventListener('click', () => {
             // slider button
             this.setState({ currentMode: 'slider' });
-            changeButtonColor(modeButtons[2] as HTMLElement, true);
-            changeButtonColor(modeButtons[0] as HTMLElement, false);
-            changeButtonColor(modeButtons[1] as HTMLElement, false);
-            new SliderMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this);
+            changeButtonColor(modeButtons[2], true);
+            changeButtonColor(modeButtons[0], false);
+            changeButtonColor(modeButtons[1], false);
+            new SliderMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this);
         });
-
         // attach event listener to model indicator button
         let modelIndicatorButton = this.parent.querySelector('.cp-model-indicator');
-        modelIndicatorButton?.addEventListener('click', () => {
+        modelIndicatorButton === null || modelIndicatorButton === void 0 ? void 0 : modelIndicatorButton.addEventListener('click', () => {
             this.state.changeModelColor = !this.state.changeModelColor; // we don't want to call set state, because it updates the appearance as well 
-            modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? Localized('Foreground Color') : Localized('Background Color');
-            changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);
+            modelIndicatorButton.querySelector('.cp-mode-btn-text').innerHTML = this.state.changeModelColor ? Localized('Foreground Color') : Localized('Background Color');
+            changeButtonColor(modelIndicatorButton, !this.state.changeModelColor);
         });
-
         //attach event listener to close button
         const closeButton = this.parent.querySelector('.cp-close');
-        closeButton?.addEventListener('click', () => {
+        closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => {
             // return the selected color, as well as the saved colors for "memory"
-    		const selectedColorObj: SelectedColor = {
-        		netlogo: colors.rgbToNetlogo(this.state.currentColor),
-        		rgba: this.state.currentColor,
-    		};
+            const selectedColorObj = {
+                netlogo: colors.rgbToNetlogo(this.state.currentColor),
+                rgba: this.state.currentColor,
+            };
             // the first element will be the different representations of selected color as an Object
-			this.onColorSelect([selectedColorObj, this.state.savedColors]);
+            this.onColorSelect([selectedColorObj, this.state.savedColors]);
         });
-
         // attach switch color display parameters event listeners 
         const paramSwitchBtns = this.parent.querySelectorAll('.cp-values-type');
         // this is the RGBA / HSLA param button
-        paramSwitchBtns[0]?.addEventListener('click', () => {
-            if(this.displayParameter == 'RGBA') {
-                this.displayParameter = 'HEX'
-            } else if (this.displayParameter == 'HEX') {
-                this.displayParameter = "HSLA"
-            } else if (this.displayParameter == 'HSLA') {
-                this.displayParameter = 'RGBA'
+        (_a = paramSwitchBtns[0]) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
+            if (this.displayParameter == 'RGBA') {
+                this.displayParameter = 'HEX';
+            }
+            else if (this.displayParameter == 'HEX') {
+                this.displayParameter = "HSLA";
+            }
+            else if (this.displayParameter == 'HSLA') {
+                this.displayParameter = 'RGBA';
             }
             this.updateColorParameters();
         });
         // NetLogo number --> doesn't have to switch text but does switch the display value 
-
-        paramSwitchBtns[1]?.addEventListener('click', () => {
+        (_b = paramSwitchBtns[1]) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => {
             this.isNetLogoNum = !this.isNetLogoNum;
             this.updateColorParameters();
         });
     }
-
     /** initAlphaSlider: initializes the alpha slider */
-    private initAlphaSlider() {
-        let alphaSlider = this.parent.querySelector('.cp-alpha-slider') as HTMLInputElement;
+    initAlphaSlider() {
+        let alphaSlider = this.parent.querySelector('.cp-alpha-slider');
         (alphaSlider);
         alphaSlider.addEventListener('input', () => {
             this.setState({ currentColor: [this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], parseInt(alphaSlider.value)] });
             (this.state);
         });
     }
-
     /** toDOM: creates and attaches the ColorPicker body to parent */
-    private toDOM() {
+    toDOM() {
         // localize strings before adding to dom
-
         const cpBody = `
         <div class="cp">
             <div class="cp-header">
@@ -300,19 +266,18 @@ export default class ColorPicker {
             </div>
         </div>
     `;
-    this.parent.innerHTML = cpBody;
+        this.parent.innerHTML = cpBody;
     }
 }
-
 /** Localized: a helper function to get localized strings from the editor. */
 // If the EditorLocalized object is available, use it to get the localized string
 // Otherwise, return the source string
-export function Localized(Source: string, ...Args: string[]): string {
-    var Localized = (window as any).EditorLocalized;
+export function Localized(Source, ...Args) {
+    var Localized = window.EditorLocalized;
     if (Localized) {
         return Localized.Get(Source, Args);
-    } else {
+    }
+    else {
         return Source;
     }
 }
-
