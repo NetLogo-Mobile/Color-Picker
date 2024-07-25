@@ -1,4 +1,4 @@
-import ColorPicker from "./dist/ColorPicker.bundle.js";
+import ColorPicker from "./ColorPicker.bundle.js";
 
 const savedColors = [
     [228, 202, 152, 255],
