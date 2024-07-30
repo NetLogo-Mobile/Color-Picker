@@ -106,7 +106,6 @@ export default class ColorPicker {
         /** changeButtonColor: Helper function to toggle button color */
         function changeButtonColor(button, isPressed) {
             // Set styles based on isPressed
-            console.log("change button color called");
             button.style.backgroundColor = isPressed ? '#5A648D' : '#E5E5E5';
             button.style.color = isPressed ? 'white' : 'black';
             let image = button.querySelector('.cp-mode-btn-img');

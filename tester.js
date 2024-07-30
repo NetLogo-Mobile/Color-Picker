@@ -20,7 +20,11 @@ function init(parent) {
 }
 var ce = document.querySelector(".code-editor");
 ce.style.width = '100%';
-ce.style.height ='20px';
-ce.style.bordeer = '1px solid red';
+ce.style.height = '20px';
+ce.style.border = '1px solid red';
+ce.style.display = 'flex';
+ce.style.justifyContent = 'center';
+ce.style.alignItems = 'center';
+ce.style.margin = '0 auto';
 var editor = init(ce);
 
