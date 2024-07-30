@@ -68,7 +68,6 @@
 
 /* cp-body: main body, everything in the color picker goes in here */
 .cp {
-    position: absolute;
     border-radius: 0.625rem;
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
