@@ -1,6 +1,6 @@
 {
   "name": "@netlogo/netlogo-color-picker",
-  "version": "1.10.2",
+  "version": "2.0.0",
   "description": "Color Picker for NetLogo Web",
   "main": "./dist/ColorPicker.bundle.js",
   "module": "./dist/ColorPicker.bundle.js",
