@@ -17,6 +17,7 @@ export default class ColorPicker {
         // color display states that only ColorPicker needs to know about
         this.displayParameter = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
         this.isNetLogoNum = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
+        this.isMinimized = false; // default value for minimize is false
         this.state = {
             currentColor: config.initColor,
             currentMode: 'grid',
@@ -26,8 +27,27 @@ export default class ColorPicker {
             savedColors: config.savedColors || [], // Use an empty array as default if savedColors is not provided
         };
         this.parent = config.parent;
+        // we should resize hide if the size of the parent container is smaller than the full size of the color picker 37.5rem or 600px
+        if (this.parent.offsetWidth < 600) {
+        }
         this.onColorSelect = config.onColorSelect;
+        console.log(this.parent.classList);
+        console.log(this.parent.offsetWidth);
+        if (this.parent.offsetWidth < 600) {
+            this.isMinimized = true;
+        }
         this.init();
+    }
+    updateLayout() {
+        const cpElement = this.parent.querySelector('.cp');
+        if (cpElement) {
+            if (this.isMinimized) {
+                cpElement.classList.add('cp-compact');
+            }
+            else {
+                cpElement.classList.remove('cp-compact');
+            }
+        }
     }
     /** setState: used to change the state of the color picker and call all update functions */
     setState(newState) {
@@ -42,6 +62,7 @@ export default class ColorPicker {
     /** init: initializes the ColorPicker */
     init() {
         this.toDOM();
+        this.updateLayout();
         this.updateColorParameters();
         this.attachEventListeners();
         this.initAlphaSlider();
