@@ -36,6 +36,7 @@ export default class ColorPicker {
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
+    private isMinimized: boolean = false; // default value for minimize is false
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config: {
         parent: HTMLElement,
@@ -52,10 +53,30 @@ export default class ColorPicker {
             savedColors: config.savedColors || [],  // Use an empty array as default if savedColors is not provided
         }
         this.parent = config.parent;
+        // we should resize hide if the size of the parent container is smaller than the full size of the color picker 37.5rem or 600px
+        if (this.parent.offsetWidth < 600) {
+            
+        }
         this.onColorSelect = config.onColorSelect;
+        console.log(this.parent.classList);
+        console.log(this.parent.offsetWidth);
+        if (this.parent.offsetWidth < 600) {
+            this.isMinimized = true;
+        }
         this.init();
     }
 
+    private updateLayout() {
+        const cpElement = this.parent.querySelector('.cp') as HTMLElement;
+        if (cpElement) {
+            if (this.isMinimized) {
+                cpElement.classList.add('cp-compact');
+            }
+            else {
+                cpElement.classList.remove('cp-compact');
+            }
+        }
+    }
     /** setState: used to change the state of the color picker and call all update functions */
     private setState(newState: Partial<typeof this.state>) {
         // Directly update properties of the existing state object
@@ -71,6 +92,7 @@ export default class ColorPicker {
     /** init: initializes the ColorPicker */
     private init() {
         this.toDOM();
+        this.updateLayout();
         this.updateColorParameters();
         this.attachEventListeners();
         this.initAlphaSlider();

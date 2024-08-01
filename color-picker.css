@@ -68,14 +68,15 @@
 
 /* cp-body: main body, everything in the color picker goes in here */
 .cp {
-    border-radius: 0.625rem;
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
-    background-color: #eeeff0;
-    height: 27.6rem;
-    box-shadow: 0 0 10px rgb(0 0 0 / 0.2);
-    font-family: 'Lato', sans-serif;
-  }
+  border-radius: 0.625rem;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  background-color: #eeeff0;
+  width: fit-content;
+  height: 27.6rem;
+  box-shadow: 0 0 10px rgb(0 0 0 / 0.2);
+  font-family: 'Lato', sans-serif;
+}
 
 .cp-header {
   background-color: #5a648d;
@@ -84,6 +85,7 @@
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
   display: flex;
+  flex-grow: 0;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
@@ -210,6 +212,15 @@
   .cp-mode-color-display {
     visibility: visible;
   }
+}
+
+/* additional classes for invisible */ 
+.cp-compact .cp-body-right {
+  display: none;
+}
+
+.cp-compact .cp-mode-color-display {
+  visibility: visible;
 }
 
 .cp-color-preview {
