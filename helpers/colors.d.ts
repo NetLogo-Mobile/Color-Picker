@@ -41,13 +41,13 @@ declare function netlogoColorToHex(netlogoColor: number): string;
 /**
  * arrToString: takes an rgb(a) array and returns a string rgb(a)**/
 declare function arrToString(colorArray: number[]): string;
-/** RGBAToHSLA: Converts rgba color to hsla color array. */
-declare function RGBAToHSLA(r: number, g: number, b: number, a: number): number[];
-/** HSLAToRGBA: Converts hsla color array to rgba color array. */
-declare function HSLAToRGBA(h: number, s: number, l: number, alpha: number): number[];
+/** RGBAToHSBA: Converts rgba color to hsba color array. */
+declare function RGBAToHSBA(r: number, g: number, b: number, a: number): [number, number, number, number];
+/** HSBAToRGBA: Converts hsba color values to rgba color array. */
+declare function HSBAToRGBA(h: number, s: number, b: number, alpha: number): [number, number, number, number];
 /** netlogoColorToRGBA: Converts NetLogo color to rgba color array. */
 declare function netlogoColorToRGBA(netlogoColor: number, alpha?: number): number[];
 /** netlogoToCompound: Converts a numeric NetLogo Color to a compound color string */
 declare function netlogoToCompound(netlogoColor: number): string;
 
-export { HSLAToRGBA, RGBAToHSLA, arrToString, b, baseColorsToRGB, baseIndex, cached, cachedNetlogoColors, colorTimesTen, colorToHex, colorToNumberMapping, componentToHex, compoundToRGB, g, hexToRgb, mappedColors, netlogoArrToRGB, netlogoBaseColors, netlogoColorToHex, netlogoColorToRGBA, netlogoToCompound, netlogoToRGB, r, rgbToHex, rgbToNetlogo, rgbaToHex, step };
+export { HSBAToRGBA, RGBAToHSBA, arrToString, b, baseColorsToRGB, baseIndex, cached, cachedNetlogoColors, colorTimesTen, colorToHex, colorToNumberMapping, componentToHex, compoundToRGB, g, hexToRgb, mappedColors, netlogoArrToRGB, netlogoBaseColors, netlogoColorToHex, netlogoColorToRGBA, netlogoToCompound, netlogoToRGB, r, rgbToHex, rgbToNetlogo, rgbaToHex, step };
