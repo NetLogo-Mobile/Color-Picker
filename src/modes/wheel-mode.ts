@@ -217,7 +217,7 @@ export class WheelMode extends ColorMode {
         let outerThumbHitArea = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         outerThumbHitArea.setAttribute('cx', `${outerThumbCor[0]}`);
         outerThumbHitArea.setAttribute('cy', `${outerThumbCor[1]}`);
-        outerThumbHitArea.setAttribute('r', '10'); // Larger radius
+        outerThumbHitArea.setAttribute('r', '20'); // Larger radius
         outerThumbHitArea.setAttribute('fill', 'transparent');
         outerThumbHitArea.classList.add("cp-outer-thumb-hit-area");
         outerThumbHitArea.classList.add("cp-draggable");

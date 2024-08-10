@@ -58,8 +58,6 @@ export default class ColorPicker {
             
         }
         this.onColorSelect = config.onColorSelect;
-        console.log(this.parent.classList);
-        console.log(this.parent.offsetWidth);
         if (this.parent.offsetWidth < 600) {
             this.isMinimized = true;
         }
@@ -115,8 +113,8 @@ export default class ColorPicker {
             colorParamDisplay[0].innerHTML = `${colors.rgbaToHex(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3])}`;
         } else {
             // HSLA display
-            const hsla = colors.RGBAToHSLA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
-            colorParamDisplay[0].innerHTML = `(${hsla[0]}, ${hsla[1]}, ${hsla[2]}, ${hsla[3]})`;
+            const hsba = colors.RGBAToHSBA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
+            colorParamDisplay[0].innerHTML = `(${hsba[0]}, ${hsba[1]}, ${hsba[2]}, ${hsba[3]})`;
         }
         // netlogo color parameter update
         if(this.isNetLogoNum) {
@@ -218,8 +216,8 @@ export default class ColorPicker {
             if(this.displayParameter == 'RGBA') {
                 this.displayParameter = 'HEX'
             } else if (this.displayParameter == 'HEX') {
-                this.displayParameter = "HSLA"
-            } else if (this.displayParameter == 'HSLA') {
+                this.displayParameter = "HSBA"
+            } else if (this.displayParameter == 'HSBA') {
                 this.displayParameter = 'RGBA'
             }
             this.updateColorParameters();

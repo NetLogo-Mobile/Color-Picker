@@ -238,76 +238,81 @@ function arrToString(colorArray: number[]) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-/** RGBAToHSLA: Converts rgba color to hsla color array. */
-function RGBAToHSLA(r: number, g: number, b: number, a: number): number[] {
-  // turn into fractionss
+/** RGBAToHSBA: Converts rgba color to hsba color array. */
+function RGBAToHSBA(r: number, g: number, b: number, a: number): [number, number, number, number] {
+  // Normalize RGB values to [0, 1]
   r /= 255;
   g /= 255;
   b /= 255;
-  a /= 255;
 
-  // find max and min
-  let cmax = Math.max(r, g, b),
-    cmin = Math.min(r, g, b),
-    delta = cmax - cmin;
-  let h,
-    s,
-    l = 0; // initialize
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const delta = max - min;
+
+  let h = 0;
+  let s = 0;
+  const v = max;
+
   // calculate hue
-  if (delta == 0) h = 0;
-  else if (cmax == r) h = ((g - b) / delta) % 6;
-  else if (cmax == g) h = (b - r) / delta + 2;
-  else h = (r - g) / delta + 4;
-  h = Math.round(h * 60);
-  if (h < 0) h += 360;
-  // calculate lightness
-  l = (cmax + cmin) / 2;
-  // calculate saturation
-  s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+  if (delta !== 0) {
+    if (max === r) {
+      h = ((g - b) / delta) % 6;
+    } else if (max === g) {
+      h = (b - r) / delta + 2;
+    } else {
+      h = (r - g) / delta + 4;
+    }
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+  }
+  s = max === 0 ? 0 : (delta / max) * 100;
 
-  // multiply l and s by 100
-  s = +(s * 100).toFixed(1);
-  l = +(l * 100).toFixed(1);
+  const b_percent = v * 100;
 
-  // multiply a by 100
-  a = +(a * 100).toFixed(1);
-  return [h, s, l, a];
+  // round values
+  h = Math.round(h);
+  s = Math.round(s);
+  const v_percent = Math.round(b_percent);
+
+  // Keep alpha in [0, 255] range
+  a = Math.round(Math.max(0, Math.min(255, a)));
+
+  return [h, s, v_percent, a];
 }
 
-/** HSLAToRGBA: Converts hsla color array to rgba color array. */
-function HSLAToRGBA(h: number, s: number, l: number, alpha: number) {
-  // divide h, s, and l by 360, 100, and 100 respectively
-  h /= 360;
-  s /= 100;
-  l /= 100;
-  let r, g, b;
-  if (s === 0) {
-      // if saturation is 0, it's an achromatic color (gray)
-      r = g = b = l;
-  }
-  else {
-      const hueToRGB = (p: number, q: number, t: number) => {
-          if (t < 0)
-              t += 1;
-          if (t > 1)
-              t -= 1;
-          if (t < 1 / 6)
-              return p + (q - p) * 6 * t;
-          if (t < 1 / 2)
-              return q;
-          if (t < 2 / 3)
-              return p + (q - p) * (2 / 3 - t) * 6;
-          return p;
-      };
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hueToRGB(p, q, h + 1 / 3) * 255;
-      g = hueToRGB(p, q, h) * 255;
-      b = hueToRGB(p, q, h - 1 / 3) * 255;
-  }
-  return [Math.round(r), Math.round(g), Math.round(b), alpha];
-}
+/** HSBAToRGBA: Converts hsba color values to rgba color array. */
+function HSBAToRGBA(h: number, s: number, b: number, alpha: number): [number, number, number, number] {
+  // ensure h, s, and b are in the correct range
+  h = Math.max(0, Math.min(360, h));
+  s = Math.max(0, Math.min(100, s)) / 100;
+  b = Math.max(0, Math.min(100, b)) / 100;
 
+  const c = b * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = b - c;
+
+  let r: number, g: number, bl: number;
+
+  if (h >= 0 && h < 60) {
+    [r, g, bl] = [c, x, 0];
+  } else if (h >= 60 && h < 120) {
+    [r, g, bl] = [x, c, 0];
+  } else if (h >= 120 && h < 180) {
+    [r, g, bl] = [0, c, x];
+  } else if (h >= 180 && h < 240) {
+    [r, g, bl] = [0, x, c];
+  } else if (h >= 240 && h < 300) {
+    [r, g, bl] = [x, 0, c];
+  } else {
+    [r, g, bl] = [c, 0, x];
+  }
+
+  r = Math.round((r + m) * 255);
+  g = Math.round((g + m) * 255);
+  bl = Math.round((bl + m) * 255);
+
+  return [r, g, bl, alpha];
+}
 
 /** netlogoColorToRGBA: Converts NetLogo color to rgba color array. */
 function netlogoColorToRGBA(
@@ -342,7 +347,7 @@ export {
   cachedNetlogoColors,
   netlogoBaseColors,
   cached,
-  RGBAToHSLA,
+  RGBAToHSBA,
   rgbToHex,
   rgbaToHex,
   componentToHex,
@@ -355,7 +360,7 @@ export {
   rgbToNetlogo,
   arrToString,
   hexToRgb,
-  HSLAToRGBA,
+  HSBAToRGBA,
   netlogoToCompound,
   netlogoArrToRGB,
   compoundToRGB,

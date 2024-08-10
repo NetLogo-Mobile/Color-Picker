@@ -1,4 +1,4 @@
-type SliderColor = 'Red' | 'Green' | 'Blue' | 'alpha' | 'Hue' | 'Saturation' | 'Luminance';
+type SliderColor = 'Red' | 'Green' | 'Blue' | 'alpha' | 'Hue' | 'Saturation' | 'Brightness';
 
 export class Slider {
     private valueDisplayElement: HTMLInputElement | null = null; // the input Element defining the value indicator
@@ -105,6 +105,7 @@ export class Slider {
         this.finalize();
     }
 
+
     private rangeSlide(event: Event): void {
         const target = event.target as HTMLInputElement;
         let val = target.value;
@@ -114,6 +115,7 @@ export class Slider {
         }
         // color value has changed so call onValueChange
         this.onValueChange(Number(val));
+
     }
 
     private finalize(): void {
