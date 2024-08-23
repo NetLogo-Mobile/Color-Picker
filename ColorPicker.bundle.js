@@ -265,6 +265,9 @@ function netlogoToCompound(netlogoColor) {
     if (netlogoColor == 9.9) {
         return 'white';
     }
+    if (netlogoColor == 0) {
+        return 'black';
+    }
     if (offset === 0) {
         // If the color is a base color, return only the base color name
         return baseColorName;
