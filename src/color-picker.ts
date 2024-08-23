@@ -36,13 +36,14 @@ export default class ColorPicker {
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
     private isMinimized: boolean = false; // default value for minimize is false
+    private openTo: string; // defines what part of the color picker to open to. If 'grid', we open to Grid. If 'wheel', we open to wheel, if 'slider', we open to slider. If 'sliderHSB', we open to hsb
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config: {
         parent: HTMLElement,
         initColor: number[],
         onColorSelect: (colorData: [SelectedColor, number[][]]) => void,
         savedColors?: number[][],
-    }) {
+    },  openTo: string = 'g') {
         this.state = {
             currentColor: config.initColor,
             currentMode: 'grid',
@@ -60,6 +61,7 @@ export default class ColorPicker {
         if (this.parent.offsetWidth < 600) {
             this.isMinimized = true;
         }
+        this.openTo = openTo;
         this.init();
     }
 
@@ -93,8 +95,22 @@ export default class ColorPicker {
         this.updateColorParameters();
         this.attachEventListeners();
         this.initAlphaSlider();
-        // click the grid button to start
-        this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
+        // click the correct button to start 
+        switch(this.openTo) {
+            case 'wheel': 
+                this.parent.querySelectorAll('.cp-mode-btn')[1].dispatchEvent(new Event('click'));
+                break;
+            case 'slider': 
+                this.parent.querySelectorAll('.cp-mode-btn')[2].dispatchEvent(new Event('click'));
+                break;
+            case 'sliderHSB':
+                this.parent.querySelectorAll('.cp-mode-btn')[2].dispatchEvent(new Event('click')); 
+                // click the hsb button 
+                this.parent.querySelectorAll('.cp-slider-changer')[0].dispatchEvent(new Event('click'));
+                break
+            default:
+                this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
+        } 
     }
     
 

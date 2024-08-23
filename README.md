@@ -21,6 +21,12 @@ After importing it into your project, you can create a Color Picker by calling t
 - `onColorSelect`: A callback function that is invoked when a color is selected. This function should handle the selected color data. **The returned color data is an array, where the first element is an object representing the selected color in NetLogo color and RGBA, and the second element is an array of the saved colors.**. To access the NetLogo color, do `returnedArray[0]['netlogo']`, and to get the rgba array, do: `returnedArray[0]['rgba']`
 - `savedColors`: An optional array of colors that the user can save for later use. Each color is also represented as an RGB array.
 
+You can also pass in an optional `openTo` parameter, which indicates which mode of the color picker to open to:
+- 'grid': opens to Grid
+- 'wheel': opens to Wheel
+- 'slider': opens to Slider's default RGB mode
+- 'sliderHSB': opens to the Slider's HSB mode
+
 Here is a basic example of how to instantiate the Color Picker:
 
 ```javascript
