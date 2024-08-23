@@ -1255,7 +1255,7 @@ class SliderMode extends ColorMode {
 
 class ColorPicker {
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
-    constructor(config) {
+    constructor(config, openTo = 'g') {
         // color display states that only ColorPicker needs to know about
         this.displayParameter = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
         this.isNetLogoNum = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
@@ -1275,6 +1275,7 @@ class ColorPicker {
         if (this.parent.offsetWidth < 600) {
             this.isMinimized = true;
         }
+        this.openTo = openTo;
         this.init();
     }
     updateLayout() {
@@ -1305,8 +1306,22 @@ class ColorPicker {
         this.updateColorParameters();
         this.attachEventListeners();
         this.initAlphaSlider();
-        // click the grid button to start
-        this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
+        // click the correct button to start 
+        switch (this.openTo) {
+            case 'wheel':
+                this.parent.querySelectorAll('.cp-mode-btn')[1].dispatchEvent(new Event('click'));
+                break;
+            case 'slider':
+                this.parent.querySelectorAll('.cp-mode-btn')[2].dispatchEvent(new Event('click'));
+                break;
+            case 'sliderHSB':
+                this.parent.querySelectorAll('.cp-mode-btn')[2].dispatchEvent(new Event('click'));
+                // click the hsb button 
+                this.parent.querySelectorAll('.cp-slider-changer')[0].dispatchEvent(new Event('click'));
+                break;
+            default:
+                this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
+        }
     }
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     updateColorParameters() {

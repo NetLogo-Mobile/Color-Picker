@@ -30,13 +30,14 @@ declare class ColorPicker {
     private displayParameter;
     private isNetLogoNum;
     private isMinimized;
+    private openTo;
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config: {
         parent: HTMLElement;
         initColor: number[];
         onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
         savedColors?: number[][];
-    });
+    }, openTo?: string);
     private updateLayout;
     /** setState: used to change the state of the color picker and call all update functions */
     private setState;

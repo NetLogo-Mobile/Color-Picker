@@ -15,7 +15,6 @@ function init(parent) {
         },
         savedColors: savedColors
     };
-
     let colorPicker = new ColorPicker(colorPickerConfig);
 }
 var ce = document.querySelector(".code-editor");
