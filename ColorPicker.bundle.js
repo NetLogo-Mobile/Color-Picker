@@ -261,6 +261,10 @@ function netlogoToCompound(netlogoColor) {
     let baseColorName = Object.keys(mappedColors)[baseColorIndex];
     // Calculate offset and immediately round to one decimal point
     let offset = Number(((netlogoColor % 10) - 5).toFixed(1));
+    // if white return white
+    if (netlogoColor == 9.9) {
+        return 'white';
+    }
     if (offset === 0) {
         // If the color is a base color, return only the base color name
         return baseColorName;

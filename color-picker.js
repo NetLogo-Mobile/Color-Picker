@@ -5,7 +5,6 @@ import cpGrid from './assets/cp-grid.png';
 import cpWheel from './assets/cp-wheel.png';
 import cpSlider from './assets/cp-slider.png';
 import modelIndicator from './assets/cp-model-indicator.png';
-import { rgbToNetlogo } from './helpers/colors';
 import { GridMode } from './modes/grid-mode';
 import { WheelMode } from './modes/wheel-mode';
 import { SliderMode } from './modes/slider-mode';
@@ -89,7 +88,7 @@ export default class ColorPicker {
         // netlogo color parameter update
         if (this.isNetLogoNum) {
             // netlogo number
-            colorParamDisplay[1].innerHTML = `${rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
+            colorParamDisplay[1].innerHTML = `${colors.rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]])}`;
         }
         else {
             const compoundColor = `${colors.netlogoToCompound(colors.rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]))}`;

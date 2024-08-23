@@ -44,6 +44,7 @@ const baseColorsToRGB = {
 /** colorToNumberMapping: maps the NetLogo Base colors to their corresponding numeric value  */
 const colorToNumberMapping = {
     gray: 5,
+    white: 9.9,
     red: 15,
     orange: 25,
     brown: 35,
@@ -58,7 +59,6 @@ const colorToNumberMapping = {
     magenta: 125,
     pink: 135,
     black: 145,
-    white: 155,
 };
 /** netlogoToRGB: converts netlogo colors to rgb string  */
 function netlogoToRGB(netlogoColor) {
@@ -300,6 +300,10 @@ function netlogoToCompound(netlogoColor) {
     let baseColorName = Object.keys(mappedColors)[baseColorIndex];
     // Calculate offset and immediately round to one decimal point
     let offset = Number(((netlogoColor % 10) - 5).toFixed(1));
+    // if white return white
+    if (netlogoColor == 9.9) {
+        return 'white';
+    }
     if (offset === 0) {
         // If the color is a base color, return only the base color name
         return baseColorName;
