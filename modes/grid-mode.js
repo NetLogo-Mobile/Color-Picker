@@ -44,7 +44,7 @@ export class GridMode extends ColorMode {
                 // netlogoColor defaults to 255 for the alpha value
                 newColor[3] = this.state.currentColor[3];
                 // Use setState to update the currentColor in the component's state
-                this.setState({ currentColor: newColor });
+                this.setState({ currentColor: newColor, colorType: "netlogo" });
             }
         }
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

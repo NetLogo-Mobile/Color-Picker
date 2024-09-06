@@ -231,7 +231,7 @@ export class WheelMode extends ColorMode {
             // set the color to the current color 
             const colorAsRGB = colors.hexToRgb(color);
             const colorAsRGBA = [colorAsRGB[0], colorAsRGB[1], colorAsRGB[2], this.state.currentColor[3]];
-            this.setState({ currentColor: colorAsRGBA });
+            this.setState({ currentColor: colorAsRGBA, colorType: "netlogo" });
         }
     }
     /** outerWheelSetup(): sets up the color of the outer wheel */

@@ -5,6 +5,7 @@ styleInject(css_248z);
 
 type ColorPickerState = {
     currentColor: number[];
+    colorType: string;
     currentMode: string;
     changeModelColor: boolean;
     increment: number;
@@ -22,6 +23,7 @@ interface ColorPickerConfig {
 interface SelectedColor {
     netlogo: number;
     rgba: number[];
+    colorType: string;
 }
 declare class ColorPicker {
     state: ColorPickerState;
@@ -36,6 +38,7 @@ declare class ColorPicker {
     constructor(config: {
         parent: HTMLElement;
         initColor: number[];
+        initColorType: string;
         onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
         savedColors?: number[][];
     }, openTo?: string);

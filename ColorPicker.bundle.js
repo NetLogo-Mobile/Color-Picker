@@ -340,7 +340,7 @@ class GridMode extends ColorMode {
                 // netlogoColor defaults to 255 for the alpha value
                 newColor[3] = this.state.currentColor[3];
                 // Use setState to update the currentColor in the component's state
-                this.setState({ currentColor: newColor });
+                this.setState({ currentColor: newColor, colorType: "netlogo" });
             }
         }
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -728,7 +728,7 @@ class WheelMode extends ColorMode {
             // set the color to the current color 
             const colorAsRGB = hexToRgb(color);
             const colorAsRGBA = [colorAsRGB[0], colorAsRGB[1], colorAsRGB[2], this.state.currentColor[3]];
-            this.setState({ currentColor: colorAsRGBA });
+            this.setState({ currentColor: colorAsRGBA, colorType: "netlogo" });
         }
     }
     /** outerWheelSetup(): sets up the color of the outer wheel */
@@ -1201,7 +1201,7 @@ class SliderMode extends ColorMode {
         const updateRGBColor = (colorIndex, sliderValue) => {
             const newColor = [...this.state.currentColor];
             newColor[colorIndex] = sliderValue;
-            this.setState({ currentColor: newColor });
+            this.setState({ currentColor: newColor, colorType: "rgb" });
             this.updateColorDisplay();
         };
         const parent = document.querySelector('.cp-sliders');
@@ -1236,7 +1236,7 @@ class SliderMode extends ColorMode {
         const updateHSBColor = (hsbIndex, sliderValue) => {
             this.HSBA[hsbIndex] = sliderValue;
             const newRGB = HSBAToRGBA(this.HSBA[0], this.HSBA[1], this.HSBA[2], this.HSBA[3]);
-            this.setState({ currentColor: newRGB });
+            this.setState({ currentColor: newRGB, colorType: "hsb" });
             this.updateColorDisplay();
             this.updateSlideGradients(this.HSBA[0], this.HSBA[1], this.HSBA[2]);
         };
@@ -1266,6 +1266,7 @@ class ColorPicker {
         this.copyMessageTimeout = null; //Keeps track of "Copied" message timeouts, so they don't stack and are cancelled if we switch colors 
         this.state = {
             currentColor: config.initColor,
+            colorType: config.initColorType, //tracks the color type, being one of: "netlogo", "rgb", or "hsb"
             currentMode: 'grid',
             changeModelColor: true,
             increment: 1,
@@ -1273,8 +1274,6 @@ class ColorPicker {
             savedColors: config.savedColors || [], // Use an empty array as default if savedColors is not provided
         };
         this.parent = config.parent;
-        // we should resize hide if the size of the parent container is smaller than the full size of the color picker 37.5rem or 600px
-        if (this.parent.offsetWidth < 600) ;
         this.onColorSelect = config.onColorSelect;
         if (this.parent.offsetWidth < 600) {
             this.isMinimized = true;
@@ -1430,10 +1429,11 @@ class ColorPicker {
         //attach event listener to close button
         const closeButton = this.parent.querySelector('.cp-close');
         closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => {
-            // return the selected color, as well as the saved colors for "memory"
+            // return the selected color, as well as the saved colors for "memory", as well as the color type 
             const selectedColorObj = {
                 netlogo: rgbToNetlogo(this.state.currentColor),
                 rgba: this.state.currentColor,
+                colorType: this.state.colorType
             };
             // the first element will be the different representations of selected color as an Object
             this.onColorSelect([selectedColorObj, this.state.savedColors]);
