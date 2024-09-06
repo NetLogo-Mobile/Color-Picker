@@ -137,7 +137,7 @@ export class SliderMode extends ColorMode {
         const updateRGBColor = (colorIndex: number, sliderValue: number) => {
             const newColor = [...this.state.currentColor];
             newColor[colorIndex] = sliderValue;
-            this.setState({ currentColor: newColor });
+            this.setState({ currentColor: newColor, colorType:"rgb" });
             this.updateColorDisplay();
         }
 
@@ -179,7 +179,7 @@ export class SliderMode extends ColorMode {
         const updateHSBColor = (hsbIndex: number, sliderValue: number) => {
             this.HSBA[hsbIndex] = sliderValue;
             const newRGB = colors.HSBAToRGBA(this.HSBA[0], this.HSBA[1], this.HSBA[2], this.HSBA[3]);
-            this.setState({currentColor: newRGB});
+            this.setState({currentColor: newRGB, colorType: "hsb"});
             this.updateColorDisplay();
             this.updateSlideGradients(this.HSBA[0], this.HSBA[1], this.HSBA[2]);
         }

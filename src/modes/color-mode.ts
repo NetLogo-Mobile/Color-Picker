@@ -1,5 +1,6 @@
 type ColorPickerState = {
     currentColor: number[];
+    colorType: string;
     currentMode: string;
     changeModelColor: boolean;
     increment: number;

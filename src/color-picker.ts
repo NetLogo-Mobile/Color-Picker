@@ -22,7 +22,8 @@ export interface ColorPickerConfig {
 // Object type for returned color (the object passed to the callback fn)
 interface SelectedColor {
     netlogo: number; 
-    rgba: number[]; 
+    rgba: number[];
+    colorType: string; 
 }
 
 export default class ColorPicker {
@@ -42,11 +43,13 @@ export default class ColorPicker {
     constructor(config: {
         parent: HTMLElement,
         initColor: number[],
+        initColorType: string,
         onColorSelect: (colorData: [SelectedColor, number[][]]) => void,
         savedColors?: number[][],
     },  openTo: string = 'g') {
         this.state = {
             currentColor: config.initColor,
+            colorType: config.initColorType, //tracks the color type, being one of: "netlogo", "rgb", or "hsb"
             currentMode: 'grid',
             changeModelColor: true,
             increment : 1,
@@ -54,10 +57,6 @@ export default class ColorPicker {
             savedColors: config.savedColors || [],  // Use an empty array as default if savedColors is not provided
         }
         this.parent = config.parent;
-        // we should resize hide if the size of the parent container is smaller than the full size of the color picker 37.5rem or 600px
-        if (this.parent.offsetWidth < 600) {
-            
-        }
         this.onColorSelect = config.onColorSelect;
         if (this.parent.offsetWidth < 600) {
             this.isMinimized = true;
@@ -216,10 +215,11 @@ export default class ColorPicker {
         //attach event listener to close button
         const closeButton = this.parent.querySelector('.cp-close');
         closeButton?.addEventListener('click', () => {
-            // return the selected color, as well as the saved colors for "memory"
+            // return the selected color, as well as the saved colors for "memory", as well as the color type 
     		const selectedColorObj: SelectedColor = {
         		netlogo: colors.rgbToNetlogo(this.state.currentColor),
         		rgba: this.state.currentColor,
+                colorType: this.state.colorType
     		};
             // the first element will be the different representations of selected color as an Object
 			this.onColorSelect([selectedColorObj, this.state.savedColors]);

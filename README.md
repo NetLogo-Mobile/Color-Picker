@@ -33,10 +33,12 @@ Here is a basic example of how to instantiate the Color Picker:
 const colorPickerConfig = {
     parent: document.getElementById('color-picker-container'),
     initColor: [255, 255, 255], // Initial color as rgb (white)
+    initColorType: string, //Initial color type ("netlogo", "rgb" or "hsb")
     onColorSelect: (colorData) => {
         console.log('Selected color:', colorData);
     },
-    savedColors: [[255, 0, 0], [0, 255, 0]] // Optional saved colors
+    savedColors: [[255, 0, 0], [0, 255, 0]], // Optional saved colors
+    openTo: string, //optional opening to which part of the color picker {'g', 'w', 's'}
 };
 
 const colorPicker = new ColorPicker(colorPickerConfig);
