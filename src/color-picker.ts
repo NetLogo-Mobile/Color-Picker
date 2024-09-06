@@ -37,6 +37,7 @@ export default class ColorPicker {
     private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
     private isMinimized: boolean = false; // default value for minimize is false
     private openTo: string; // defines what part of the color picker to open to. If 'grid', we open to Grid. If 'wheel', we open to wheel, if 'slider', we open to slider. If 'sliderHSB', we open to hsb
+    private copyMessageTimeout: number | null = null;  //Keeps track of "Copied" message timeouts, so they don't stack and are cancelled if we switch colors 
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config: {
         parent: HTMLElement,
@@ -86,6 +87,8 @@ export default class ColorPicker {
         // Call update functions to reflect changes
         this.updateColorParameters();
         this.updateModelDisplay();
+        // remove the copy timeout, if its there
+        this.clearCopyTimeout();
     }
 
     /** init: initializes the ColorPicker */
@@ -122,14 +125,14 @@ export default class ColorPicker {
         colorParamType[1].innerHTML = 'NetLogo';
         let colorParamDisplay = this.parent.querySelectorAll('.cp-values-value');
         if(this.displayParameter == 'RGBA') {
-            colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
+            colorParamDisplay[0].innerHTML = `[${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]}]`;
         } else if (this.displayParameter == 'HEX') {
             // hex display
             colorParamDisplay[0].innerHTML = `${colors.rgbaToHex(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3])}`;
         } else {
             // HSLA display
             const hsba = colors.RGBAToHSBA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
-            colorParamDisplay[0].innerHTML = `(${hsba[0]}, ${hsba[1]}, ${hsba[2]}, ${hsba[3]})`;
+            colorParamDisplay[0].innerHTML = `[${hsba[0]}, ${hsba[1]}, ${hsba[2]}, ${hsba[3]}]`;
         }
         // netlogo color parameter update
         if(this.isNetLogoNum) {
@@ -203,14 +206,12 @@ export default class ColorPicker {
             changeButtonColor(modeButtons[1] as HTMLElement, false);
             new SliderMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this);
         });
-
         // attach event listener to model indicator button
         let modelIndicatorButton = this.parent.querySelector('.cp-model-indicator');
         modelIndicatorButton?.addEventListener('click', () => {
             this.state.changeModelColor = !this.state.changeModelColor; // we don't want to call set state, because it updates the appearance as well 
             modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? Localized('Foreground Color') : Localized('Background Color');
-            changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);
-        });
+            changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);        });
 
         //attach event listener to close button
         const closeButton = this.parent.querySelector('.cp-close');
@@ -243,7 +244,59 @@ export default class ColorPicker {
             this.isNetLogoNum = !this.isNetLogoNum;
             this.updateColorParameters();
         });
+
+        // add event listeners to copy elements 
+        const valueDisplayElements = document.querySelectorAll(".cp-values-value");
+        valueDisplayElements.forEach((display, index) => {
+            const displayAsElement = display as HTMLElement;
+            displayAsElement.addEventListener('click', () => {
+                this.copyToClipboard(displayAsElement);
+            })
+        })
     }
+
+    /** clearCopyTimeout: Helper function to clear the copy timeout if necessary, and reset all values */
+    private clearCopyTimeout() {
+        if(this.copyMessageTimeout) {
+            clearTimeout(this.copyMessageTimeout);
+            this.copyMessageTimeout = null;
+            // also reset the state of all display elements
+            const valueDisplayElements = document.querySelectorAll(".cp-values-value");
+            valueDisplayElements.forEach((display, index) => {
+                const displayAsElement = display as HTMLElement;
+                displayAsElement.style.pointerEvents = 'auto';
+                displayAsElement.style.opacity = '1';
+            })
+        }
+    }
+
+    /** Copies innerText of displayElement to the clipboard */
+    private copyToClipboard(displayElement: HTMLElement) {
+        const originalText = displayElement.innerText;
+        const textToCopy = originalText;
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            // Change to "Copied!"
+            displayElement.innerText = 'Copied!';
+            // Set a timeout to revert back to the original text
+            // clear previosu timeouts
+            if(this.copyMessageTimeout) {
+                clearTimeout(this.copyMessageTimeout);
+            }
+            // don't let user copy this 
+            displayElement.style.pointerEvents = 'none';
+            displayElement.style.opacity = "0.5"
+            this.copyMessageTimeout = window.setTimeout(() => {
+                displayElement.innerText = originalText;
+                this.copyMessageTimeout = null;
+                displayElement.style.opacity = "1"
+                displayElement.style.pointerEvents ='auto';
+            }, 1500);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+
 
     /** initAlphaSlider: initializes the alpha slider */
     private initAlphaSlider() {
