@@ -17,6 +17,7 @@ export default class ColorPicker {
         this.displayParameter = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
         this.isNetLogoNum = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
         this.isMinimized = false; // default value for minimize is false
+        this.copyMessageTimeout = null; //Keeps track of "Copied" message timeouts, so they don't stack and are cancelled if we switch colors 
         this.state = {
             currentColor: config.initColor,
             currentMode: 'grid',
@@ -56,6 +57,8 @@ export default class ColorPicker {
         // Call update functions to reflect changes
         this.updateColorParameters();
         this.updateModelDisplay();
+        // remove the copy timeout, if its there
+        this.clearCopyTimeout();
     }
     /** init: initializes the ColorPicker */
     init() {
@@ -89,7 +92,7 @@ export default class ColorPicker {
         colorParamType[1].innerHTML = 'NetLogo';
         let colorParamDisplay = this.parent.querySelectorAll('.cp-values-value');
         if (this.displayParameter == 'RGBA') {
-            colorParamDisplay[0].innerHTML = `(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]})`;
+            colorParamDisplay[0].innerHTML = `[${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]}]`;
         }
         else if (this.displayParameter == 'HEX') {
             // hex display
@@ -98,7 +101,7 @@ export default class ColorPicker {
         else {
             // HSLA display
             const hsba = colors.RGBAToHSBA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
-            colorParamDisplay[0].innerHTML = `(${hsba[0]}, ${hsba[1]}, ${hsba[2]}, ${hsba[3]})`;
+            colorParamDisplay[0].innerHTML = `[${hsba[0]}, ${hsba[1]}, ${hsba[2]}, ${hsba[3]}]`;
         }
         // netlogo color parameter update
         if (this.isNetLogoNum) {
@@ -209,6 +212,53 @@ export default class ColorPicker {
         (_b = paramSwitchBtns[1]) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => {
             this.isNetLogoNum = !this.isNetLogoNum;
             this.updateColorParameters();
+        });
+        // add event listeners to copy elements 
+        const valueDisplayElements = document.querySelectorAll(".cp-values-value");
+        valueDisplayElements.forEach((display, index) => {
+            const displayAsElement = display;
+            displayAsElement.addEventListener('click', () => {
+                this.copyToClipboard(displayAsElement);
+            });
+        });
+    }
+    /** clearCopyTimeout: Helper function to clear the copy timeout if necessary, and reset all values */
+    clearCopyTimeout() {
+        if (this.copyMessageTimeout) {
+            clearTimeout(this.copyMessageTimeout);
+            this.copyMessageTimeout = null;
+            // also reset the state of all display elements
+            const valueDisplayElements = document.querySelectorAll(".cp-values-value");
+            valueDisplayElements.forEach((display, index) => {
+                const displayAsElement = display;
+                displayAsElement.style.pointerEvents = 'auto';
+                displayAsElement.style.opacity = '1';
+            });
+        }
+    }
+    /** Copies innerText of displayElement to the clipboard */
+    copyToClipboard(displayElement) {
+        const originalText = displayElement.innerText;
+        const textToCopy = originalText;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            // Change to "Copied!"
+            displayElement.innerText = 'Copied!';
+            // Set a timeout to revert back to the original text
+            // clear previosu timeouts
+            if (this.copyMessageTimeout) {
+                clearTimeout(this.copyMessageTimeout);
+            }
+            // don't let user copy this 
+            displayElement.style.pointerEvents = 'none';
+            displayElement.style.opacity = "0.5";
+            this.copyMessageTimeout = window.setTimeout(() => {
+                displayElement.innerText = originalText;
+                this.copyMessageTimeout = null;
+                displayElement.style.opacity = "1";
+                displayElement.style.pointerEvents = 'auto';
+            }, 1500);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
         });
     }
     /** initAlphaSlider: initializes the alpha slider */
