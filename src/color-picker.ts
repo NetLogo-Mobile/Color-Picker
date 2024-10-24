@@ -26,7 +26,7 @@ interface SelectedColor {
     colorType: string; 
 }
 
-export default class ColorPicker {
+export class ColorPicker {
     // state: the state of the ColorPicker
     public state: ColorPickerState;
     //parent: the parent element of the ColorPicker
@@ -216,6 +216,7 @@ export default class ColorPicker {
         const closeButton = this.parent.querySelector('.cp-close');
         closeButton?.addEventListener('click', () => {
             // return the selected color, as well as the saved colors for "memory", as well as the color type 
+            // selected color is color type 
     		const selectedColorObj: SelectedColor = {
         		netlogo: colors.rgbToNetlogo(this.state.currentColor),
         		rgba: this.state.currentColor,
