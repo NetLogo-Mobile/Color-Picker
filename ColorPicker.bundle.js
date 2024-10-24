@@ -1430,6 +1430,7 @@ class ColorPicker {
         const closeButton = this.parent.querySelector('.cp-close');
         closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => {
             // return the selected color, as well as the saved colors for "memory", as well as the color type 
+            // selected color is color type 
             const selectedColorObj = {
                 netlogo: rgbToNetlogo(this.state.currentColor),
                 rgba: this.state.currentColor,
@@ -1608,4 +1609,4 @@ function Localized(Source, ...Args) {
     }
 }
 
-export { Localized, ColorPicker as default };
+export { ColorPicker, Localized };

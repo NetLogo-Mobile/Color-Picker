@@ -10,7 +10,7 @@ import { WheelMode } from './modes/wheel-mode';
 import { SliderMode } from './modes/slider-mode';
 import cpDropdown from './assets/drop-down.svg';
 import * as colors from './helpers/colors';
-export default class ColorPicker {
+export class ColorPicker {
     /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
     constructor(config, openTo = 'g') {
         // color display states that only ColorPicker needs to know about
@@ -184,6 +184,7 @@ export default class ColorPicker {
         const closeButton = this.parent.querySelector('.cp-close');
         closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => {
             // return the selected color, as well as the saved colors for "memory", as well as the color type 
+            // selected color is color type 
             const selectedColorObj = {
                 netlogo: colors.rgbToNetlogo(this.state.currentColor),
                 rgba: this.state.currentColor,

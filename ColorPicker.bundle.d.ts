@@ -67,4 +67,4 @@ declare class ColorPicker {
 /** Localized: a helper function to get localized strings from the editor. */
 declare function Localized(Source: string, ...Args: string[]): string;
 
-export { type ColorPickerConfig, Localized, ColorPicker as default };
+export { ColorPicker, type ColorPickerConfig, Localized };
