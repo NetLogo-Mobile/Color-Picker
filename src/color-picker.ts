@@ -26,7 +26,7 @@ interface SelectedColor {
     colorType: string; 
 }
 
-export default class ColorPicker {
+export class ColorPicker {
     // state: the state of the ColorPicker
     public state: ColorPickerState;
     //parent: the parent element of the ColorPicker

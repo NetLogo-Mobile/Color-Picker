@@ -2,18 +2,50 @@
 
 This is a guide to the Color Picker feature for NetLogo Web. The Color Picker is a user interface that allows a user to explore and experiment with different colors, and finally select one. The selected color can then be provided to the program using the Color Picker in the form of a callback function. The Color Picker is still in the experimental stage, all feedback is welcome.
 
-## Demo Link
+### Demo Link
 https://netlogo-mobile.github.io/Color-Picker/
 - This should bring you to a page with just the standalone color picker. The callback function after selecting a color simply logs the color.
 
-## Usage
-
-To integrate the Color Picker into your NetLogo Web project, start by installing the Color Picker npm package:
-
+### Installation
 ```bash
 npm i @netlogo/netlogo-color-picker
 ```
 
+### Usage Examples
+
+This repository provides two usage examples for the NetLogo Color Picker:
+
+1. **ES Module Example**:
+   - Import the `ColorPicker` as an ES module within your JavaScript.
+   - Example usage:
+     ```javascript
+     import { ColorPicker } from "./dist/ColorPicker.bundle.js";
+     
+     const colorPickerConfig = {
+         parent: parentElement,
+         initColor: [165, 234, 251, 255],
+         onColorSelect: (selectedColor) => {
+             console.log("Color selected:", selectedColor);
+         },
+         savedColors: savedColorsArray
+     };
+     let colorPicker = new ColorPicker(colorPickerConfig);
+     ```
+
+2. **Standalone UMD Example**:
+   - Use the standalone UMD bundle with a `<script>` tag in your HTML.
+   - Example usage:
+     ```html
+     <script src="../dist/ColorPicker.standalone.js"></script>
+     <script>
+         const colorPicker = new ColorPicker.ColorPicker(colorPickerConfig);
+     </script>
+     ```
+
+Check the `examples/` folder for the full HTML implementations of each example: `module.html` for ES module usage and `standalone.html` for UMD bundle usage.
+To integrate the Color Picker into your NetLogo Web project, start by installing the Color Picker npm package:
+
+### Configuration Options
 After importing it into your project, you can create a Color Picker by calling the constructor. The `ColorPicker` class constructor accepts a single `config` object that contains the necessary properties for initialization:
 
 - `parent`: The HTML element that will host the Color Picker. This ensures the picker is embedded in the correct location in your UI.
