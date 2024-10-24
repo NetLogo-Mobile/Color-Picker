@@ -9,6 +9,7 @@ https://netlogo-mobile.github.io/Color-Picker/
 ### Installation
 ```bash
 npm i @netlogo/netlogo-color-picker
+npm install 
 ```
 
 ### Usage Examples

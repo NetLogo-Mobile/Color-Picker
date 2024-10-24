@@ -28,9 +28,10 @@ jobs:
           exit 1
         fi
 
-    - name: Copy module.html to dist as index.html
+    - name: Copy index.html and tester.js to dist
       run: |
-        cp ./examples/module.html ./dist/index.html
+        cp index.html dist/
+        cp tester.js dist/
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
