@@ -62,11 +62,10 @@ export class GridMode extends ColorMode {
                     // Remove gold border from previously selected rect
                     this.selectedRect.setAttribute('stroke-width', '');
                     this.selectedRect.setAttribute('stroke', '');
+                    this.selectedRect.style.filter = 'none'
                 }
 
-                // Set gold border to the newly selected rect
-                rect.setAttribute('stroke-width', '0.1'); // slightly thicker for select
-                rect.setAttribute('stroke', 'gold');
+                rect.style.filter = 'drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4))';
                 this.selectedRect = rect;
             }
         };

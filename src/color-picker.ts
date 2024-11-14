@@ -35,7 +35,7 @@ export class ColorPicker {
     private onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
-    private isNetLogoNum: boolean = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
+    private isNetLogoNum: boolean = false; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
     private isMinimized: boolean = false; // default value for minimize is false
     private openTo: string; // defines what part of the color picker to open to. If 'grid', we open to Grid. If 'wheel', we open to wheel, if 'slider', we open to slider. If 'sliderHSB', we open to hsb
     private copyMessageTimeout: number | null = null;  //Keeps track of "Copied" message timeouts, so they don't stack and are cancelled if we switch colors 
