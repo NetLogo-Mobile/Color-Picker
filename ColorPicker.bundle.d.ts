@@ -34,7 +34,7 @@ declare class ColorPicker {
     private isMinimized;
     private openTo;
     private copyMessageTimeout;
-    /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
+    /** constructor: creates a Color Picker instance. A color picker has a parent div and an initial color */
     constructor(config: {
         parent: HTMLElement;
         initColor: number[];

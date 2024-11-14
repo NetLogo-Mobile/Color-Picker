@@ -1,30 +1,34 @@
 import { ColorMode } from "./color-mode";
 import { Slider } from "../helpers/slider";
 import { arrToString } from "../helpers/colors";
-import cpDropdown from '../assets/drop-down.svg';
 import * as colors from '../helpers/colors';
 import { Localized } from "../color-picker";
-/** GridMode: A mode for the ColorPicker that shows a grid of colors */
+/** SliderMode: A mode for the ColorPicker that shows sliders for color adjustment */
 export class SliderMode extends ColorMode {
-    constructor(parent, state, setState, colorPickerInstance) {
+    /**
+     * Constructor for SliderMode
+     * @param parent - The parent HTML element
+     * @param state - The current state of the color picker
+     * @param setState - Function to update the state
+     * @param colorPickerInstance - Instance of the ColorPicker
+     * @param mode - Initial mode, either 'rgb' or 'hsb' (optional, defaults to 'rgb')
+     */
+    constructor(parent, state, setState, colorPickerInstance, mode = 'rgb' // New parameter with default value
+    ) {
         super(parent, state, setState);
-        this.isRGB = true; // true if the current mode is RGB, false if it is HSL
         this.HSBA = [0, 0, 0, 0];
         this.sliders = [];
+        this.isRGB = mode === 'rgb'; // Set initial mode based on the parameter
         this.init();
     }
-    /** toDOM: creates the body of the Grid */
+    /** toDOM: creates the body of the SliderMode */
     toDOM() {
         this.parent.innerHTML = `
             <div class="cp-slider-cont">
                 <div class="cp-slider-color-display"></div>
-                <div class="cp-slider-changer">
-                    <img src="${cpDropdown}"></img>
-                    <span class="cp-dropdown-text">RGB</span>
-                </div>
                 <div class="cp-sliders">
                     <div class="cp-slider-change-mode"></div>
-                    <!-- part that switches from rgb to hsl -->
+                    <!-- part that switches from rgb to hsb -->
                 </div>
                 <div class="cp-saved-colors-cont">
                     <div class="cp-saved-colors"></div>
@@ -39,40 +43,37 @@ export class SliderMode extends ColorMode {
     /** updateColorDisplay: updates the color display to be the current color  */
     updateColorDisplay() {
         const colorDisplay = document.querySelector('.cp-slider-color-display');
-        colorDisplay.style.backgroundColor = `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]})`;
+        colorDisplay.style.backgroundColor = `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3] / 255})`;
     }
     /** setupSavedColors: sets up saved colors by adding event handlers */
     setupSavedColors() {
         const addButton = document.querySelector(".cp-saved-color-add");
         addButton === null || addButton === void 0 ? void 0 : addButton.addEventListener("click", () => {
-            const savedColors = this.state.savedColors;
+            const savedColors = [...this.state.savedColors]; // Clone to avoid direct mutation
             const colorCopy = [...this.state.currentColor];
             savedColors.unshift(colorCopy);
             // if saved colors is length 5, remove the last element
-            if (savedColors.length == 5)
+            if (savedColors.length > 5)
                 savedColors.pop();
             this.setState({ savedColors });
             this.updateSavedColors();
         });
-        // update the appearance of each color grid based on the queue 
+        // Update the appearance of each color grid based on the queue 
         this.updateSavedColors();
-        // add event handler to each color button
+        // Add event handler to each color button
         const savedButtons = document.querySelectorAll(".cp-saved-colors");
-        for (let i = 0; i < savedButtons.length; i++) {
-            const button = savedButtons[i];
+        savedButtons.forEach(button => {
             button.addEventListener("click", () => {
-                if (button.dataset.value) {
+                const btn = button;
+                if (btn.dataset.value) {
                     // has a color so return it 
-                    const colorsAsArr = button.dataset.value.split(",");
-                    const colorIntArr = colorsAsArr.map(Number);
-                    this.setState({ currentColor: colorIntArr });
+                    const colorsAsArr = btn.dataset.value.split(",").map(Number);
+                    this.setState({ currentColor: colorsAsArr });
                     this.updateColorDisplay();
-                    this.updateSliders(colorIntArr);
+                    this.updateSliders(colorsAsArr);
                 }
-                else
-                    return;
             });
-        }
+        });
     }
     /** updateSliders: updates the sliders based on the current color */
     updateSliders(color) {
@@ -90,44 +91,28 @@ export class SliderMode extends ColorMode {
             this.updateSlideGradients(hsbColor[0], hsbColor[1], hsbColor[2]);
         }
     }
-    /** attachEventListeners: attaches the event listeners to the Slider body */
-    attachEventListeners() {
-        // add event listener to the rgb / hsl swapping 
-        const sliderChanger = document.querySelector(".cp-slider-changer");
-        const changerText = document.querySelector(".cp-dropdown-text");
-        sliderChanger.addEventListener('click', () => {
-            if (this.isRGB) {
-                // switch to HSB
-                this.isRGB = false;
-                changerText.innerText = "HSB";
-                this.createHSB();
-            }
-            else {
-                this.isRGB = true;
-                changerText.innerText = "RGB";
-                this.createRGB();
-            }
-        });
-    }
-    /** updatedSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
+    /** updateSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
     updateSavedColors() {
         const savedColors = this.state.savedColors;
         const savedSquares = document.querySelectorAll(".cp-saved-colors");
+        // Reset all squares to default background
         savedSquares.forEach(square => {
             square.style.backgroundColor = '#f1f1f1';
+            square.removeAttribute('data-value');
         });
+        // Assign colors to squares
         for (let i = 0; i < savedColors.length; i++) {
             const squareIndex = savedSquares.length - 1 - i;
             if (savedSquares[squareIndex]) {
                 const square = savedSquares[squareIndex];
                 square.style.backgroundColor = arrToString(savedColors[i]);
-                square.setAttribute('data-value', savedColors[i] + "");
+                square.setAttribute('data-value', savedColors[i].join(","));
             }
         }
     }
     /** createRGB: creates the RGB sliders */
     createRGB() {
-        // callback function for slider to change currentColor 
+        // Callback function for slider to change currentColor 
         const updateRGBColor = (colorIndex, sliderValue) => {
             const newColor = [...this.state.currentColor];
             newColor[colorIndex] = sliderValue;
@@ -142,10 +127,11 @@ export class SliderMode extends ColorMode {
             new Slider(parent, this.state.currentColor[2], 0, 255, 'Blue', '200px', Localized('Blue'), (value) => updateRGBColor(2, value), true)
         ];
     }
-    /** updateSliderGradients: Updates the gradients for the slider background if it is saturation and brightness slider */
+    /** updateSlideGradients: Updates the gradients for the slider background if it is saturation and brightness slider */
     updateSlideGradients(hue, saturation, brightness) {
         // Saturation: gradient from white to full color (hue)
         const saturationGradient = `linear-gradient(to right, hsl(${hue}, 0%, 100%), hsl(${hue}, 100%, 50%))`;
+        // Brightness: gradient from black to the hue-saturation color
         const brightnessGradient = `linear-gradient(to right, #000, hsl(${hue}, ${saturation}%, 50%))`;
         const saturationThumbColor = `hsl(${hue}, ${saturation}%, ${100 - saturation / 2}%)`;
         const brightnessThumbColor = `hsl(${hue}, ${saturation}%, ${brightness}%)`;
@@ -155,14 +141,14 @@ export class SliderMode extends ColorMode {
         document.documentElement.style.setProperty('--saturation-thumb', saturationThumbColor);
         document.documentElement.style.setProperty('--brightness-thumb', brightnessThumbColor);
     }
-    /** createHSB: creates the HSB sliders */ /** createHSL: creates the HSL sliders */
+    /** createHSB: creates the HSB sliders */
     createHSB() {
         const parent = document.querySelector('.cp-sliders');
         parent.innerHTML = '';
         const colorAsHSB = colors.RGBAToHSBA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
         this.HSBA = colorAsHSB;
         this.updateSlideGradients(this.HSBA[0], this.HSBA[1], this.HSBA[2]);
-        // callback function for slider to change HSL and update currentColor
+        // Callback function for slider to change HSB and update currentColor
         const updateHSBColor = (hsbIndex, sliderValue) => {
             this.HSBA[hsbIndex] = sliderValue;
             const newRGB = colors.HSBAToRGBA(this.HSBA[0], this.HSBA[1], this.HSBA[2], this.HSBA[3]);
@@ -176,12 +162,16 @@ export class SliderMode extends ColorMode {
             new Slider(parent, colorAsHSB[2], 0, 100, 'Brightness', '200px', Localized('Brightness'), (value) => updateHSBColor(2, value), true)
         ];
     }
-    /** init(): initializes the slider  */
+    /** init(): initializes the slider */
     init() {
         this.toDOM();
         this.updateColorDisplay();
-        this.createRGB();
+        if (this.isRGB) {
+            this.createRGB();
+        }
+        else {
+            this.createHSB();
+        }
         this.setupSavedColors();
-        this.attachEventListeners();
     }
 }

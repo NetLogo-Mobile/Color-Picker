@@ -305,90 +305,89 @@ class GridMode extends ColorMode {
         this.colorArray = [];
         /** textElements: Array of SVGTextElements that are the "numbers" of each cell in the grid. */
         this.textElements = [];
+        /** selectedRect: The currently selected SVGRectElement */
+        this.selectedRect = null;
         this.init();
     }
     /** createGrid: creates the grid of colors */
     createGrid() {
-        function hover(e) {
-            if (e.target instanceof SVGRectElement) {
-                let rect = e.target;
-                let hoverColor;
-                if (Number(rect.dataset.value) % colorsPerRow <
-                    (colorsPerRow + 1) / 3) {
-                    hoverColor = 'white'; // the color should be white
-                }
-                else {
-                    hoverColor = 'black';
-                }
+        const colorsPerRow = 10 / this.state.increment + 1;
+        const numRows = 14;
+        const cellWidth = 21 / colorsPerRow;
+        const cellHeight = 16.5 / numRows;
+        const textFontSize = this.state.increment == 1 ? 0.6 : 0.4;
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+        svg.setAttribute('viewBox', '0 0 21 16.5');
+        // Event Handlers
+        const hover = (e) => {
+            if (e.target instanceof SVGRectElement && e.target !== this.selectedRect) {
+                const rect = e.target;
+                const value = Number(rect.dataset.value);
+                const hoverColor = (value % colorsPerRow < (colorsPerRow + 1) / 3) ? 'white' : 'black';
                 rect.setAttribute('stroke-width', '0.08');
                 rect.setAttribute('stroke', hoverColor);
             }
-        }
-        function hoverOut(e) {
-            if (e.target instanceof SVGRectElement) {
-                let rect = e.target;
+        };
+        const hoverOut = (e) => {
+            if (e.target instanceof SVGRectElement && e.target !== this.selectedRect) {
+                const rect = e.target;
                 rect.setAttribute('stroke-width', '');
                 rect.setAttribute('stroke', '');
             }
-        }
-        function handleChangeColor(e) {
+        };
+        const handleChangeColor = (e) => {
             if (e.target instanceof SVGRectElement) {
-                let rect = e.target;
-                let colorIndex = Number(rect.dataset.value);
-                // Convert the selected color to RGBA format
-                let newColor = netlogoColorToRGBA(this.colorArray[colorIndex]);
-                // netlogoColor defaults to 255 for the alpha value
+                const rect = e.target;
+                const colorIndex = Number(rect.dataset.value);
+                const newColor = netlogoColorToRGBA(this.colorArray[colorIndex]);
                 newColor[3] = this.state.currentColor[3];
-                // Use setState to update the currentColor in the component's state
                 this.setState({ currentColor: newColor, colorType: "netlogo" });
+                // Update selectedRect
+                if (this.selectedRect) {
+                    // Remove gold border from previously selected rect
+                    this.selectedRect.setAttribute('stroke-width', '');
+                    this.selectedRect.setAttribute('stroke', '');
+                    this.selectedRect.style.filter = 'none';
+                }
+                rect.style.filter = 'drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4))';
+                this.selectedRect = rect;
             }
-        }
-        let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('width', '100%');
-        svg.setAttribute('height', '100%');
-        // the height of the svg is 16.5 rem, and the width is 21rem, we set the viewbox to be equal to that so its a 1:1 ratio
-        svg.setAttribute('viewBox', '0 0 21 16.5');
-        // create the cells 
-        let numRows = 14;
-        let colorsPerRow = 10 / this.state.increment + 1;
-        let cellWidth = 21 / colorsPerRow;
-        let cellHeight = 16.5 / numRows;
-        let textFontSize = this.state.increment == 1 ? 0.6 : 0.4;
+        };
+        // Create grid cells
         for (let j = 0; j < numRows; j++) {
-            // generate the row
             for (let i = 0; i < colorsPerRow; i++) {
                 let number = j * 10 + i * this.state.increment;
                 if (i == colorsPerRow - 1) {
                     number -= 0.1;
                 }
                 this.colorArray.push(number);
-                let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 rect.classList.add('cp-grid-cell');
                 rect.setAttribute('x', `${cellWidth * i}`);
                 rect.setAttribute('y', `${cellHeight * j}`);
                 rect.setAttribute('width', `${cellWidth}`);
                 rect.setAttribute('height', `${cellHeight}`);
                 rect.setAttribute('fill', netlogoColorToHex(number));
-                rect.setAttribute('data-value', '' + (j * colorsPerRow + i)); //we are storing the index (row major order) of the cell's color in the corresponding colorArray
+                rect.setAttribute('data-value', `${j * colorsPerRow + i}`);
                 rect.addEventListener('mouseover', hover);
                 rect.addEventListener('mouseout', hoverOut);
-                rect.addEventListener('click', handleChangeColor.bind(this));
+                rect.addEventListener('click', handleChangeColor);
                 svg.appendChild(rect);
                 // Create and append text element for each rect
                 if (this.state.increment > 0.1) {
-                    let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                     text.setAttribute('x', `${cellWidth * i + cellWidth / 2}`);
                     text.setAttribute('y', `${cellHeight * j + cellHeight / 2}`);
-                    if (i < (colorsPerRow + 1) / 3) {
-                        text.setAttribute('fill', 'white');
-                    }
+                    text.setAttribute('fill', (i < (colorsPerRow + 1) / 3) ? 'white' : 'black');
                     text.setAttribute('dominant-baseline', 'middle');
                     text.setAttribute('text-anchor', 'middle');
                     text.classList.add('cp-grid-text');
                     text.textContent = `${number}`;
                     text.setAttribute('visibility', this.state.showNumbers ? 'visible' : 'hidden');
                     text.setAttribute('font-size', textFontSize.toString());
-                    this.textElements.push(text); // pushed to the list to allow toggling visibility 
+                    this.textElements.push(text);
                     svg.appendChild(text);
                 }
             }
@@ -398,26 +397,45 @@ class GridMode extends ColorMode {
     /** toDOM: creates the body of the Grid */
     toDOM() {
         this.parent.innerHTML = '';
-        let gridContainer = document.createElement('div');
+        const gridContainer = document.createElement('div');
         gridContainer.classList.add('cp-grid-cont');
         gridContainer.appendChild(this.createGrid());
-        let spaceContainer = document.createElement('div');
+        const spaceContainer = document.createElement('div');
         spaceContainer.classList.add("cp-space-container");
         spaceContainer.appendChild(gridContainer);
-        let incrementBtns = `
-      <div class="cp-grid-btn-cont"><div class="cp-increment-cont"><button class="cp-numbers-btn"></button><span class="cp-increment-label">${Localized('Numbers')}</span></div><div class="cp-increment-cont"><div class="cp-btn-label-cont"><button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button><span class="cp-increment-label">1</span></div><div class="cp-btn-label-cont"><button data-increment="0.5" class="cp-numbers-btn"></button><span class="cp-increment-label">0.5</span></div><div class="cp-btn-label-cont"><button data-increment="0.1" class="cp-numbers-btn"></button><span class="cp-increment-label">0.1</span></div><span class="cp-increment-label">${Localized('Increment')}</span></div></div>
-      `;
+        const incrementBtns = `
+        <div class="cp-grid-btn-cont">
+            <div class="cp-increment-cont">
+                <button class="cp-numbers-btn"></button>
+                <span class="cp-increment-label">${Localized('Numbers')}</span>
+            </div>
+            <div class="cp-increment-cont">
+                <div class="cp-btn-label-cont">
+                    <button data-increment="1" class="cp-numbers-btn cp-numbers-clicked"></button>
+                    <span class="cp-increment-label">1</span>
+                </div>
+                <div class="cp-btn-label-cont">
+                    <button data-increment="0.5" class="cp-numbers-btn"></button>
+                    <span class="cp-increment-label">0.5</span>
+                </div>
+                <div class="cp-btn-label-cont">
+                    <button data-increment="0.1" class="cp-numbers-btn"></button>
+                    <span class="cp-increment-label">0.1</span>
+                </div>
+                <span class="cp-increment-label">${Localized('Increment')}</span>
+            </div>
+        </div>
+        `;
         spaceContainer.insertAdjacentHTML('beforeend', incrementBtns);
         this.parent.appendChild(spaceContainer);
     }
-    /** updateIncrementApperance: updates the increment button apperance based on which increment is on */
+    /** updateIncrementAppearance: updates the increment button appearance based on which increment is on */
     updateIncrementAppearance() {
         var _a;
         const incrementBtns = this.parent.querySelectorAll('.cp-numbers-btn');
         incrementBtns[0].classList.toggle('cp-numbers-clicked', this.state.showNumbers);
         for (let i = 1; i < incrementBtns.length; i++) {
             const btn = incrementBtns[i];
-            // Retrieve the data-increment value
             const incrementValue = parseFloat((_a = btn.getAttribute('data-increment')) !== null && _a !== void 0 ? _a : "0");
             const isSelected = incrementValue === this.state.increment;
             btn.classList.toggle('cp-numbers-clicked', isSelected);
@@ -426,20 +444,19 @@ class GridMode extends ColorMode {
     /** attachEventListeners: Attaches the event listeners to the GridMode body */
     attachEventListeners() {
         const gridBtns = this.parent.querySelectorAll('.cp-numbers-btn');
-        // event listener of the numbers button 
+        // Event listener for the numbers button 
         gridBtns[0].addEventListener('click', () => {
             this.setState({ showNumbers: !this.state.showNumbers });
             this.toggleTextVisibility();
             this.updateIncrementAppearance();
         });
-        // the increment buttons 
+        // Event listeners for the increment buttons 
         for (let i = 1; i < gridBtns.length; i++) {
             gridBtns[i].addEventListener('click', () => {
                 var _a;
-                let increment = parseFloat((_a = gridBtns[i].getAttribute('data-increment')) !== null && _a !== void 0 ? _a : "0");
+                const increment = parseFloat((_a = gridBtns[i].getAttribute('data-increment')) !== null && _a !== void 0 ? _a : "0");
                 this.setState({ increment: increment });
-                this.state.increment = increment; // weird bug, did we create a copy of the state?
-                // reset the colorArray
+                // Reset the colorArray and reinitialize the grid
                 this.colorArray = [];
                 this.init();
             });
@@ -447,7 +464,8 @@ class GridMode extends ColorMode {
     }
     /** toggleTextVisibility: toggles the text visibility based on state of numbers */
     toggleTextVisibility() {
-        this.state.showNumbers ? this.textElements.forEach((text) => text.setAttribute('visibility', 'visible')) : this.textElements.forEach((text) => text.setAttribute('visibility', 'hidden'));
+        const visibility = this.state.showNumbers ? 'visible' : 'hidden';
+        this.textElements.forEach((text) => text.setAttribute('visibility', visibility));
     }
     /** init: initializes a grid mode  */
     init() {
@@ -1072,29 +1090,32 @@ class Slider {
     }
 }
 
-var img = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a7a7a7' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3e %3cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3e%3c/svg%3e";
-
-/** GridMode: A mode for the ColorPicker that shows a grid of colors */
+/** SliderMode: A mode for the ColorPicker that shows sliders for color adjustment */
 class SliderMode extends ColorMode {
-    constructor(parent, state, setState, colorPickerInstance) {
+    /**
+     * Constructor for SliderMode
+     * @param parent - The parent HTML element
+     * @param state - The current state of the color picker
+     * @param setState - Function to update the state
+     * @param colorPickerInstance - Instance of the ColorPicker
+     * @param mode - Initial mode, either 'rgb' or 'hsb' (optional, defaults to 'rgb')
+     */
+    constructor(parent, state, setState, colorPickerInstance, mode = 'rgb' // New parameter with default value
+    ) {
         super(parent, state, setState);
-        this.isRGB = true; // true if the current mode is RGB, false if it is HSL
         this.HSBA = [0, 0, 0, 0];
         this.sliders = [];
+        this.isRGB = mode === 'rgb'; // Set initial mode based on the parameter
         this.init();
     }
-    /** toDOM: creates the body of the Grid */
+    /** toDOM: creates the body of the SliderMode */
     toDOM() {
         this.parent.innerHTML = `
             <div class="cp-slider-cont">
                 <div class="cp-slider-color-display"></div>
-                <div class="cp-slider-changer">
-                    <img src="${img}"></img>
-                    <span class="cp-dropdown-text">RGB</span>
-                </div>
                 <div class="cp-sliders">
                     <div class="cp-slider-change-mode"></div>
-                    <!-- part that switches from rgb to hsl -->
+                    <!-- part that switches from rgb to hsb -->
                 </div>
                 <div class="cp-saved-colors-cont">
                     <div class="cp-saved-colors"></div>
@@ -1109,40 +1130,37 @@ class SliderMode extends ColorMode {
     /** updateColorDisplay: updates the color display to be the current color  */
     updateColorDisplay() {
         const colorDisplay = document.querySelector('.cp-slider-color-display');
-        colorDisplay.style.backgroundColor = `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]})`;
+        colorDisplay.style.backgroundColor = `rgba(${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3] / 255})`;
     }
     /** setupSavedColors: sets up saved colors by adding event handlers */
     setupSavedColors() {
         const addButton = document.querySelector(".cp-saved-color-add");
         addButton === null || addButton === void 0 ? void 0 : addButton.addEventListener("click", () => {
-            const savedColors = this.state.savedColors;
+            const savedColors = [...this.state.savedColors]; // Clone to avoid direct mutation
             const colorCopy = [...this.state.currentColor];
             savedColors.unshift(colorCopy);
             // if saved colors is length 5, remove the last element
-            if (savedColors.length == 5)
+            if (savedColors.length > 5)
                 savedColors.pop();
             this.setState({ savedColors });
             this.updateSavedColors();
         });
-        // update the appearance of each color grid based on the queue 
+        // Update the appearance of each color grid based on the queue 
         this.updateSavedColors();
-        // add event handler to each color button
+        // Add event handler to each color button
         const savedButtons = document.querySelectorAll(".cp-saved-colors");
-        for (let i = 0; i < savedButtons.length; i++) {
-            const button = savedButtons[i];
+        savedButtons.forEach(button => {
             button.addEventListener("click", () => {
-                if (button.dataset.value) {
+                const btn = button;
+                if (btn.dataset.value) {
                     // has a color so return it 
-                    const colorsAsArr = button.dataset.value.split(",");
-                    const colorIntArr = colorsAsArr.map(Number);
-                    this.setState({ currentColor: colorIntArr });
+                    const colorsAsArr = btn.dataset.value.split(",").map(Number);
+                    this.setState({ currentColor: colorsAsArr });
                     this.updateColorDisplay();
-                    this.updateSliders(colorIntArr);
+                    this.updateSliders(colorsAsArr);
                 }
-                else
-                    return;
             });
-        }
+        });
     }
     /** updateSliders: updates the sliders based on the current color */
     updateSliders(color) {
@@ -1160,44 +1178,28 @@ class SliderMode extends ColorMode {
             this.updateSlideGradients(hsbColor[0], hsbColor[1], hsbColor[2]);
         }
     }
-    /** attachEventListeners: attaches the event listeners to the Slider body */
-    attachEventListeners() {
-        // add event listener to the rgb / hsl swapping 
-        const sliderChanger = document.querySelector(".cp-slider-changer");
-        const changerText = document.querySelector(".cp-dropdown-text");
-        sliderChanger.addEventListener('click', () => {
-            if (this.isRGB) {
-                // switch to HSB
-                this.isRGB = false;
-                changerText.innerText = "HSB";
-                this.createHSB();
-            }
-            else {
-                this.isRGB = true;
-                changerText.innerText = "RGB";
-                this.createRGB();
-            }
-        });
-    }
-    /** updatedSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
+    /** updateSavedColors: updates the appearance of the saved colors based on the current state of the saved colors array */
     updateSavedColors() {
         const savedColors = this.state.savedColors;
         const savedSquares = document.querySelectorAll(".cp-saved-colors");
+        // Reset all squares to default background
         savedSquares.forEach(square => {
             square.style.backgroundColor = '#f1f1f1';
+            square.removeAttribute('data-value');
         });
+        // Assign colors to squares
         for (let i = 0; i < savedColors.length; i++) {
             const squareIndex = savedSquares.length - 1 - i;
             if (savedSquares[squareIndex]) {
                 const square = savedSquares[squareIndex];
                 square.style.backgroundColor = arrToString(savedColors[i]);
-                square.setAttribute('data-value', savedColors[i] + "");
+                square.setAttribute('data-value', savedColors[i].join(","));
             }
         }
     }
     /** createRGB: creates the RGB sliders */
     createRGB() {
-        // callback function for slider to change currentColor 
+        // Callback function for slider to change currentColor 
         const updateRGBColor = (colorIndex, sliderValue) => {
             const newColor = [...this.state.currentColor];
             newColor[colorIndex] = sliderValue;
@@ -1212,10 +1214,11 @@ class SliderMode extends ColorMode {
             new Slider(parent, this.state.currentColor[2], 0, 255, 'Blue', '200px', Localized('Blue'), (value) => updateRGBColor(2, value), true)
         ];
     }
-    /** updateSliderGradients: Updates the gradients for the slider background if it is saturation and brightness slider */
+    /** updateSlideGradients: Updates the gradients for the slider background if it is saturation and brightness slider */
     updateSlideGradients(hue, saturation, brightness) {
         // Saturation: gradient from white to full color (hue)
         const saturationGradient = `linear-gradient(to right, hsl(${hue}, 0%, 100%), hsl(${hue}, 100%, 50%))`;
+        // Brightness: gradient from black to the hue-saturation color
         const brightnessGradient = `linear-gradient(to right, #000, hsl(${hue}, ${saturation}%, 50%))`;
         const saturationThumbColor = `hsl(${hue}, ${saturation}%, ${100 - saturation / 2}%)`;
         const brightnessThumbColor = `hsl(${hue}, ${saturation}%, ${brightness}%)`;
@@ -1225,14 +1228,14 @@ class SliderMode extends ColorMode {
         document.documentElement.style.setProperty('--saturation-thumb', saturationThumbColor);
         document.documentElement.style.setProperty('--brightness-thumb', brightnessThumbColor);
     }
-    /** createHSB: creates the HSB sliders */ /** createHSL: creates the HSL sliders */
+    /** createHSB: creates the HSB sliders */
     createHSB() {
         const parent = document.querySelector('.cp-sliders');
         parent.innerHTML = '';
         const colorAsHSB = RGBAToHSBA(this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2], this.state.currentColor[3]);
         this.HSBA = colorAsHSB;
         this.updateSlideGradients(this.HSBA[0], this.HSBA[1], this.HSBA[2]);
-        // callback function for slider to change HSL and update currentColor
+        // Callback function for slider to change HSB and update currentColor
         const updateHSBColor = (hsbIndex, sliderValue) => {
             this.HSBA[hsbIndex] = sliderValue;
             const newRGB = HSBAToRGBA(this.HSBA[0], this.HSBA[1], this.HSBA[2], this.HSBA[3]);
@@ -1246,22 +1249,28 @@ class SliderMode extends ColorMode {
             new Slider(parent, colorAsHSB[2], 0, 100, 'Brightness', '200px', Localized('Brightness'), (value) => updateHSBColor(2, value), true)
         ];
     }
-    /** init(): initializes the slider  */
+    /** init(): initializes the slider */
     init() {
         this.toDOM();
         this.updateColorDisplay();
-        this.createRGB();
+        if (this.isRGB) {
+            this.createRGB();
+        }
+        else {
+            this.createHSB();
+        }
         this.setupSavedColors();
-        this.attachEventListeners();
     }
 }
 
+var img = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a7a7a7' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3e %3cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3e%3c/svg%3e";
+
 class ColorPicker {
-    /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
+    /** constructor: creates a Color Picker instance. A color picker has a parent div and an initial color */
     constructor(config, openTo = 'g') {
         // color display states that only ColorPicker needs to know about
         this.displayParameter = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
-        this.isNetLogoNum = true; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
+        this.isNetLogoNum = false; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
         this.isMinimized = false; // default value for minimize is false
         this.copyMessageTimeout = null; //Keeps track of "Copied" message timeouts, so they don't stack and are cancelled if we switch colors 
         this.state = {
@@ -1316,8 +1325,11 @@ class ColorPicker {
             case 'wheel':
                 this.parent.querySelectorAll('.cp-mode-btn')[1].dispatchEvent(new Event('click'));
                 break;
-            case 'slider':
+            case 'rgb': // Updated from 'slider' to 'rgb'
                 this.parent.querySelectorAll('.cp-mode-btn')[2].dispatchEvent(new Event('click'));
+                break;
+            case 'hsb': // New case for HSB mode
+                this.parent.querySelectorAll('.cp-mode-btn')[3].dispatchEvent(new Event('click'));
                 break;
             case 'sliderHSB':
                 this.parent.querySelectorAll('.cp-mode-btn')[2].dispatchEvent(new Event('click'));
@@ -1395,29 +1407,41 @@ class ColorPicker {
         }
         // attach event listeners to the mode buttons 
         let modeButtons = this.parent.querySelectorAll('.cp-mode-btn');
+        // Grid Button
         modeButtons[0].addEventListener('click', () => {
-            // grid button
             this.setState({ currentMode: 'grid' });
             changeButtonColor(modeButtons[0], true);
             changeButtonColor(modeButtons[1], false);
             changeButtonColor(modeButtons[2], false);
+            changeButtonColor(modeButtons[3], false); // Ensure HSB button is not active
             new GridMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
+        // Wheel Button
         modeButtons[1].addEventListener('click', () => {
-            // wheel button
             this.setState({ currentMode: 'wheel' });
             changeButtonColor(modeButtons[1], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[2], false);
+            changeButtonColor(modeButtons[3], false); // Ensure HSB button is not active
             new WheelMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
+        // RGB (previously Slider) Button
         modeButtons[2].addEventListener('click', () => {
-            // slider button
-            this.setState({ currentMode: 'slider' });
+            this.setState({ currentMode: 'rgb' }); // Updated from 'slider' to 'rgb'
             changeButtonColor(modeButtons[2], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[1], false);
-            new SliderMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this);
+            changeButtonColor(modeButtons[3], false); // Ensure HSB button is not active
+            new SliderMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this, 'rgb');
+        });
+        // HSB Button
+        modeButtons[3].addEventListener('click', () => {
+            this.setState({ currentMode: 'hsb' });
+            changeButtonColor(modeButtons[3], true);
+            changeButtonColor(modeButtons[0], false);
+            changeButtonColor(modeButtons[1], false);
+            changeButtonColor(modeButtons[2], false); // Ensure RGB button is not active
+            new SliderMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this, 'hsb');
         });
         // attach event listener to model indicator button
         let modelIndicatorButton = this.parent.querySelector('.cp-model-indicator');
@@ -1460,7 +1484,7 @@ class ColorPicker {
             this.updateColorParameters();
         });
         // add event listeners to copy elements 
-        const valueDisplayElements = document.querySelectorAll(".cp-values-value");
+        const valueDisplayElements = this.parent.querySelectorAll(".cp-values-value");
         valueDisplayElements.forEach((display, index) => {
             const displayAsElement = display;
             displayAsElement.addEventListener('click', () => {
@@ -1490,7 +1514,7 @@ class ColorPicker {
             // Change to "Copied!"
             displayElement.innerText = 'Copied!';
             // Set a timeout to revert back to the original text
-            // clear previosu timeouts
+            // clear previous timeouts
             if (this.copyMessageTimeout) {
                 clearTimeout(this.copyMessageTimeout);
             }
@@ -1541,10 +1565,12 @@ class ColorPicker {
                         </button>
                         <button class="cp-mode-btn">
                             <img class="cp-mode-btn-img" src="${img$2}"/>
-                            <span class="cp-mode-btn-text">${Localized('Slider')}</span> 
+                            <span class="cp-mode-btn-text">RGB</span> 
                         </button>
-                        <div class="cp-mode-color-display" style="background-color:${arrToString(this.state.currentColor)}">
-                        </div>
+                        <button class="cp-mode-btn"> <!-- New HSB button -->
+                            <img class="cp-mode-btn-img" src="${img$2}"/>
+                            <span class="cp-mode-btn-text">HSB</span> 
+                        </button>
                     </div>
                     <div class="cp-body-mode-main no-select"></div>
                 </div>
