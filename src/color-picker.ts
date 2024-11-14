@@ -39,7 +39,8 @@ export class ColorPicker {
     private isMinimized: boolean = false; // default value for minimize is false
     private openTo: string; // defines what part of the color picker to open to. If 'grid', we open to Grid. If 'wheel', we open to wheel, if 'slider', we open to slider. If 'sliderHSB', we open to hsb
     private copyMessageTimeout: number | null = null;  //Keeps track of "Copied" message timeouts, so they don't stack and are cancelled if we switch colors 
-    /** constructor: creates a Color Picker instance. A color picker has a parent div and a inital color */
+
+    /** constructor: creates a Color Picker instance. A color picker has a parent div and an initial color */
     constructor(config: {
         parent: HTMLElement,
         initColor: number[],
@@ -102,8 +103,11 @@ export class ColorPicker {
             case 'wheel': 
                 this.parent.querySelectorAll('.cp-mode-btn')[1].dispatchEvent(new Event('click'));
                 break;
-            case 'slider': 
+            case 'rgb': // Updated from 'slider' to 'rgb'
                 this.parent.querySelectorAll('.cp-mode-btn')[2].dispatchEvent(new Event('click'));
+                break;
+            case 'hsb': // New case for HSB mode
+                this.parent.querySelectorAll('.cp-mode-btn')[3].dispatchEvent(new Event('click')); 
                 break;
             case 'sliderHSB':
                 this.parent.querySelectorAll('.cp-mode-btn')[2].dispatchEvent(new Event('click')); 
@@ -114,7 +118,6 @@ export class ColorPicker {
                 this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
         } 
     }
-    
 
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
     private updateColorParameters() {
@@ -176,54 +179,72 @@ export class ColorPicker {
             let image = button.querySelector('.cp-mode-btn-img') as HTMLElement;
             if (image) {
                 image.classList.toggle('cp-inverted', isPressed);
-              }
+            }
         }
 
         // attach event listeners to the mode buttons 
         let modeButtons = this.parent.querySelectorAll('.cp-mode-btn');
+        
+        // Grid Button
         modeButtons[0].addEventListener('click', () => {
-            // grid button
             this.setState({ currentMode: 'grid' });
             changeButtonColor(modeButtons[0] as HTMLElement, true);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
+            changeButtonColor(modeButtons[3] as HTMLElement, false); // Ensure HSB button is not active
             new GridMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
+
+        // Wheel Button
         modeButtons[1].addEventListener('click', () => {
-            // wheel button
             this.setState({ currentMode: 'wheel' });
             changeButtonColor(modeButtons[1] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
+            changeButtonColor(modeButtons[3] as HTMLElement, false); // Ensure HSB button is not active
             new WheelMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
+
+        // RGB (previously Slider) Button
         modeButtons[2].addEventListener('click', () => {
-            // slider button
-            this.setState({ currentMode: 'slider' });
+            this.setState({ currentMode: 'rgb' }); // Updated from 'slider' to 'rgb'
             changeButtonColor(modeButtons[2] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
-            new SliderMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this);
+            changeButtonColor(modeButtons[3] as HTMLElement, false); // Ensure HSB button is not active
+            new SliderMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this, 'rgb');
         });
+
+        // HSB Button
+        modeButtons[3].addEventListener('click', () => {
+            this.setState({ currentMode: 'hsb' });
+            changeButtonColor(modeButtons[3] as HTMLElement, true);
+            changeButtonColor(modeButtons[0] as HTMLElement, false);
+            changeButtonColor(modeButtons[1] as HTMLElement, false);
+            changeButtonColor(modeButtons[2] as HTMLElement, false); // Ensure RGB button is not active
+            new SliderMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this, 'hsb');
+        });
+
         // attach event listener to model indicator button
         let modelIndicatorButton = this.parent.querySelector('.cp-model-indicator');
         modelIndicatorButton?.addEventListener('click', () => {
             this.state.changeModelColor = !this.state.changeModelColor; // we don't want to call set state, because it updates the appearance as well 
             modelIndicatorButton!.querySelector('.cp-mode-btn-text')!.innerHTML = this.state.changeModelColor ? Localized('Foreground Color') : Localized('Background Color');
-            changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);        });
+            changeButtonColor(modelIndicatorButton as HTMLElement, !this.state.changeModelColor);        
+        });
 
         //attach event listener to close button
         const closeButton = this.parent.querySelector('.cp-close');
         closeButton?.addEventListener('click', () => {
             // return the selected color, as well as the saved colors for "memory", as well as the color type 
             // selected color is color type 
-    		const selectedColorObj: SelectedColor = {
-        		netlogo: colors.rgbToNetlogo(this.state.currentColor),
-        		rgba: this.state.currentColor,
+            const selectedColorObj: SelectedColor = {
+                netlogo: colors.rgbToNetlogo(this.state.currentColor),
+                rgba: this.state.currentColor,
                 colorType: this.state.colorType
-    		};
+            };
             // the first element will be the different representations of selected color as an Object
-			this.onColorSelect([selectedColorObj, this.state.savedColors]);
+            this.onColorSelect([selectedColorObj, this.state.savedColors]);
         });
 
         // attach switch color display parameters event listeners 
@@ -247,7 +268,7 @@ export class ColorPicker {
         });
 
         // add event listeners to copy elements 
-        const valueDisplayElements = document.querySelectorAll(".cp-values-value");
+        const valueDisplayElements = this.parent.querySelectorAll(".cp-values-value");
         valueDisplayElements.forEach((display, index) => {
             const displayAsElement = display as HTMLElement;
             displayAsElement.addEventListener('click', () => {
@@ -280,7 +301,7 @@ export class ColorPicker {
             // Change to "Copied!"
             displayElement.innerText = 'Copied!';
             // Set a timeout to revert back to the original text
-            // clear previosu timeouts
+            // clear previous timeouts
             if(this.copyMessageTimeout) {
                 clearTimeout(this.copyMessageTimeout);
             }
@@ -336,10 +357,12 @@ export class ColorPicker {
                         </button>
                         <button class="cp-mode-btn">
                             <img class="cp-mode-btn-img" src="${cpSlider}"/>
-                            <span class="cp-mode-btn-text">${Localized('Slider')}</span> 
+                            <span class="cp-mode-btn-text">RGB</span> 
                         </button>
-                        <div class="cp-mode-color-display" style="background-color:${colors.arrToString(this.state.currentColor)}">
-                        </div>
+                        <button class="cp-mode-btn"> <!-- New HSB button -->
+                            <img class="cp-mode-btn-img" src="${cpSlider}"/>
+                            <span class="cp-mode-btn-text">HSB</span> 
+                        </button>
                     </div>
                     <div class="cp-body-mode-main no-select"></div>
                 </div>
@@ -403,4 +426,3 @@ export function Localized(Source: string, ...Args: string[]): string {
         return Source;
     }
 }
-
