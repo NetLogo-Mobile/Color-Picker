@@ -1,12 +1,13 @@
-import { netlogoColorToHex, netlogoColorToRGBA } from "../helpers/colors";
+import { netlogoColorToHex, netlogoColorToRGBA, rgbToNetlogo } from "../helpers/colors";
 import { ColorMode } from "./color-mode";
 import { ColorPickerState } from "./color-mode";
 import { Localized } from "../color-picker";
 
-/** GridMode: A mode for the ColorPicker that shows a grid of colors */
 export class GridMode extends ColorMode {
     /** colorArray: an array of netlogo colors in the grid */
     private colorArray: number[] = [];
+    /** rectArray: a 2D array of grid rects */
+    private rectArray: SVGRectElement[][] = [];
     /** textElements: Array of SVGTextElements that are the "numbers" of each cell in the grid. */
     private textElements: SVGTextElement[] = [];
     /** selectedRect: The currently selected SVGRectElement */
@@ -29,6 +30,8 @@ export class GridMode extends ColorMode {
         svg.setAttribute('width', '100%');
         svg.setAttribute('height', '100%');
         svg.setAttribute('viewBox', '0 0 21 16.5');
+
+        this.rectArray = []; // Initialize 2D rectArray
 
         // Event Handlers
         const hover = (e: Event) => {
@@ -72,6 +75,7 @@ export class GridMode extends ColorMode {
 
         // Create grid cells
         for (let j = 0; j < numRows; j++) {
+            const row: SVGRectElement[] = []; // Create a new row
             for (let i = 0; i < colorsPerRow; i++) {
                 let number = j * 10 + i * this.state.increment;
                 if (i == colorsPerRow - 1) {
@@ -91,9 +95,10 @@ export class GridMode extends ColorMode {
                 rect.addEventListener('mouseout', hoverOut);
                 rect.addEventListener('click', handleChangeColor);
                 svg.appendChild(rect);
+                row.push(rect); // Add the rect to the current row
 
                 // Create and append text element for each rect
-                if(this.state.increment > 0.1) {
+                if (this.state.increment > 0.1) {
                     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                     text.setAttribute('x', `${cellWidth * i + cellWidth / 2}`);
                     text.setAttribute('y', `${cellHeight * j + cellHeight / 2}`);
@@ -108,6 +113,7 @@ export class GridMode extends ColorMode {
                     svg.appendChild(text);
                 }
             }
+            this.rectArray.push(row); // Add the row to the 2D rectArray
         }
 
         return svg;
@@ -193,7 +199,47 @@ export class GridMode extends ColorMode {
     /** init: initializes a grid mode  */
     private init() {
         this.toDOM();
+        this.setSelectedRect();
         this.updateIncrementAppearance();
         this.attachEventListeners();
+    }
+
+    /** setSelectedRect: sets the selectedRect at the beginning, based on the closest netlogo color */
+    private setSelectedRect() {
+        if (this.rectArray.length > 0) {
+            const colorsPerRow = this.rectArray[0].length;
+
+            const netlogoColor = rgbToNetlogo(this.state.currentColor.slice(0, 3));
+            console.log(`Calculated NetLogo color: ${netlogoColor}`);
+
+            let closestColorIndex = 0;
+            let smallestDifference = Infinity;
+
+            this.colorArray.forEach((color, index) => {
+                const difference = Math.abs(color - netlogoColor);
+                if (difference < smallestDifference) {
+                    smallestDifference = difference;
+                    closestColorIndex = index;
+                }
+            });
+
+            const rowIndex = Math.floor(closestColorIndex / colorsPerRow);
+            const colIndex = closestColorIndex % colorsPerRow;
+            const closestRect = this.rectArray[rowIndex][colIndex];
+
+            if (this.selectedRect) {
+                this.selectedRect.setAttribute('stroke-width', '');
+                this.selectedRect.setAttribute('stroke', '');
+                this.selectedRect.style.filter = 'none';
+            }
+
+            const value = Number(closestRect.dataset.value);
+            const strokeColor = (value % colorsPerRow < (colorsPerRow + 1) / 3) ? 'white' : 'black';
+
+            closestRect.style.filter = 'drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4))';
+            closestRect.setAttribute('stroke-width', '0.08');
+            closestRect.setAttribute('stroke', strokeColor);
+            this.selectedRect = closestRect;
+        }
     }
 }
