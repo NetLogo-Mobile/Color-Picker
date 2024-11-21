@@ -78,11 +78,10 @@ export class ColorPicker {
             showNumbers: false,
             savedColors: config.savedColors || [], 
         };
-        const validModes = ['DEFAULT', 'RGBA', 'NETLOGO'];
-        const mode = config.mode || 'DEFAULT'; 
+        const mode = config.mode || 'DEFAULT';
 
-        if (!validModes.includes(mode)) {
-            throw new Error(`Invalid mode: ${mode}. Must be one of ${validModes.join(', ')}.`);
+        if (mode !== 'DEFAULT' && mode !== 'RGBA' && mode !== 'NETLOGO') {
+            throw new Error(`Invalid mode: ${mode}. Must be one of DEFAULT, RGBA, NETLOGO.`);
         }
         
         this.parent = config.parent;
