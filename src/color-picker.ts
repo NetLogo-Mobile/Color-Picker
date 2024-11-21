@@ -12,11 +12,28 @@ import { ColorPickerState } from './modes/color-mode';
 import cpDropdown from './assets/drop-down.svg';
 import * as colors from './helpers/colors'
 
+/**
+ * Configuration object for the color picker component.
+ * Provides customizable options to initialize and control the color picker.
+ * parent: The parent element of the Color Picker object 
+ * initColor: The initial color of the Color picker, as an array [r, g, b, a]
+ * onColorSelect: the callback function when the color picker is closed 
+ * savedColors: array of [r, g, b, a] arrays that can be provided optionally as "savedColors" from runs past 
+ * mode: the operating mode of the Color Picker 
+ */
 export interface ColorPickerConfig {
-    parent: HTMLElement;
+    parent: HTMLElement; 
     initColor: number[];
     onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
     savedColors?: number[][];
+    /**
+     * Specifies the operating mode of the color picker. Default will be all color types available. 
+     * Must be one of the following values:
+     * - 'RGBA': Only displays 'RGBA' values
+     * - 'NETLOGO': Only displays NetLogo values
+     * - 'DEFAULT': Display all values 
+     */
+    mode?: string;
 }
 
 // Object type for returned color (the object passed to the callback fn)
@@ -39,6 +56,7 @@ export class ColorPicker {
     private isMinimized: boolean = false; // default value for minimize is false
     private openTo: string; // defines what part of the color picker to open to. If 'grid', we open to Grid. If 'wheel', we open to wheel, if 'slider', we open to slider. If 'sliderHSB', we open to hsb
     private copyMessageTimeout: number | null = null;  //Keeps track of "Copied" message timeouts, so they don't stack and are cancelled if we switch colors 
+    private operatingMode: string;  
 
     /** constructor: creates a Color Picker instance. A color picker has a parent div and an initial color */
     constructor(config: {
@@ -47,25 +65,37 @@ export class ColorPicker {
         initColorType: string,
         onColorSelect: (colorData: [SelectedColor, number[][]]) => void,
         savedColors?: number[][],
-    },  openTo: string = 'g') {
+        mode?: string, // Match the property name to `ColorPickerConfig`
+    }, openTo: string = 'g') {
+        this.operatingMode = config.mode || 'DEFAULT'; 
+        
         this.state = {
             currentColor: config.initColor,
-            colorType: config.initColorType, //tracks the color type, being one of: "netlogo", "rgb", or "hsb"
+            colorType: config.initColorType,
             currentMode: 'grid',
             changeModelColor: true,
-            increment : 1,
+            increment: 1,
             showNumbers: false,
-            savedColors: config.savedColors || [],  // Use an empty array as default if savedColors is not provided
+            savedColors: config.savedColors || [], 
+        };
+        const validModes = ['DEFAULT', 'RGBA', 'NETLOGO'];
+        const mode = config.mode || 'DEFAULT'; 
+
+        if (!validModes.includes(mode)) {
+            throw new Error(`Invalid mode: ${mode}. Must be one of ${validModes.join(', ')}.`);
         }
+        
         this.parent = config.parent;
         this.onColorSelect = config.onColorSelect;
-        if (this.parent.offsetWidth < 600) {
+        
+        if (this.parent.offsetWidth < 600) { 
             this.isMinimized = true;
         }
+        
         this.openTo = openTo;
         this.init();
+        console.log(this.operatingMode);
     }
-
     private updateLayout() {
         const cpElement = this.parent.querySelector('.cp') as HTMLElement;
         if (cpElement) {
@@ -98,6 +128,8 @@ export class ColorPicker {
         this.updateColorParameters();
         this.attachEventListeners();
         this.initAlphaSlider();
+        this.updateAlphaBlockVisibility();
+        this.updateValuesDisplayVisibility();
         // click the correct button to start 
         switch(this.openTo) {
             case 'wheel': 
@@ -117,6 +149,51 @@ export class ColorPicker {
             default:
                 this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
         } 
+    }
+    /** updateAlphaBlockVisibility: updates the visibility of the alpha block. Needed to hide or show the Alpha block based on the different operationModes */
+    private updateAlphaBlockVisibility() {
+        if (this.operatingMode === 'NETLOGO') {
+            const alphaContainer = this.parent.querySelector('.cp-alpha-cont') as HTMLElement;
+            if (alphaContainer) {
+                alphaContainer.style.visibility = 'hidden';
+                alphaContainer.style.pointerEvents = 'none';
+            }
+        }
+        // both NETLOGO and RGBA hide 'COLOR PARAMETERS'
+        if (this.operatingMode === 'NETLOGO' || this.operatingMode === 'RGBA') {
+            const parametersText = this.parent.querySelector('.cp-color-param-txt') as HTMLElement
+            if (parametersText) {
+                parametersText.style.visibility = 'hidden';
+                parametersText.style.pointerEvents = 'none';
+            }
+        }
+    }
+
+    /**
+     * updateValuesDisplayVisibility:
+     * Updates the visibility of color parameter displays based on the current operating mode.
+     * - Hides NetLogo values when in 'RGBA' mode.
+     * - Hides RGBA values when in 'NETLOGO' mode.
+     * - Shows all values for other modes (e.g., 'DEFAULT').
+     */
+    private updateValuesDisplayVisibility() {
+        if (this.operatingMode == 'DEFAULT') {
+            return // return, because we don't need to hide anything 
+        }
+        // hide NetLogo display
+        if (this.operatingMode == 'RGBA') {
+            let netlogoDisplay = document.querySelector('#cp-values-display-netlogo') as HTMLElement;
+            if (netlogoDisplay) {
+                netlogoDisplay.style.display = 'none'
+            }
+        }
+        else {
+            let rgbaDisplay = document.querySelector('#cp-values-display-other') as HTMLElement;
+            if (rgbaDisplay) {
+                rgbaDisplay.style.display = 'none';
+            }
+        }
+        // both methods add two buttons 'OKAY', 'CANCEL', my guess is you want to return the color both times? So destroy and call the callback function
     }
 
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
@@ -383,7 +460,7 @@ export class ColorPicker {
                     </div>
                     <div class="cp-values-display-cont">
                         <span class="cp-color-param-txt">${Localized('Color Parameters')}</span>
-                        <div class="cp-values-display">
+                        <div id="cp-values-display-other" class="cp-values-display">
                             <div class="cp-values-type cp-values-type-1">
                                 <div class="cp-values-cont">
                                     <span class="cp-values-type-text"></span>
@@ -395,7 +472,7 @@ export class ColorPicker {
                             </div>
                             
                         </div>
-                        <div class="cp-values-display">
+                        <div id="cp-values-display-netlogo" class="cp-values-display">
                             <div class="cp-values-type">
                                 <div class="cp-values-cont">
                                     <span class="cp-values-type-text"></span>
