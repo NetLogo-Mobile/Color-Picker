@@ -24,7 +24,7 @@ import * as colors from './helpers/colors'
 export interface ColorPickerConfig {
     parent: HTMLElement; 
     initColor: number[];
-    onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
+    onColorSelect: (colorData: any) => void
     savedColors?: number[][];
     /**
      * Specifies the operating mode of the color picker. Default will be all color types available. 
@@ -49,7 +49,7 @@ export class ColorPicker {
     //parent: the parent element of the ColorPicker
     private parent: HTMLElement;
     // onColorSelect: a callback function that is called when a color is selected
-    private onColorSelect: (colorData: [SelectedColor, number[][]]) => void;
+    private onColorSelect: (colorData: any) => void;
     // color display states that only ColorPicker needs to know about
     private displayParameter: string = 'RGBA'; // true if the color display is in RGB mode, false if it is in HSLA mode
     private isNetLogoNum: boolean = false; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
@@ -194,6 +194,24 @@ export class ColorPicker {
             }
         }
         // both methods add two buttons 'OKAY', 'CANCEL', my guess is you want to return the color both times? So destroy and call the callback function
+        let colorDisplayCont = document.querySelector('.cp-values-display-cont');
+        if (colorDisplayCont) {
+            let buttonCont = document.createElement('div')
+            buttonCont.style.display = 'flex'
+            buttonCont.style.justifyContent = 'space-between';
+
+            let okayButton = document.createElement('button');
+            okayButton.textContent = 'OKAY'; 
+            okayButton.classList.add('cp-values-display-btn')
+            okayButton?.addEventListener('click', () => this.handleClose());
+            let cancelButton = document.createElement('button');
+            cancelButton.textContent = 'CANCEL'; 
+            cancelButton.classList.add('cp-values-display-btn');
+            cancelButton?.addEventListener('click', () => this.handleClose());       
+            buttonCont.appendChild(okayButton);
+            buttonCont.appendChild(cancelButton);
+            colorDisplayCont.appendChild(buttonCont)
+        }
     }
 
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
@@ -245,7 +263,29 @@ export class ColorPicker {
         const modeColorDisplay = this.parent.querySelector('.cp-mode-color-display') as HTMLElement;
         if (modeColorDisplay) modeColorDisplay.style.backgroundColor = colorString;
     }
-
+    /** handleClose: Handles the closure of the color picker and triggers the onColorSelect callback */
+    private handleClose() {
+        // Return the selected color, saved colors, and color type
+        if (this.operatingMode == 'DEFAULT') {
+            const selectedColorObj: SelectedColor = {
+                netlogo: colors.rgbToNetlogo(this.state.currentColor),
+                rgba: this.state.currentColor,
+                colorType: this.state.colorType
+            };
+            // Invoke the callback function with selected color data
+            this.onColorSelect([selectedColorObj, this.state.savedColors]);
+        }
+        else if (this.operatingMode == 'RGBA') {
+            // return just the RGBA number, as a string 
+            this.onColorSelect(`[${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]}]`)
+        }
+        else {
+            // netlogo color 
+            const compoundColor = `${colors.netlogoToCompound(colors.rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]))}`;
+            const formattedColor = compoundColor.charAt(0).toUpperCase() + compoundColor.slice(1);
+            return formattedColor;
+        }
+    }
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
     private attachEventListeners() {
         /** changeButtonColor: Helper function to toggle button color */
@@ -268,7 +308,7 @@ export class ColorPicker {
             changeButtonColor(modeButtons[0] as HTMLElement, true);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
-            changeButtonColor(modeButtons[3] as HTMLElement, false); // Ensure HSB button is not active
+            changeButtonColor(modeButtons[3] as HTMLElement, false); 
             new GridMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
 
@@ -278,17 +318,16 @@ export class ColorPicker {
             changeButtonColor(modeButtons[1] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[2] as HTMLElement, false);
-            changeButtonColor(modeButtons[3] as HTMLElement, false); // Ensure HSB button is not active
+            changeButtonColor(modeButtons[3] as HTMLElement, false); 
             new WheelMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this));
         });
 
-        // RGB (previously Slider) Button
         modeButtons[2].addEventListener('click', () => {
-            this.setState({ currentMode: 'rgb' }); // Updated from 'slider' to 'rgb'
+            this.setState({ currentMode: 'rgb' }); 
             changeButtonColor(modeButtons[2] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
-            changeButtonColor(modeButtons[3] as HTMLElement, false); // Ensure HSB button is not active
+            changeButtonColor(modeButtons[3] as HTMLElement, false); 
             new SliderMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this, 'rgb');
         });
 
@@ -298,7 +337,7 @@ export class ColorPicker {
             changeButtonColor(modeButtons[3] as HTMLElement, true);
             changeButtonColor(modeButtons[0] as HTMLElement, false);
             changeButtonColor(modeButtons[1] as HTMLElement, false);
-            changeButtonColor(modeButtons[2] as HTMLElement, false); // Ensure RGB button is not active
+            changeButtonColor(modeButtons[2] as HTMLElement, false); 
             new SliderMode(this.parent.querySelector('.cp-body-mode-main') as HTMLElement, this.state, this.setState.bind(this), this, 'hsb');
         });
 
@@ -312,17 +351,7 @@ export class ColorPicker {
 
         //attach event listener to close button
         const closeButton = this.parent.querySelector('.cp-close');
-        closeButton?.addEventListener('click', () => {
-            // return the selected color, as well as the saved colors for "memory", as well as the color type 
-            // selected color is color type 
-            const selectedColorObj: SelectedColor = {
-                netlogo: colors.rgbToNetlogo(this.state.currentColor),
-                rgba: this.state.currentColor,
-                colorType: this.state.colorType
-            };
-            // the first element will be the different representations of selected color as an Object
-            this.onColorSelect([selectedColorObj, this.state.savedColors]);
-        });
+        closeButton?.addEventListener('click', () => this.handleClose());
 
         // attach switch color display parameters event listeners 
         const paramSwitchBtns = this.parent.querySelectorAll('.cp-values-type');

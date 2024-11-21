@@ -20,17 +20,20 @@ This repository provides two usage examples for the NetLogo Color Picker:
    - Import the `ColorPicker` as an ES module within your JavaScript.
    - Example usage:
      ```javascript
-     import { ColorPicker } from "./dist/ColorPicker.bundle.js";
-     
-     const colorPickerConfig = {
-         parent: parentElement,
-         initColor: [165, 234, 251, 255],
-         onColorSelect: (selectedColor) => {
-             console.log("Color selected:", selectedColor);
-         },
-         savedColors: savedColorsArray
-     };
-     let colorPicker = new ColorPicker(colorPickerConfig);
+    import { ColorPicker } from "./dist/ColorPicker.bundle.js";
+
+    const colorPickerConfig = {
+        parent: parentElement,
+        initColor: [165, 234, 251, 255],
+        initColorType: 'rgba', // 'rgba', 'netlogo', or 'hsb'
+        onColorSelect: (selectedColor) => {
+            console.log("Color selected:", selectedColor);
+        },
+        savedColors: savedColorsArray,
+        mode: 'DEFAULT', // 'DEFAULT', 'RGBA', or 'NETLOGO'
+        openTo: 'grid' // 'grid', 'wheel', 'slider', or 'sliderHSB'
+    };
+    let colorPicker = new ColorPicker(colorPickerConfig);
      ```
 
 2. **Standalone UMD Example**:
@@ -50,42 +53,40 @@ To integrate the Color Picker into your NetLogo Web project, start by installing
 After importing it into your project, you can create a Color Picker by calling the constructor. The `ColorPicker` class constructor accepts a single `config` object that contains the necessary properties for initialization:
 
 - `parent`: The HTML element that will host the Color Picker. This ensures the picker is embedded in the correct location in your UI.
-- `initColor`: The initial color selected in the Color Picker, expressed as an RGB array (e.g., `[255, 0, 0]` for red).
-- `onColorSelect`: A callback function that is invoked when a color is selected. This function should handle the selected color data. **The returned color data is an array, where the first element is an object representing the selected color in NetLogo color and RGBA, and the second element is an array of the saved colors.**. To access the NetLogo color, do `returnedArray[0]['netlogo']`, and to get the rgba array, do: `returnedArray[0]['rgba']`
-- `savedColors`: An optional array of colors that the user can save for later use. Each color is also represented as an RGB array.
-
-You can also pass in an optional `openTo` parameter, which indicates which mode of the color picker to open to:
-- 'grid': opens to Grid
-- 'wheel': opens to Wheel
-- 'slider': opens to Slider's default RGB mode
-- 'sliderHSB': opens to the Slider's HSB mode
+- `initColor`: The initial color selected in the Color Picker, expressed as an RGBA array (e.g., `[255, 0, 0, 255]` for red).
+- `initColorType`: The initial color type, expressed as a string. Supported values are `'rgba'`, `'netlogo'`, or `'hsb'`.
+- `onColorSelect`: A callback function that is invoked when a color is selected. This function should handle the selected color data. 
+  - If `mode` is `'DEFAULT'`, the returned color data is an array, where the first element is an object representing the selected color in NetLogo color and RGBA, and the second element is an array of the saved colors. 
+    - To access the NetLogo color: `returnedArray[0].netlogo`
+    - To access the RGBA array: `returnedArray[0].rgba`
+  - If `mode` is `'RGBA'`, the returned color is the RGBA array as a string (e.g., `"[255, 255, 255, 255]"`).
+  - If `mode` is `'NETLOGO'`, the returned color is the NetLogo color name.
+- `savedColors`: An optional array of colors that the user can save for later use. Each color is also represented as an RGBA array.
+- `mode`: Specifies the operating mode of the color picker. Supported values are:
+  - `'DEFAULT'`: Shows all color types.
+  - `'RGBA'`: Shows only RGBA values.
+  - `'NETLOGO'`: Shows only NetLogo color values.
+- `openTo`: An optional parameter that indicates which mode of the color picker to open to:
+  - `'grid'`: Opens to Grid.
+  - `'wheel'`: Opens to Wheel.
+  - `'slider'`: Opens to Slider's default RGB mode.
 
 Here is a basic example of how to instantiate the Color Picker:
 
 ```javascript
 const colorPickerConfig = {
     parent: document.getElementById('color-picker-container'),
-    initColor: [255, 255, 255], // Initial color as rgb (white)
-    initColorType: string, //Initial color type ("netlogo", "rgb" or "hsb")
+    initColor: [255, 255, 255, 255], // Initial color as rgba (white)
+    initColorType: 'rgba', // Initial color type ('rgba', 'netlogo', or 'hsb')
     onColorSelect: (colorData) => {
         console.log('Selected color:', colorData);
     },
-    savedColors: [[255, 0, 0], [0, 255, 0]], // Optional saved colors
-    openTo: string, //optional opening to which part of the color picker {'g', 'w', 's'}
+    savedColors: [[255, 0, 0, 255], [0, 255, 0, 255]], // Optional saved colors
+    mode: 'DEFAULT',
+    openTo: 'grid'
 };
 
 const colorPicker = new ColorPicker(colorPickerConfig);
-```
-
-## TypeScript 
-You can import import the ColorPickerConfig interface. 
-```typescript
-export interface ColorPickerConfig {
-    parent: HTMLElement;
-    initColor: number[];
-    onColorSelect: (colorData: [number[], number[][]]) => void;
-    savedColors?: number[][];
-}
 ```
 
 ## Feature Overview
