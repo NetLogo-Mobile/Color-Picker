@@ -283,7 +283,7 @@ export class ColorPicker {
             // netlogo color 
             const compoundColor = `${colors.netlogoToCompound(colors.rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]))}`;
             const formattedColor = compoundColor.charAt(0).toUpperCase() + compoundColor.slice(1);
-            return formattedColor;
+            this.onColorSelect(formattedColor)
         }
     }
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
