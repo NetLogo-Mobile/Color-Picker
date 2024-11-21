@@ -20,20 +20,20 @@ This repository provides two usage examples for the NetLogo Color Picker:
    - Import the `ColorPicker` as an ES module within your JavaScript.
    - Example usage:
      ```javascript
-    import { ColorPicker } from "./dist/ColorPicker.bundle.js";
+     import { ColorPicker } from "./dist/ColorPicker.bundle.js";
 
-    const colorPickerConfig = {
-        parent: parentElement,
-        initColor: [165, 234, 251, 255],
-        initColorType: 'rgba', // 'rgba', 'netlogo', or 'hsb'
-        onColorSelect: (selectedColor) => {
-            console.log("Color selected:", selectedColor);
-        },
-        savedColors: savedColorsArray,
-        mode: 'DEFAULT', // 'DEFAULT', 'RGBA', or 'NETLOGO'
-        openTo: 'grid' // 'grid', 'wheel', 'slider', or 'sliderHSB'
-    };
-    let colorPicker = new ColorPicker(colorPickerConfig);
+     const colorPickerConfig = {
+         parent: parentElement,
+         initColor: [165, 234, 251, 255],
+         initColorType: 'rgba', // 'rgba', 'netlogo', or 'hsb'
+         onColorSelect: (selectedColor) => {
+             console.log("Color selected:", selectedColor);
+         },
+         savedColors: savedColorsArray,
+         mode: 'DEFAULT', // 'DEFAULT', 'RGBA', or 'NETLOGO'
+         openTo: 'grid' // 'grid', 'wheel', 'slider', or 'sliderHSB'
+     };
+     let colorPicker = new ColorPicker(colorPickerConfig);
      ```
 
 2. **Standalone UMD Example**:
