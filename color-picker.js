@@ -18,15 +18,20 @@ export class ColorPicker {
         this.isNetLogoNum = false; // true if the color display is in NetLogo number, false if its a compound number like Red + 2
         this.isMinimized = false; // default value for minimize is false
         this.copyMessageTimeout = null; //Keeps track of "Copied" message timeouts, so they don't stack and are cancelled if we switch colors 
+        this.operatingMode = config.mode || 'DEFAULT';
         this.state = {
             currentColor: config.initColor,
-            colorType: config.initColorType, //tracks the color type, being one of: "netlogo", "rgb", or "hsb"
+            colorType: config.initColorType,
             currentMode: 'grid',
             changeModelColor: true,
             increment: 1,
             showNumbers: false,
-            savedColors: config.savedColors || [], // Use an empty array as default if savedColors is not provided
+            savedColors: config.savedColors || [],
         };
+        const mode = config.mode || 'DEFAULT';
+        if (mode !== 'DEFAULT' && mode !== 'RGBA' && mode !== 'NETLOGO') {
+            throw new Error(`Invalid mode: ${mode}. Must be one of DEFAULT, RGBA, NETLOGO.`);
+        }
         this.parent = config.parent;
         this.onColorSelect = config.onColorSelect;
         if (this.parent.offsetWidth < 600) {
@@ -34,6 +39,7 @@ export class ColorPicker {
         }
         this.openTo = openTo;
         this.init();
+        console.log(this.operatingMode);
     }
     updateLayout() {
         const cpElement = this.parent.querySelector('.cp');
@@ -65,6 +71,8 @@ export class ColorPicker {
         this.updateColorParameters();
         this.attachEventListeners();
         this.initAlphaSlider();
+        this.updateAlphaBlockVisibility();
+        this.updateValuesDisplayVisibility();
         // click the correct button to start 
         switch (this.openTo) {
             case 'wheel':
@@ -83,6 +91,67 @@ export class ColorPicker {
                 break;
             default:
                 this.parent.querySelectorAll('.cp-mode-btn')[0].dispatchEvent(new Event('click'));
+        }
+    }
+    /** updateAlphaBlockVisibility: updates the visibility of the alpha block. Needed to hide or show the Alpha block based on the different operationModes */
+    updateAlphaBlockVisibility() {
+        if (this.operatingMode === 'NETLOGO') {
+            const alphaContainer = this.parent.querySelector('.cp-alpha-cont');
+            if (alphaContainer) {
+                alphaContainer.style.visibility = 'hidden';
+                alphaContainer.style.pointerEvents = 'none';
+            }
+        }
+        // both NETLOGO and RGBA hide 'COLOR PARAMETERS'
+        if (this.operatingMode === 'NETLOGO' || this.operatingMode === 'RGBA') {
+            const parametersText = this.parent.querySelector('.cp-color-param-txt');
+            if (parametersText) {
+                parametersText.style.visibility = 'hidden';
+                parametersText.style.pointerEvents = 'none';
+            }
+        }
+    }
+    /**
+     * updateValuesDisplayVisibility:
+     * Updates the visibility of color parameter displays based on the current operating mode.
+     * - Hides NetLogo values when in 'RGBA' mode.
+     * - Hides RGBA values when in 'NETLOGO' mode.
+     * - Shows all values for other modes (e.g., 'DEFAULT').
+     */
+    updateValuesDisplayVisibility() {
+        if (this.operatingMode == 'DEFAULT') {
+            return; // return, because we don't need to hide anything 
+        }
+        // hide NetLogo display
+        if (this.operatingMode == 'RGBA') {
+            let netlogoDisplay = document.querySelector('#cp-values-display-netlogo');
+            if (netlogoDisplay) {
+                netlogoDisplay.style.display = 'none';
+            }
+        }
+        else {
+            let rgbaDisplay = document.querySelector('#cp-values-display-other');
+            if (rgbaDisplay) {
+                rgbaDisplay.style.display = 'none';
+            }
+        }
+        // both methods add two buttons 'OKAY', 'CANCEL', my guess is you want to return the color both times? So destroy and call the callback function
+        let colorDisplayCont = document.querySelector('.cp-values-display-cont');
+        if (colorDisplayCont) {
+            let buttonCont = document.createElement('div');
+            buttonCont.style.display = 'flex';
+            buttonCont.style.justifyContent = 'space-between';
+            let okayButton = document.createElement('button');
+            okayButton.textContent = 'OKAY';
+            okayButton.classList.add('cp-values-display-btn');
+            okayButton === null || okayButton === void 0 ? void 0 : okayButton.addEventListener('click', () => this.handleClose());
+            let cancelButton = document.createElement('button');
+            cancelButton.textContent = 'CANCEL';
+            cancelButton.classList.add('cp-values-display-btn');
+            cancelButton === null || cancelButton === void 0 ? void 0 : cancelButton.addEventListener('click', () => this.handleClose());
+            buttonCont.appendChild(okayButton);
+            buttonCont.appendChild(cancelButton);
+            colorDisplayCont.appendChild(buttonCont);
         }
     }
     /** updateColorParameters: updates the displayed color parameters to reflect the current Color. Also updates the alpha slider value because I don't know where else to put it  */
@@ -137,6 +206,29 @@ export class ColorPicker {
         if (modeColorDisplay)
             modeColorDisplay.style.backgroundColor = colorString;
     }
+    /** handleClose: Handles the closure of the color picker and triggers the onColorSelect callback */
+    handleClose() {
+        // Return the selected color, saved colors, and color type
+        if (this.operatingMode == 'DEFAULT') {
+            const selectedColorObj = {
+                netlogo: colors.rgbToNetlogo(this.state.currentColor),
+                rgba: this.state.currentColor,
+                colorType: this.state.colorType
+            };
+            // Invoke the callback function with selected color data
+            this.onColorSelect([selectedColorObj, this.state.savedColors]);
+        }
+        else if (this.operatingMode == 'RGBA') {
+            // return just the RGBA number, as a string 
+            this.onColorSelect(`[${this.state.currentColor[0]}, ${this.state.currentColor[1]}, ${this.state.currentColor[2]}, ${this.state.currentColor[3]}]`);
+        }
+        else {
+            // netlogo color 
+            const compoundColor = `${colors.netlogoToCompound(colors.rgbToNetlogo([this.state.currentColor[0], this.state.currentColor[1], this.state.currentColor[2]]))}`;
+            const formattedColor = compoundColor.charAt(0).toUpperCase() + compoundColor.slice(1);
+            this.onColorSelect(formattedColor);
+        }
+    }
     /** attachEventListeners: Attaches the event listeners to the ColorPicker body */
     attachEventListeners() {
         var _a, _b;
@@ -158,7 +250,7 @@ export class ColorPicker {
             changeButtonColor(modeButtons[0], true);
             changeButtonColor(modeButtons[1], false);
             changeButtonColor(modeButtons[2], false);
-            changeButtonColor(modeButtons[3], false); // Ensure HSB button is not active
+            changeButtonColor(modeButtons[3], false);
             new GridMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
         // Wheel Button
@@ -167,16 +259,15 @@ export class ColorPicker {
             changeButtonColor(modeButtons[1], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[2], false);
-            changeButtonColor(modeButtons[3], false); // Ensure HSB button is not active
+            changeButtonColor(modeButtons[3], false);
             new WheelMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this));
         });
-        // RGB (previously Slider) Button
         modeButtons[2].addEventListener('click', () => {
-            this.setState({ currentMode: 'rgb' }); // Updated from 'slider' to 'rgb'
+            this.setState({ currentMode: 'rgb' });
             changeButtonColor(modeButtons[2], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[1], false);
-            changeButtonColor(modeButtons[3], false); // Ensure HSB button is not active
+            changeButtonColor(modeButtons[3], false);
             new SliderMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this, 'rgb');
         });
         // HSB Button
@@ -185,7 +276,7 @@ export class ColorPicker {
             changeButtonColor(modeButtons[3], true);
             changeButtonColor(modeButtons[0], false);
             changeButtonColor(modeButtons[1], false);
-            changeButtonColor(modeButtons[2], false); // Ensure RGB button is not active
+            changeButtonColor(modeButtons[2], false);
             new SliderMode(this.parent.querySelector('.cp-body-mode-main'), this.state, this.setState.bind(this), this, 'hsb');
         });
         // attach event listener to model indicator button
@@ -197,17 +288,7 @@ export class ColorPicker {
         });
         //attach event listener to close button
         const closeButton = this.parent.querySelector('.cp-close');
-        closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => {
-            // return the selected color, as well as the saved colors for "memory", as well as the color type 
-            // selected color is color type 
-            const selectedColorObj = {
-                netlogo: colors.rgbToNetlogo(this.state.currentColor),
-                rgba: this.state.currentColor,
-                colorType: this.state.colorType
-            };
-            // the first element will be the different representations of selected color as an Object
-            this.onColorSelect([selectedColorObj, this.state.savedColors]);
-        });
+        closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventListener('click', () => this.handleClose());
         // attach switch color display parameters event listeners 
         const paramSwitchBtns = this.parent.querySelectorAll('.cp-values-type');
         // this is the RGBA / HSLA param button
@@ -337,7 +418,7 @@ export class ColorPicker {
                     </div>
                     <div class="cp-values-display-cont">
                         <span class="cp-color-param-txt">${Localized('Color Parameters')}</span>
-                        <div class="cp-values-display">
+                        <div id="cp-values-display-other" class="cp-values-display">
                             <div class="cp-values-type cp-values-type-1">
                                 <div class="cp-values-cont">
                                     <span class="cp-values-type-text"></span>
@@ -349,7 +430,7 @@ export class ColorPicker {
                             </div>
                             
                         </div>
-                        <div class="cp-values-display">
+                        <div id="cp-values-display-netlogo" class="cp-values-display">
                             <div class="cp-values-type">
                                 <div class="cp-values-cont">
                                     <span class="cp-values-type-text"></span>

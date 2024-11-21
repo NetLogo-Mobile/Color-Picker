@@ -370,6 +370,28 @@ input[type='range'].cp-styled-slider.color-blue.slider-progress:hover::-webkit-s
   align-items: center;
 }
 
+.cp-values-display-btn {
+  all: unset;
+  cursor: pointer;
+  font-size: 0.8rem;
+  background: white;
+  padding: 0.4rem 0.2rem;
+  border: solid 1px gray;
+  border-radius: 0.2rem;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
+}
+
+.cp-values-display-btn:hover {
+  background: #f0f0f0; 
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3); 
+}
+
+.cp-values-display-btn:active {
+  background: #e0e0e0; 
+  transform: translateY(0);
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2); 
+}
+
 .cp-values-type-text {
   font-weight: 500;
   padding-left: 10%;
