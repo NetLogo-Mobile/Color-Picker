@@ -83,6 +83,13 @@
   font-family: 'Lato', sans-serif;
 }
 
+.cp-embedded .cp {
+  width: 100%;
+  height: 100%;
+  box-shadow: none;
+  border-radius: 0;
+}
+
 .cp-header {
   background-color: #5a648d;
   width: 100%;
@@ -94,6 +101,10 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+}
+
+.cp-embedded .cp-header {
+  display: none;
 }
 
 /* cp-title: title of the color picker and icon */
@@ -374,16 +385,14 @@ input[type='range'].cp-styled-slider.color-blue.slider-progress:hover::-webkit-s
   all: unset;
   cursor: pointer;
   font-size: 0.8rem;
-  background: white;
-  padding: 0.4rem 0.2rem;
-  border: solid 1px gray;
-  border-radius: 0.2rem;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
+  background: #e5e5e5;
+  padding: 0.4rem 0.6rem;
+  border: #cecece 1px solid;
+  border-radius: 0.15rem;
 }
 
 .cp-values-display-btn:hover {
   background: #f0f0f0; 
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3); 
 }
 
 .cp-values-display-btn:active {

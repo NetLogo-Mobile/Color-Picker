@@ -142,11 +142,11 @@ export class ColorPicker {
             buttonCont.style.display = 'flex';
             buttonCont.style.justifyContent = 'space-between';
             let okayButton = document.createElement('button');
-            okayButton.textContent = 'OKAY';
+            okayButton.textContent = Localized('Confirm');
             okayButton.classList.add('cp-values-display-btn');
             okayButton === null || okayButton === void 0 ? void 0 : okayButton.addEventListener('click', () => this.handleClose());
             let cancelButton = document.createElement('button');
-            cancelButton.textContent = 'CANCEL';
+            cancelButton.textContent = Localized('Cancel');
             cancelButton.classList.add('cp-values-display-btn');
             cancelButton === null || cancelButton === void 0 ? void 0 : cancelButton.addEventListener('click', () => this.handleClose());
             buttonCont.appendChild(okayButton);
